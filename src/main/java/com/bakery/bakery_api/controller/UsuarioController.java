@@ -1,6 +1,6 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.Service.UsuarioService;
+import com.bakery.bakery_api.service.UsuarioService;
 import com.bakery.bakery_api.dto.request.CreateUsuarioDTO;
 import com.bakery.bakery_api.dto.request.UpdateUsuarioDTO;
 import com.bakery.bakery_api.dto.response.UsuarioDTO;

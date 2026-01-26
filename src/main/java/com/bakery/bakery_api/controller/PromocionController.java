@@ -1,6 +1,6 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.Service.PromocionService;
+import com.bakery.bakery_api.service.PromocionService;
 import com.bakery.bakery_api.dto.request.CreatePromocionDTO;
 import com.bakery.bakery_api.dto.request.UpdatePromocionDTO;
 import com.bakery.bakery_api.dto.response.PromocionDTO;

@@ -1,6 +1,6 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.Service.DetalleCompraService;
+import com.bakery.bakery_api.service.DetalleCompraService;
 import com.bakery.bakery_api.domain.DetalleCompra;
 import com.bakery.bakery_api.dto.request.CreateDetalleCompraDTO;
 import com.bakery.bakery_api.dto.request.UpdateDetalleCompraDTO;

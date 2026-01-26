@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-
 @Entity
 @Table(name = "producto_ventas")
 @Getter
@@ -14,12 +12,12 @@ import org.springframework.data.annotation.Id;
 public class ProductoVentas {
 
     @Id
-    @Column(name = "id_producto")
-    private Long idProducto;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_producto_ventas")
+    private Long id;
 
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "id_producto")
+    @JoinColumn(name = "id_producto", nullable = false, unique = true)
     private Producto producto;
 
     @Column(name = "cantidad_vendida", nullable = false)
@@ -30,8 +28,8 @@ public class ProductoVentas {
         this.cantidadVendida = 0L;
     }
 
-    public ProductoVentas(Producto producto, long l) {
+    public ProductoVentas(Producto producto, long cantidad) {
         this.producto = producto;
-        this.cantidadVendida = l;
+        this.cantidadVendida = cantidad;
     }
 }

@@ -1,4 +1,4 @@
-package com.bakery.bakery_api.Service;
+package com.bakery.bakery_api.service;
 
 import com.bakery.bakery_api.domain.Producto;
 import com.bakery.bakery_api.dto.request.CreateProductoDTO;

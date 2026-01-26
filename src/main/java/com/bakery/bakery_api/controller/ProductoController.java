@@ -1,6 +1,6 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.Service.ProductoService;
+import com.bakery.bakery_api.service.ProductoService;
 import com.bakery.bakery_api.dto.request.CreateProductoDTO;
 import com.bakery.bakery_api.dto.request.UpdateProductoDTO;
 import com.bakery.bakery_api.dto.response.ProductoDTO;
