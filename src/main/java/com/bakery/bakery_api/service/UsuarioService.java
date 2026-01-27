@@ -27,27 +27,36 @@ public class UsuarioService {
 
     public Usuario findById(Long id) {
         return repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
     }
 
-    // Crear usuario desde DTO
     public Usuario create(CreateUsuarioDTO dto) {
         if (repo.existsByEmail(dto.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya existe");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El email ya existe");
         }
 
-        Usuario usuario = new Usuario();
-        usuario.setNombre(dto.nombre());
-        usuario.setEmail(dto.email());
-        usuario.setContrasena(dto.contrasena());
-        usuario.setRol(dto.rol());
+        Usuario usuario = new Usuario(
+                dto.nombre(),
+                dto.email(),
+                dto.contrasena(),
+                dto.rol()
+        );
 
         return repo.save(usuario);
     }
 
-    // Actualización parcial desde DTO
     public Usuario update(Long id, UpdateUsuarioDTO dto) {
         Usuario existing = findById(id);
+
+        if (dto.email() != null &&
+                repo.existsByEmail(dto.email()) &&
+                !existing.getEmail().equals(dto.email())) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El email ya existe");
+        }
 
         if (dto.nombre() != null) existing.setNombre(dto.nombre());
         if (dto.email() != null) existing.setEmail(dto.email());

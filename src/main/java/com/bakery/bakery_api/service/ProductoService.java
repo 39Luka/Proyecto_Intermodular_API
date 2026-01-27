@@ -30,11 +30,18 @@ public class ProductoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
     }
 
-    // Crear producto desde DTO
     public Producto create(CreateProductoDTO dto) {
-        if (repo.findAll().stream().anyMatch(p -> p.getNombre().equalsIgnoreCase(dto.nombre()))) {
+        if (dto.nombre() == null || dto.nombre().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre es obligatorio");
+        if (dto.precio() == null || dto.precio() <= 0)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio debe ser mayor que 0");
+        if (dto.stock() == null || dto.stock() < 0)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El stock no puede ser negativo");
+
+        boolean exists = repo.findAll().stream()
+                .anyMatch(p -> p.getNombre().equalsIgnoreCase(dto.nombre()));
+        if (exists)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El producto ya existe");
-        }
 
         Producto producto = new Producto();
         producto.setNombre(dto.nombre());
@@ -45,14 +52,17 @@ public class ProductoService {
         return repo.save(producto);
     }
 
-    // Actualización parcial desde DTO
     public Producto update(Long id, UpdateProductoDTO dto) {
         Producto existing = findById(id);
 
-        if (dto.nombre() != null) existing.setNombre(dto.nombre());
-        if (dto.descripcion() != null) existing.setDescripcion(dto.descripcion());
-        if (dto.precio() != null) existing.setPrecio(dto.precio());
-        if (dto.stock() != null) existing.setStock(dto.stock());
+        if (dto.nombre() != null && !dto.nombre().isBlank())
+            existing.setNombre(dto.nombre());
+        if (dto.descripcion() != null)
+            existing.setDescripcion(dto.descripcion());
+        if (dto.precio() != null && dto.precio() > 0)
+            existing.setPrecio(dto.precio());
+        if (dto.stock() != null && dto.stock() >= 0)
+            existing.setStock(dto.stock());
 
         return repo.save(existing);
     }

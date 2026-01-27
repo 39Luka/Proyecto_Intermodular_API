@@ -1,15 +1,15 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.service.ProductoService;
+import com.bakery.bakery_api.domain.Producto;
 import com.bakery.bakery_api.dto.request.CreateProductoDTO;
 import com.bakery.bakery_api.dto.request.UpdateProductoDTO;
 import com.bakery.bakery_api.dto.response.ProductoDTO;
+import com.bakery.bakery_api.service.ProductoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/productos")
@@ -25,7 +25,7 @@ public class ProductoController {
     public ResponseEntity<List<ProductoDTO>> getAll() {
         List<ProductoDTO> dtos = service.findAll().stream()
                 .map(ProductoDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -36,12 +36,15 @@ public class ProductoController {
 
     @PostMapping
     public ResponseEntity<ProductoDTO> create(@RequestBody CreateProductoDTO dto) {
-        return new ResponseEntity<>(ProductoDTO.fromEntity(service.create(dto)), HttpStatus.CREATED);
+        Producto producto = service.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ProductoDTO.fromEntity(producto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductoDTO> update(@PathVariable Long id, @RequestBody UpdateProductoDTO dto) {
-        return ResponseEntity.ok(ProductoDTO.fromEntity(service.update(id, dto)));
+        Producto producto = service.update(id, dto);
+        return ResponseEntity.ok(ProductoDTO.fromEntity(producto));
     }
 
     @DeleteMapping("/{id}")

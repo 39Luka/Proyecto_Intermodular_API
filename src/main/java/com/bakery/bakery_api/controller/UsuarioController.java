@@ -31,18 +31,26 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> getUsuarioById(@PathVariable Long id) {
-        return ResponseEntity.ok(UsuarioDTO.fromEntity(usuarioService.findById(id)));
+        return ResponseEntity.ok(
+                UsuarioDTO.fromEntity(usuarioService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioDTO> createUsuario(@RequestBody CreateUsuarioDTO dto) {
-        return new ResponseEntity<>(UsuarioDTO.fromEntity(usuarioService.create(dto)), HttpStatus.CREATED);
+    public ResponseEntity<UsuarioDTO> createUsuario(
+            @RequestBody CreateUsuarioDTO dto) {
+
+        return new ResponseEntity<>(
+                UsuarioDTO.fromEntity(usuarioService.create(dto)),
+                HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> updateUsuario(@PathVariable Long id,
-                                                    @RequestBody UpdateUsuarioDTO dto) {
-        return ResponseEntity.ok(UsuarioDTO.fromEntity(usuarioService.update(id, dto)));
+    public ResponseEntity<UsuarioDTO> updateUsuario(
+            @PathVariable Long id,
+            @RequestBody UpdateUsuarioDTO dto) {
+
+        return ResponseEntity.ok(
+                UsuarioDTO.fromEntity(usuarioService.update(id, dto)));
     }
 
     @DeleteMapping("/{id}")

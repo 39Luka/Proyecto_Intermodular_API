@@ -1,5 +1,6 @@
 package com.bakery.bakery_api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,12 +33,13 @@ public class Usuario {
     @Column(nullable = false)
     private Rol rol = Rol.CLIENTE;
 
-    // Relación con compras
-    @OneToMany(mappedBy = "usuario")
+    // Compras del usuario
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Compra> compras;
 
-    // Relación con promociones asignadas
+    // Promociones asignadas (no se serializa)
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "Usuario_Promocion",
             joinColumns = @JoinColumn(name = "id_usuario"),
@@ -45,7 +47,6 @@ public class Usuario {
     )
     private List<Promocion> promocionesAsignadas;
 
-    // Enum del rol
     public enum Rol { ADMIN, CLIENTE }
 
     public Usuario(String nombre, String email, String contrasena, Rol rol) {

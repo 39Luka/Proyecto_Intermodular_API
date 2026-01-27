@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Entity
 @Table(name = "producto_ventas")
 @Getter
@@ -26,10 +27,5 @@ public class ProductoVentas {
     public ProductoVentas(Producto producto) {
         this.producto = producto;
         this.cantidadVendida = 0L;
-    }
-
-    public ProductoVentas(Producto producto, long cantidad) {
-        this.producto = producto;
-        this.cantidadVendida = cantidad;
     }
 }

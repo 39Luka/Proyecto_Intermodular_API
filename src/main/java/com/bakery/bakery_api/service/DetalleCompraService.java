@@ -41,27 +41,42 @@ public class DetalleCompraService {
     }
 
     public DetalleCompra create(CreateDetalleCompraDTO dto) {
-        DetalleCompra detalle = new DetalleCompra();
-        detalle.setCompra(compraService.findById(dto.compraId()));
-        detalle.setProducto(productoService.findById(dto.productoId()));
-        detalle.setCantidad(dto.cantidad());
-        detalle.setSubtotal(dto.subtotal());
+        // Validaciones
+        if (dto.compraId() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Compra es obligatoria");
+        if (dto.productoId() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto es obligatorio");
+        if (dto.cantidad() == null || dto.cantidad() <= 0)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cantidad debe ser mayor que 0");
+
+        var compra = compraService.findById(dto.compraId());
+        var producto = productoService.findById(dto.productoId());
+
+        DetalleCompra detalle = new DetalleCompra(compra, producto, dto.cantidad());
 
         DetalleCompra saved = repo.save(detalle);
 
-        ProductoVentas pv = ventasService.getOrCreateByProducto(detalle.getProducto());
+        // Actualizar ventas
+        ProductoVentas pv = ventasService.getOrCreateByProducto(producto);
         pv.setCantidadVendida(pv.getCantidadVendida() + detalle.getCantidad());
         ventasService.save(pv);
 
         return saved;
     }
+
     public DetalleCompra update(Long id, UpdateDetalleCompraDTO dto) {
         DetalleCompra existing = findById(id);
 
-        if (dto.compraId() != null) existing.setCompra(compraService.findById(dto.compraId()));
-        if (dto.productoId() != null) existing.setProducto(productoService.findById(dto.productoId()));
+        if (dto.compraId() != null)
+            existing.setCompra(compraService.findById(dto.compraId()));
+
+        if (dto.productoId() != null)
+            existing.setProducto(productoService.findById(dto.productoId()));
 
         if (dto.cantidad() != null) {
+            if (dto.cantidad() <= 0)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cantidad inválida");
+
             long diferencia = dto.cantidad() - existing.getCantidad();
             existing.setCantidad(dto.cantidad());
 
@@ -70,11 +85,8 @@ public class DetalleCompraService {
             ventasService.save(pv);
         }
 
-        if (dto.subtotal() != null) existing.setSubtotal(dto.subtotal());
-
         return repo.save(existing);
     }
-
 
     public void delete(Long id) {
         DetalleCompra existing = findById(id);

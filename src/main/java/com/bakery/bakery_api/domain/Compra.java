@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,8 +36,8 @@ public class Compra {
     @JoinColumn(name = "id_promocion")
     private Promocion promocion;
 
-    @OneToMany(mappedBy = "compra")
-    private List<DetalleCompra> detalles;
+    @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleCompra> detalles = new ArrayList<>();
 
     public enum Estado { PENDIENTE, LISTO_EN_TIENDA, CANCELADO }
 
@@ -45,5 +46,15 @@ public class Compra {
         this.fecha = fecha;
         this.estado = estado;
         this.promocion = promocion;
+    }
+
+    public void addDetalle(DetalleCompra detalle) {
+        detalles.add(detalle);
+        detalle.setCompra(this);
+    }
+
+    public void removeDetalle(DetalleCompra detalle) {
+        detalles.remove(detalle);
+        detalle.setCompra(null);
     }
 }

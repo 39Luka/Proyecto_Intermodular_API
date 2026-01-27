@@ -21,14 +21,10 @@ public class ProductoVentasService {
         this.repo = repo;
     }
 
+    // CAMBIO IMPORTANTE AQUÍ
     public ProductoVentas getOrCreateByProducto(Producto producto) {
         return repo.findByProducto(producto)
-                .orElseGet(() -> {
-                    ProductoVentas nuevo = new ProductoVentas();
-                    nuevo.setProducto(producto);
-                    nuevo.setCantidadVendida(0L);
-                    return nuevo;
-                });
+                .orElseGet(() -> repo.save(new ProductoVentas(producto)));
     }
 
     public void save(ProductoVentas pv) {
@@ -40,3 +36,4 @@ public class ProductoVentasService {
         return repo.findAll(pageable).getContent();
     }
 }
+

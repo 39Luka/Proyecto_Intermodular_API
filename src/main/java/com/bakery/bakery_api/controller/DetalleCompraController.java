@@ -1,16 +1,14 @@
 package com.bakery.bakery_api.controller;
 
-import com.bakery.bakery_api.service.DetalleCompraService;
-import com.bakery.bakery_api.domain.DetalleCompra;
 import com.bakery.bakery_api.dto.request.CreateDetalleCompraDTO;
 import com.bakery.bakery_api.dto.request.UpdateDetalleCompraDTO;
 import com.bakery.bakery_api.dto.response.DetalleCompraDTO;
+import com.bakery.bakery_api.service.DetalleCompraService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/detalle-compras")
@@ -26,7 +24,7 @@ public class DetalleCompraController {
     public ResponseEntity<List<DetalleCompraDTO>> getAll() {
         List<DetalleCompraDTO> dtos = service.findAll().stream()
                 .map(DetalleCompraDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -37,14 +35,13 @@ public class DetalleCompraController {
 
     @PostMapping
     public ResponseEntity<DetalleCompraDTO> create(@RequestBody CreateDetalleCompraDTO dto) {
-        DetalleCompra creado = service.create(dto);
-        return new ResponseEntity<>(DetalleCompraDTO.fromEntity(creado), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(DetalleCompraDTO.fromEntity(service.create(dto)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<DetalleCompraDTO> update(@PathVariable Long id, @RequestBody UpdateDetalleCompraDTO dto) {
-        DetalleCompra actualizado = service.update(id, dto);
-        return ResponseEntity.ok(DetalleCompraDTO.fromEntity(actualizado));
+        return ResponseEntity.ok(DetalleCompraDTO.fromEntity(service.update(id, dto)));
     }
 
     @DeleteMapping("/{id}")
