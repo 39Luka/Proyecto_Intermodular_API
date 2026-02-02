@@ -13,6 +13,9 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+bootJar {
+    archiveFileName = 'bakery-api.jar' // nombre final del JAR
+}
 
 configurations {
     compileOnly {
