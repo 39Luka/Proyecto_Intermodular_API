@@ -1,7 +1,8 @@
 package org.example.bakeryapi.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.common.exception.GlobalExceptionHandler;
+import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.dto.UserRequest;
 import org.example.bakeryapi.user.dto.UserResponse;
 import org.example.bakeryapi.user.exception.EmailAlreadyExistsException;
@@ -43,7 +44,7 @@ class UserControllerTest {
 
     @Test
     void getUser_existingId_returnsUser() throws Exception {
-        User user = new User("test@example.com", "1234", Role.USER);
+        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true);
         when(userService.getById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/users/1"))
@@ -56,7 +57,7 @@ class UserControllerTest {
 
     @Test
     void getByEmail_existingEmail_returnsUser() throws Exception {
-        User user = new User("test@example.com", "1234", Role.USER);
+        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true);
         when(userService.getByEmail("test@example.com")).thenReturn(user);
 
         mockMvc.perform(get("/users")
@@ -71,9 +72,9 @@ class UserControllerTest {
     @Test
     void createUser_validRequest_createsUser() throws Exception {
         UserRequest request = new UserRequest("new@example.com", "pass", Role.USER);
-        User createdUser = new User(request.email(), request.password(), request.role());
+        UserResponse createdUser = new UserResponse(1L, request.email(), request.role(), true);
 
-        when(userService.create(anyString(), anyString(), any())).thenReturn(createdUser);
+        when(userService.create(any(UserRequest.class))).thenReturn(createdUser);
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,13 +83,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("new@example.com"))
                 .andExpect(jsonPath("$.role").value("USER"));
 
-        verify(userService).create(request.email(), request.password(), request.role());
+        verify(userService).create(request);
     }
 
     @Test
     void disableUser_callsService() throws Exception {
         mockMvc.perform(patch("/users/1/disable"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(userService).disableUser(1L);
     }
@@ -96,7 +97,7 @@ class UserControllerTest {
     @Test
     void enableUser_callsService() throws Exception {
         mockMvc.perform(patch("/users/1/enable"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(userService).enableUser(1L);
     }
@@ -126,7 +127,7 @@ class UserControllerTest {
     @Test
     void createUser_existingEmail_returnsConflict() throws Exception {
         UserRequest request = new UserRequest("existing@example.com", "pass", Role.USER);
-        when(userService.create(anyString(), anyString(), any()))
+        when(userService.create(any(UserRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException(request.email()));
 
         mockMvc.perform(post("/users")
@@ -134,7 +135,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
 
-        verify(userService).create(request.email(), request.password(), request.role());
+        verify(userService).create(request);
     }
 
     @Test
@@ -148,3 +149,5 @@ class UserControllerTest {
     }
 
 }
+
+

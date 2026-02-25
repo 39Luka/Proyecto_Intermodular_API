@@ -18,34 +18,36 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserResponse getUser(@PathVariable Long id) {
-        User user = service.getById(id);
-        return UserResponse.from(user);
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
-    public UserResponse getByEmail(@RequestParam String email) {
-        User user = service.getByEmail(email);
-        return UserResponse.from(user);
+    public ResponseEntity<UserResponse> getByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(service.getByEmail(email));
     }
 
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest request) {
-        User user = service.create(request.email(), request.password(), request.role());
+        UserResponse user = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(UserResponse.from(user));
+                .body(user);
     }
 
 
     @PatchMapping("/{id}/disable")
-    public void disableUser(@PathVariable Long id) {
+    public ResponseEntity<Void> disableUser(@PathVariable Long id) {
         service.disableUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/enable")
-    public void enableUser(@PathVariable Long id) {
+    public ResponseEntity<Void> enableUser(@PathVariable Long id) {
         service.enableUser(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
+
+

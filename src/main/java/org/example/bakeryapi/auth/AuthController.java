@@ -22,27 +22,18 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        String token = authService.login(
-                request.email(),
-                request.password()
-        );
-
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(authService.login(request.email(), request.password()));
     }
 
     @PostMapping("/register")
     public ResponseEntity<LoginResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        String token = authService.register(
-                request.email(),
-                request.password(),
-                request.role()
-        );
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new LoginResponse(token));
+                .body(authService.register(request.email(), request.password(), request.role()));
     }
 
 }
+
+

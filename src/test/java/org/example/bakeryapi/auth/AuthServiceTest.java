@@ -1,11 +1,13 @@
 package org.example.bakeryapi.auth;
 
+import org.example.bakeryapi.auth.dto.LoginResponse;
 import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.auth.exception.InvalidCredentialsException;
 import org.example.bakeryapi.security.JwtProvider;
-import org.example.bakeryapi.user.Role;
-import org.example.bakeryapi.user.User;
+import org.example.bakeryapi.user.domain.Role;
+import org.example.bakeryapi.user.domain.User;
 import org.example.bakeryapi.user.UserService;
+import org.example.bakeryapi.user.exception.UserDisabledException;
 import org.example.bakeryapi.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,13 +56,13 @@ class AuthServiceTest {
 
         User createdUser = new User(email, passwordEncoder.encode(password), role);
 
-        when(userService.create(anyString(), anyString(), eq(role))).thenReturn(createdUser);
+        when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("fake-jwt-token");
 
-        String token = authService.register(email, password, role);
+        LoginResponse response = authService.register(email, password, role);
 
-        assertEquals("fake-jwt-token", token);
-        verify(userService).create(eq(email), anyString(), eq(role));
+        assertEquals("fake-jwt-token", response.token());
+        verify(userService).createInternal(eq(email), eq(password), eq(role));
         verify(jwtProvider).generateToken(email, role.name());
     }
 
@@ -94,13 +96,13 @@ class AuthServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         User createdUser = new User(email, passwordEncoder.encode(password), role);
-        when(userService.create(anyString(), anyString(), eq(role))).thenReturn(createdUser);
+        when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("jwt-token");
 
-        String token = authService.register(email, password, role);
+        LoginResponse response = authService.register(email, password, role);
 
-        assertEquals("jwt-token", token);
-        verify(userService).create(eq(email), anyString(), eq(role));
+        assertEquals("jwt-token", response.token());
+        verify(userService).createInternal(eq(email), anyString(), eq(role));
         verify(jwtProvider).generateToken(email, role.name());
 
         SecurityContextHolder.clearContext();
@@ -114,13 +116,13 @@ class AuthServiceTest {
         String hashedPassword = passwordEncoder.encode(password);
         User user = new User(email, hashedPassword, Role.USER);
 
-        when(userService.getByEmail(email)).thenReturn(user);
+        when(userService.getEntityByEmail(email)).thenReturn(user);
         when(jwtProvider.generateToken(email, Role.USER.name())).thenReturn("jwt-token");
 
-        String token = authService.login(email, password);
+        LoginResponse response = authService.login(email, password);
 
-        assertEquals("jwt-token", token);
-        verify(userService).getByEmail(email);
+        assertEquals("jwt-token", response.token());
+        verify(userService).getEntityByEmail(email);
         verify(jwtProvider).generateToken(email, Role.USER.name());
     }
 
@@ -129,12 +131,12 @@ class AuthServiceTest {
         String email = "user@example.com";
         User user = new User(email, passwordEncoder.encode("correctPassword"), Role.USER);
 
-        when(userService.getByEmail(email)).thenReturn(user);
+        when(userService.getEntityByEmail(email)).thenReturn(user);
 
         assertThrows(InvalidCredentialsException.class,
                 () -> authService.login(email, "wrongPassword"));
 
-        verify(userService).getByEmail(email);
+        verify(userService).getEntityByEmail(email);
         verify(jwtProvider, never()).generateToken(anyString(), anyString());
     }
 
@@ -142,13 +144,28 @@ class AuthServiceTest {
     void login_userNotFound_throwsInvalidCredentialsException() {
         String email = "missing@example.com";
 
-        when(userService.getByEmail(email)).thenThrow(new UserNotFoundException(email));
+        when(userService.getEntityByEmail(email)).thenThrow(new UserNotFoundException(email));
 
         assertThrows(InvalidCredentialsException.class,
                 () -> authService.login(email, "anyPassword"));
 
-        verify(userService).getByEmail(email);
+        verify(userService).getEntityByEmail(email);
         verify(jwtProvider, never()).generateToken(any(), any());
+    }
+
+    @Test
+    void login_disabledUser_throwsUserDisabledException() {
+        String email = "user@example.com";
+        String password = "123456";
+        User user = new User(email, passwordEncoder.encode(password), Role.USER);
+        user.disable();
+
+        when(userService.getEntityByEmail(email)).thenReturn(user);
+
+        assertThrows(UserDisabledException.class,
+                () -> authService.login(email, password));
+
+        verify(jwtProvider, never()).generateToken(anyString(), anyString());
     }
 
 
@@ -161,12 +178,12 @@ class AuthServiceTest {
         SecurityContextHolder.clearContext();
 
         User createdUser = new User(email, passwordEncoder.encode(password), role);
-        when(userService.create(anyString(), anyString(), eq(role))).thenReturn(createdUser);
+        when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("jwt-token");
 
-        String token = authService.register(email, password, role);
+        LoginResponse response = authService.register(email, password, role);
 
-        assertEquals("jwt-token", token);
+        assertEquals("jwt-token", response.token());
     }
 
     @Test
@@ -192,3 +209,5 @@ class AuthServiceTest {
 
 
 }
+
+

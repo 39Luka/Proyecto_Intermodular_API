@@ -13,3 +13,5 @@ public class UserNotFoundException extends ApiException {
         super("User with email " + email + " not found", HttpStatus.NOT_FOUND);
     }
 }
+
+

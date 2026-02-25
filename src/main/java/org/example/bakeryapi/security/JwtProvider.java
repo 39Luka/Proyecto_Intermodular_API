@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -22,19 +23,18 @@ public class JwtProvider {
 
     private Key key;
 
-
     public JwtProvider() {
     }
 
     public JwtProvider(String secret, long expiration) {
         this.secret = secret;
         this.expiration = expiration;
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email, String role) {
@@ -61,6 +61,4 @@ public class JwtProvider {
     public String getRoleFromToken(String token) {
         return (String) validateToken(token).getBody().get("role");
     }
-
-
 }

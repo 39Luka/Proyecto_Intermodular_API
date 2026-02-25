@@ -9,3 +9,4 @@ public class EmailAlreadyExistsException extends ApiException {
         super("Email '" + email + "' already exists", HttpStatus.CONFLICT);
     }
 }
+

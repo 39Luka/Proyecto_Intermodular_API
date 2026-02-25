@@ -1,7 +1,7 @@
 package org.example.bakeryapi.user.dto;
 
-import org.example.bakeryapi.user.Role;
-import org.example.bakeryapi.user.User;
+import org.example.bakeryapi.user.domain.Role;
+import org.example.bakeryapi.user.domain.User;
 
 public record UserResponse(
         Long id,
@@ -18,3 +18,5 @@ public record UserResponse(
         );
     }
 }
+
+

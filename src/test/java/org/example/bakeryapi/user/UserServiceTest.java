@@ -1,5 +1,9 @@
 package org.example.bakeryapi.user;
 
+import org.example.bakeryapi.user.domain.Role;
+import org.example.bakeryapi.user.domain.User;
+import org.example.bakeryapi.user.dto.UserRequest;
+import org.example.bakeryapi.user.dto.UserResponse;
 import org.example.bakeryapi.user.exception.EmailAlreadyExistsException;
 import org.example.bakeryapi.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -7,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -19,6 +24,9 @@ class UserServiceTest {
     @Mock
     private UserRepository repository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
@@ -27,9 +35,9 @@ class UserServiceTest {
         User user = new User("silvia@example.com", "1234", Role.USER);
         when(repository.findById(1L)).thenReturn(Optional.of(user));
 
-        User result = userService.getById(1L);
+        UserResponse result = userService.getById(1L);
 
-        assertEquals("silvia@example.com", result.getEmail());
+        assertEquals("silvia@example.com", result.email());
     }
 
     @Test
@@ -42,12 +50,14 @@ class UserServiceTest {
     @Test
     void create_uniqueEmail_savesUser() {
         when(repository.existsByEmail("silvia@example.com")).thenReturn(false);
-        User user = new User("silvia@example.com", "1234", Role.USER);
+        when(passwordEncoder.encode("1234")).thenReturn("hashed");
+        User user = new User("silvia@example.com", "hashed", Role.USER);
         when(repository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.create("silvia@example.com", "1234", Role.USER);
+        UserResponse result = userService.create(new UserRequest("silvia@example.com", "1234", Role.USER));
 
-        assertEquals("silvia@example.com", result.getEmail());
+        assertEquals("silvia@example.com", result.email());
+        verify(passwordEncoder).encode("1234");
     }
 
     @Test
@@ -55,7 +65,8 @@ class UserServiceTest {
         when(repository.existsByEmail("silvia@example.com")).thenReturn(true);
 
         assertThrows(EmailAlreadyExistsException.class,
-                () -> userService.create("silvia@example.com", "1234", Role.USER));
+                () -> userService.create(new UserRequest("silvia@example.com", "1234", Role.USER)));
+        verify(passwordEncoder, never()).encode(anyString());
     }
 
     @Test
@@ -82,3 +93,5 @@ class UserServiceTest {
     }
 
 }
+
+

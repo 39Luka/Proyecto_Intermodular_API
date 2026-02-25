@@ -1,10 +1,11 @@
 package org.example.bakeryapi.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.auth.dto.LoginRequest;
+import org.example.bakeryapi.auth.dto.LoginResponse;
 import org.example.bakeryapi.auth.dto.RegisterRequest;
 import org.example.bakeryapi.common.exception.GlobalExceptionHandler;
-import org.example.bakeryapi.user.Role;
+import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.exception.EmailAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,15 +45,15 @@ class AuthControllerTest {
     @Test
     void login_validRequest_returnsToken() throws Exception {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
-        String fakeToken = "fake.jwt.token";
+        LoginResponse response = new LoginResponse("fake.jwt.token");
 
-        when(authService.login(request.email(), request.password())).thenReturn(fakeToken);
+        when(authService.login(request.email(), request.password())).thenReturn(response);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value(fakeToken));
+                .andExpect(jsonPath("$.token").value(response.token()));
 
         verify(authService).login(request.email(), request.password());
     }
@@ -70,15 +71,15 @@ class AuthControllerTest {
     @Test
     void register_validRequest_returnsCreatedToken() throws Exception {
         RegisterRequest request = new RegisterRequest("new@example.com", "pass123", Role.USER);
-        String fakeToken = "new.jwt.token";
+        LoginResponse response = new LoginResponse("new.jwt.token");
 
-        when(authService.register(request.email(), request.password(), request.role())).thenReturn(fakeToken);
+        when(authService.register(request.email(), request.password(), request.role())).thenReturn(response);
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token").value(fakeToken));
+                .andExpect(jsonPath("$.token").value(response.token()));
 
         verify(authService).register(request.email(), request.password(), request.role());
     }
@@ -108,3 +109,5 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 }
+
+

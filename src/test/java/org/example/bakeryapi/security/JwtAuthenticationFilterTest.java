@@ -2,6 +2,7 @@ package org.example.bakeryapi.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,10 +67,12 @@ class JwtAuthenticationFilterTest {
 
         when(request.getHeader("Authorization")).thenReturn("Bearer invalidtoken");
 
-        when(jwtProvider.getEmailFromToken("invalidtoken")).thenThrow(new RuntimeException("invalid token"));
+        when(jwtProvider.getEmailFromToken("invalidtoken")).thenThrow(new JwtException("invalid token"));
 
         filter.doFilter(request, response, chain);
 
         verify(chain).doFilter(request, response);
     }
 }
+
+

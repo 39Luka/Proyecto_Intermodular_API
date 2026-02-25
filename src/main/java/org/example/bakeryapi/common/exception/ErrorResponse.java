@@ -11,3 +11,5 @@ public record ErrorResponse(
         this(status, message, Instant.now());
     }
 }
+
+

@@ -1,4 +1,4 @@
-package org.example.bakeryapi.user;
+package org.example.bakeryapi.user.domain;
 
 import jakarta.persistence.*;
 
@@ -24,7 +24,7 @@ public class User {
     private boolean enabled = true;
 
     protected User(){
-        //Constructor para JPA
+        //Constructor for JPA
     }
 
     public User(String email, String password, Role role){
@@ -61,3 +61,5 @@ public class User {
         return password;
     }
 }
+
+
