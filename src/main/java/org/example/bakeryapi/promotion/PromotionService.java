@@ -9,11 +9,15 @@ import org.example.bakeryapi.promotion.domain.PromotionUsage;
 import org.example.bakeryapi.promotion.dto.*;
 import org.example.bakeryapi.promotion.exception.InvalidPromotionException;
 import org.example.bakeryapi.promotion.exception.PromotionNotFoundException;
+import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
+import org.example.bakeryapi.common.pagination.PageableUtils;
+import org.example.bakeryapi.common.security.SecurityUtils;
+import org.example.bakeryapi.user.UserService;
 import org.example.bakeryapi.user.domain.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +33,18 @@ public class PromotionService {
     private final PromotionRepository repository;
     private final ProductService productService;
     private final PromotionUsageRepository usageRepository;
+    private final UserService userService;
 
     public PromotionService(
             PromotionRepository repository,
             ProductService productService,
-            PromotionUsageRepository usageRepository
+            PromotionUsageRepository usageRepository,
+            UserService userService
     ) {
         this.repository = repository;
         this.productService = productService;
         this.usageRepository = usageRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -88,19 +95,23 @@ public class PromotionService {
     }
 
     public Page<PromotionResponse> getAll(Pageable pageable) {
-        Pageable safePageable = createSafePageable(pageable);
+        Pageable safePageable = PageableUtils.safe(pageable);
         return repository.findAll(safePageable)
                 .map(PromotionResponse::from);
     }
 
     public Page<PromotionResponse> getActiveByProduct(Long productId, Long userId, Pageable pageable) {
-        Pageable safePageable = createSafePageable(pageable);
+        Pageable safePageable = PageableUtils.safe(pageable);
         productService.getEntityById(productId);
         LocalDate today = LocalDate.now();
-        // Si userId es null: todas las promociones activas. Si no: solo las que el usuario no ha usado
-        Page<Promotion> promotions = userId == null
+
+        Authentication auth = SecurityUtils.requireAuthentication();
+        Long effectiveUserId = resolveUserIdForPromotionFiltering(auth, userId);
+
+        // effectiveUserId == null: todas las promociones activas. Si no: solo las que el usuario no ha usado
+        Page<Promotion> promotions = effectiveUserId == null
                 ? repository.findActiveByProductId(productId, today, safePageable)
-                : repository.findActiveByProductIdAndUserId(productId, userId, today, safePageable);
+                : repository.findActiveByProductIdAndUserId(productId, effectiveUserId, today, safePageable);
         return promotions.map(PromotionResponse::from);
     }
 
@@ -190,12 +201,19 @@ public class PromotionService {
         return value.setScale(2, RoundingMode.HALF_UP);
     }
 
-    private Pageable createSafePageable(Pageable pageable) {
-        return PageRequest.of(
-                Math.max(0, pageable.getPageNumber()),
-                Math.max(1, pageable.getPageSize()),
-                pageable.getSort()
-        );
+    private Long resolveUserIdForPromotionFiltering(Authentication auth, Long requestedUserId) {
+        if (SecurityUtils.isAdmin(auth)) {
+            if (requestedUserId != null) {
+                userService.getEntityById(requestedUserId);
+            }
+            return requestedUserId;
+        }
+
+        User currentUser = userService.getEntityByEmail(auth.getName());
+        if (requestedUserId != null && !currentUser.getId().equals(requestedUserId)) {
+            throw new ForbiddenOperationException("Cannot request promotions for another user");
+        }
+        return currentUser.getId();
     }
 
 }

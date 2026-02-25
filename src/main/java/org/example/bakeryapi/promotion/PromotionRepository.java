@@ -3,6 +3,7 @@ package org.example.bakeryapi.promotion;
 import org.example.bakeryapi.promotion.domain.Promotion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,10 @@ import java.time.LocalDate;
 
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = "product")
+    Page<Promotion> findAll(Pageable pageable);
+
     @Query("""
             select p from Promotion p
             where p.active = true
@@ -18,6 +23,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
               and p.startDate <= :date
               and (p.endDate is null or p.endDate >= :date)
             """)
+    @EntityGraph(attributePaths = "product")
     Page<Promotion> findActiveByProductId(
             @Param("productId") Long productId,
             @Param("date") LocalDate date,
@@ -33,6 +39,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
               and (p.endDate is null or p.endDate >= :date)
               and pu.id is null
             """)
+    @EntityGraph(attributePaths = "product")
     Page<Promotion> findActiveByProductIdAndUserId(
             @Param("productId") Long productId,
             @Param("userId") Long userId,
@@ -41,5 +48,4 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
     );
 
 }
-
 

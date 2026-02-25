@@ -2,6 +2,8 @@ package org.example.bakeryapi.product;
 
 import org.example.bakeryapi.category.Category;
 import org.example.bakeryapi.category.CategoryService;
+import org.example.bakeryapi.common.pagination.PageableUtils;
+import org.example.bakeryapi.common.security.SecurityUtils;
 import org.example.bakeryapi.product.dto.ProductSalesResponse;
 import org.example.bakeryapi.product.dto.ProductRequest;
 import org.example.bakeryapi.product.dto.ProductResponse;
@@ -9,8 +11,8 @@ import org.example.bakeryapi.product.exception.ProductInactiveException;
 import org.example.bakeryapi.product.exception.ProductNotFoundException;
 import org.example.bakeryapi.purchase.domain.PurchaseStatus;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,23 +55,36 @@ public class ProductService {
     }
 
     public ProductResponse getById(Long id) {
-        return ProductResponse.from(getEntityById(id));
+        Authentication auth = SecurityUtils.requireAuthentication();
+        Product product = getEntityById(id);
+        if (!SecurityUtils.isAdmin(auth) && !product.isActive()) {
+            throw new ProductNotFoundException(id);
+        }
+        return ProductResponse.from(product);
     }
 
     public Page<ProductResponse> getAll(Pageable pageable, Long categoryId) {
-        Pageable safePageable = createSafePageable(pageable);
+        Pageable safePageable = PageableUtils.safe(pageable);
+        Authentication auth = SecurityUtils.requireAuthentication();
+        boolean admin = SecurityUtils.isAdmin(auth);
+
         if (categoryId == null) {
-            return repository.findAll(safePageable)
+            return (admin ? repository.findAll(safePageable) : repository.findAllByActiveTrue(safePageable))
                     .map(ProductResponse::from);
         }
         categoryService.getEntityById(categoryId);
-        return repository.findAllByCategoryId(categoryId, safePageable)
+        return (admin
+                ? repository.findAllByCategoryId(categoryId, safePageable)
+                : repository.findAllByCategoryIdAndActiveTrue(categoryId, safePageable))
                 .map(ProductResponse::from);
     }
 
     public Page<ProductSalesResponse> getTopSelling(Pageable pageable) {
-        Pageable safePageable = createSafePageable(pageable);
-        return repository.findTopSellingByStatus(PurchaseStatus.PAID, safePageable);
+        Pageable safePageable = PageableUtils.safe(pageable);
+        Authentication auth = SecurityUtils.requireAuthentication();
+        return SecurityUtils.isAdmin(auth)
+                ? repository.findTopSellingByStatus(PurchaseStatus.PAID, safePageable)
+                : repository.findTopSellingByStatusAndActiveTrue(PurchaseStatus.PAID, safePageable);
     }
 
     @Transactional
@@ -99,14 +114,5 @@ public class ProductService {
         product.enable();
         repository.save(product);
     }
-
-    private Pageable createSafePageable(Pageable pageable) {
-        return PageRequest.of(
-                Math.max(0, pageable.getPageNumber()),
-                Math.max(1, pageable.getPageSize()),
-                pageable.getSort()
-        );
-    }
 }
-
 

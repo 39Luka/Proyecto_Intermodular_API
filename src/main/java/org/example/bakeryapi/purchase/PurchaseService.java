@@ -1,6 +1,8 @@
 package org.example.bakeryapi.purchase;
 
 import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
+import org.example.bakeryapi.common.pagination.PageableUtils;
+import org.example.bakeryapi.common.security.SecurityUtils;
 import org.example.bakeryapi.product.Product;
 import org.example.bakeryapi.product.ProductService;
 import org.example.bakeryapi.promotion.PromotionService;
@@ -16,10 +18,8 @@ import org.example.bakeryapi.purchase.exception.PurchaseNotFoundException;
 import org.example.bakeryapi.user.domain.User;
 import org.example.bakeryapi.user.UserService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +54,8 @@ public class PurchaseService {
             throw new InvalidPurchaseException("Purchase must include at least one item");
         }
 
-        Authentication auth = requireAuthentication();
-        boolean admin = isAdmin(auth);
+        Authentication auth = SecurityUtils.requireAuthentication();
+        boolean admin = SecurityUtils.isAdmin(auth);
         User user;
         if (admin) {
             user = userService.getEntityById(request.userId());
@@ -114,9 +114,9 @@ public class PurchaseService {
 
     @Transactional(readOnly = true)
     public Page<PurchaseResponse> getAll(Pageable pageable, Long userId) {
-        Pageable safePageable = createSafePageable(pageable);
-        Authentication auth = requireAuthentication();
-        if (isAdmin(auth)) {
+        Pageable safePageable = PageableUtils.safe(pageable);
+        Authentication auth = SecurityUtils.requireAuthentication();
+        if (SecurityUtils.isAdmin(auth)) {
             if (userId != null) {
                 userService.getEntityById(userId);
                 return repository.findAllDetailedByUserId(userId, safePageable)
@@ -187,36 +187,15 @@ public class PurchaseService {
         return subtotal.setScale(2, RoundingMode.HALF_UP);
     }
 
-    private Authentication requireAuthentication() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new ForbiddenOperationException();
-        }
-        return auth;
-    }
-
-    private boolean isAdmin(Authentication auth) {
-        return auth.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
-    }
-
     private void enforceAccess(Purchase purchase) {
-        Authentication auth = requireAuthentication();
-        if (isAdmin(auth)) {
+        Authentication auth = SecurityUtils.requireAuthentication();
+        if (SecurityUtils.isAdmin(auth)) {
             return;
         }
         User currentUser = userService.getEntityByEmail(auth.getName());
         if (!purchase.getUser().getId().equals(currentUser.getId())) {
             throw new ForbiddenOperationException("Cannot access purchases from another user");
         }
-    }
-
-    private Pageable createSafePageable(Pageable pageable) {
-        return PageRequest.of(
-                Math.max(0, pageable.getPageNumber()),
-                Math.max(1, pageable.getPageSize()),
-                pageable.getSort()
-        );
     }
 
 }

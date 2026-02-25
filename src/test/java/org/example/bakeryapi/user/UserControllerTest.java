@@ -1,6 +1,6 @@
 package org.example.bakeryapi.user;
 
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.common.exception.GlobalExceptionHandler;
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.dto.UserRequest;

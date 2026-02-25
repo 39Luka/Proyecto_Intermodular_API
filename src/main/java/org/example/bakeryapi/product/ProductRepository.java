@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // @EntityGraph carga category en la misma query porque se usa en ProductResponse (evita N+1)
@@ -18,7 +16,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"category"})
+    Page<Product> findAllByActiveTrue(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category"})
     Page<Product> findAllByCategoryId(Long categoryId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category"})
+    Page<Product> findAllByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
 
     @Query("""
             select new org.example.bakeryapi.product.dto.ProductSalesResponse(
@@ -37,6 +41,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("status") PurchaseStatus status,
             Pageable pageable
     );
-}
 
+    @Query("""
+            select new org.example.bakeryapi.product.dto.ProductSalesResponse(
+                p.id,
+                p.name,
+                sum(pi.quantity)
+            )
+            from PurchaseItem pi
+            join pi.purchase purchase
+            join pi.product p
+            where purchase.status = :status
+              and p.active = true
+            group by p.id, p.name
+            order by sum(pi.quantity) desc
+            """)
+    Page<ProductSalesResponse> findTopSellingByStatusAndActiveTrue(
+            @Param("status") PurchaseStatus status,
+            Pageable pageable
+    );
+}
 

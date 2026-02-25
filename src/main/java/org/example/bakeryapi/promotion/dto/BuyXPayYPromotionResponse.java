@@ -13,9 +13,9 @@ public class BuyXPayYPromotionResponse extends PromotionResponse {
     }
 
     public BuyXPayYPromotionResponse(Long id, String description, String type, LocalDate startDate,
-                                      LocalDate endDate, boolean active, Long productId,
+                                      LocalDate endDate, boolean active, Long productId, String productName,
                                       Integer buyQuantity, Integer payQuantity) {
-        super(id, description, type, startDate, endDate, active, productId);
+        super(id, description, type, startDate, endDate, active, productId, productName);
         this.buyQuantity = buyQuantity;
         this.payQuantity = payQuantity;
     }
@@ -38,6 +38,7 @@ public class BuyXPayYPromotionResponse extends PromotionResponse {
 
     public static BuyXPayYPromotionResponse from(BuyXPayYPromotion promotion) {
         Long productId = promotion.getProduct() != null ? promotion.getProduct().getId() : null;
+        String productName = promotion.getProduct() != null ? promotion.getProduct().getName() : null;
         return new BuyXPayYPromotionResponse(
                 promotion.getId(),
                 promotion.getDescription(),
@@ -46,6 +47,7 @@ public class BuyXPayYPromotionResponse extends PromotionResponse {
                 promotion.getEndDate(),
                 promotion.isActive(),
                 productId,
+                productName,
                 promotion.getBuyQuantity(),
                 promotion.getPayQuantity()
         );

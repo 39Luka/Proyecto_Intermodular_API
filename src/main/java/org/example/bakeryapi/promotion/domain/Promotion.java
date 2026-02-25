@@ -100,5 +100,3 @@ public abstract class Promotion {
         return product;
     }
 }
-
-

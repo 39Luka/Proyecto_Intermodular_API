@@ -13,9 +13,9 @@ public class PercentagePromotionResponse extends PromotionResponse {
     }
 
     public PercentagePromotionResponse(Long id, String description, String type, LocalDate startDate,
-                                        LocalDate endDate, boolean active, Long productId,
+                                        LocalDate endDate, boolean active, Long productId, String productName,
                                         BigDecimal discountPercentage) {
-        super(id, description, type, startDate, endDate, active, productId);
+        super(id, description, type, startDate, endDate, active, productId, productName);
         this.discountPercentage = discountPercentage;
     }
 
@@ -29,6 +29,7 @@ public class PercentagePromotionResponse extends PromotionResponse {
 
     public static PercentagePromotionResponse from(PercentagePromotion promotion) {
         Long productId = promotion.getProduct() != null ? promotion.getProduct().getId() : null;
+        String productName = promotion.getProduct() != null ? promotion.getProduct().getName() : null;
         return new PercentagePromotionResponse(
                 promotion.getId(),
                 promotion.getDescription(),
@@ -37,6 +38,7 @@ public class PercentagePromotionResponse extends PromotionResponse {
                 promotion.getEndDate(),
                 promotion.isActive(),
                 productId,
+                productName,
                 promotion.getDiscountPercentage()
         );
     }

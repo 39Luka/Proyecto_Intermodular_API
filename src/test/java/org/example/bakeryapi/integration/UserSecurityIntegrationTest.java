@@ -4,6 +4,11 @@ import org.example.bakeryapi.security.JwtProvider;
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.domain.User;
 import org.example.bakeryapi.user.UserRepository;
+import org.example.bakeryapi.category.CategoryRepository;
+import org.example.bakeryapi.product.ProductRepository;
+import org.example.bakeryapi.promotion.PromotionRepository;
+import org.example.bakeryapi.promotion.PromotionUsageRepository;
+import org.example.bakeryapi.purchase.PurchaseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,21 @@ class UserSecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private PromotionUsageRepository promotionUsageRepository;
+
+    @Autowired
+    private PromotionRepository promotionRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -37,6 +57,11 @@ class UserSecurityIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        purchaseRepository.deleteAll();
+        promotionUsageRepository.deleteAll();
+        promotionRepository.deleteAll();
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
         userRepository.deleteAll();
     }
 

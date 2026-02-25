@@ -1,6 +1,6 @@
 package org.example.bakeryapi.auth;
 
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.auth.dto.LoginRequest;
 import org.example.bakeryapi.auth.dto.LoginResponse;
 import org.example.bakeryapi.auth.dto.RegisterRequest;

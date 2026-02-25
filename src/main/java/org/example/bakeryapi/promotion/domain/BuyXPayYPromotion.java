@@ -12,10 +12,10 @@ import java.time.LocalDate;
 @DiscriminatorValue("BUY_X_PAY_Y")
 public class BuyXPayYPromotion extends Promotion {
 
-    @Column(nullable = false)
+    @Column
     private int buyQuantity;
 
-    @Column(nullable = false)
+    @Column
     private int payQuantity;
 
     protected BuyXPayYPromotion() {
@@ -60,5 +60,3 @@ public class BuyXPayYPromotion extends Promotion {
         return payQuantity;
     }
 }
-
-

@@ -29,12 +29,13 @@ public abstract class PromotionResponse {
     protected LocalDate endDate;
     protected boolean active;
     protected Long productId;
+    protected String productName;
 
     protected PromotionResponse() {
     }
 
     protected PromotionResponse(Long id, String description, String type, LocalDate startDate,
-                                 LocalDate endDate, boolean active, Long productId) {
+                                 LocalDate endDate, boolean active, Long productId, String productName) {
         this.id = id;
         this.description = description;
         this.type = type;
@@ -42,6 +43,7 @@ public abstract class PromotionResponse {
         this.endDate = endDate;
         this.active = active;
         this.productId = productId;
+        this.productName = productName;
     }
 
     public Long getId() {
@@ -98,6 +100,14 @@ public abstract class PromotionResponse {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public static PromotionResponse from(Promotion promotion) {
