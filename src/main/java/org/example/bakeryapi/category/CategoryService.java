@@ -5,6 +5,7 @@ import org.example.bakeryapi.category.dto.CategoryResponse;
 import org.example.bakeryapi.category.exception.CategoryAlreadyExistsException;
 import org.example.bakeryapi.category.exception.CategoryNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,8 @@ public class CategoryService {
     }
 
     public Page<CategoryResponse> getAll(Pageable pageable) {
-        return repository.findAll(pageable)
+        Pageable safePageable = createSafePageable(pageable);
+        return repository.findAll(safePageable)
                 .map(CategoryResponse::from);
     }
 
@@ -52,6 +54,14 @@ public class CategoryService {
         }
         category.update(request.name());
         return CategoryResponse.from(repository.save(category));
+    }
+
+    private Pageable createSafePageable(Pageable pageable) {
+        return PageRequest.of(
+                Math.max(0, pageable.getPageNumber()),
+                Math.max(1, pageable.getPageSize()),
+                pageable.getSort()
+        );
     }
 }
 

@@ -57,27 +57,24 @@ public class ProductService {
     }
 
     public Page<ProductResponse> getAll(Pageable pageable, Long categoryId) {
+        Pageable safePageable = createSafePageable(pageable);
         if (categoryId == null) {
-            return repository.findAll(pageable)
+            return repository.findAll(safePageable)
                     .map(ProductResponse::from);
         }
         categoryService.getEntityById(categoryId);
-        return repository.findAllByCategoryId(categoryId, pageable)
+        return repository.findAllByCategoryId(categoryId, safePageable)
                 .map(ProductResponse::from);
     }
 
     public Page<ProductSalesResponse> getTopSelling(Pageable pageable) {
-        Pageable safePageable = PageRequest.of(
-                Math.max(0, pageable.getPageNumber()),
-                Math.max(1, pageable.getPageSize()),
-                pageable.getSort()
-        );
+        Pageable safePageable = createSafePageable(pageable);
         return repository.findTopSellingByStatus(PurchaseStatus.PAID, safePageable);
     }
 
     @Transactional
     public ProductResponse update(Long id, ProductRequest request) {
-        Product product = getActiveEntityById(id);
+        Product product = getEntityById(id);
         Category category = categoryService.getEntityById(request.categoryId());
         product.update(
                 request.name(),
@@ -101,6 +98,14 @@ public class ProductService {
         Product product = getEntityById(id);
         product.enable();
         repository.save(product);
+    }
+
+    private Pageable createSafePageable(Pageable pageable) {
+        return PageRequest.of(
+                Math.max(0, pageable.getPageNumber()),
+                Math.max(1, pageable.getPageSize()),
+                pageable.getSort()
+        );
     }
 }
 

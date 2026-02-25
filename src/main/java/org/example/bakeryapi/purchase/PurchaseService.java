@@ -16,6 +16,7 @@ import org.example.bakeryapi.purchase.exception.PurchaseNotFoundException;
 import org.example.bakeryapi.user.domain.User;
 import org.example.bakeryapi.user.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -113,18 +114,19 @@ public class PurchaseService {
 
     @Transactional(readOnly = true)
     public Page<PurchaseResponse> getAll(Pageable pageable, Long userId) {
+        Pageable safePageable = createSafePageable(pageable);
         Authentication auth = requireAuthentication();
         if (isAdmin(auth)) {
             if (userId != null) {
                 userService.getEntityById(userId);
-                return repository.findAllDetailedByUserId(userId, pageable)
+                return repository.findAllDetailedByUserId(userId, safePageable)
                         .map(PurchaseResponse::from);
             }
-            return repository.findAllDetailed(pageable)
+            return repository.findAllDetailed(safePageable)
                     .map(PurchaseResponse::from);
         }
         User currentUser = userService.getEntityByEmail(auth.getName());
-        return repository.findAllDetailedByUserId(currentUser.getId(), pageable)
+        return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
                 .map(PurchaseResponse::from);
     }
 
@@ -207,6 +209,14 @@ public class PurchaseService {
         if (!purchase.getUser().getId().equals(currentUser.getId())) {
             throw new ForbiddenOperationException("Cannot access purchases from another user");
         }
+    }
+
+    private Pageable createSafePageable(Pageable pageable) {
+        return PageRequest.of(
+                Math.max(0, pageable.getPageNumber()),
+                Math.max(1, pageable.getPageSize()),
+                pageable.getSort()
+        );
     }
 
 }

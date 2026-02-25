@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 public class BuyXPayYPromotionRequest extends PromotionRequest {
 
@@ -40,23 +39,5 @@ public class BuyXPayYPromotionRequest extends PromotionRequest {
 
     public void setPayQuantity(Integer payQuantity) {
         this.payQuantity = payQuantity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BuyXPayYPromotionRequest that = (BuyXPayYPromotionRequest) o;
-        return Objects.equals(buyQuantity, that.buyQuantity) &&
-               Objects.equals(payQuantity, that.payQuantity) &&
-               Objects.equals(description, that.description) &&
-               Objects.equals(startDate, that.startDate) &&
-               Objects.equals(endDate, that.endDate) &&
-               Objects.equals(productId, that.productId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(description, startDate, endDate, productId, buyQuantity, payQuantity);
     }
 }

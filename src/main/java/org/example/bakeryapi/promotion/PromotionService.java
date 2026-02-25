@@ -11,6 +11,7 @@ import org.example.bakeryapi.promotion.exception.InvalidPromotionException;
 import org.example.bakeryapi.promotion.exception.PromotionNotFoundException;
 import org.example.bakeryapi.user.domain.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -87,17 +88,19 @@ public class PromotionService {
     }
 
     public Page<PromotionResponse> getAll(Pageable pageable) {
-        return repository.findAll(pageable)
+        Pageable safePageable = createSafePageable(pageable);
+        return repository.findAll(safePageable)
                 .map(PromotionResponse::from);
     }
 
     public Page<PromotionResponse> getActiveByProduct(Long productId, Long userId, Pageable pageable) {
+        Pageable safePageable = createSafePageable(pageable);
         productService.getEntityById(productId);
         LocalDate today = LocalDate.now();
         // Si userId es null: todas las promociones activas. Si no: solo las que el usuario no ha usado
         Page<Promotion> promotions = userId == null
-                ? repository.findActiveByProductId(productId, today, pageable)
-                : repository.findActiveByProductIdAndUserId(productId, userId, today, pageable);
+                ? repository.findActiveByProductId(productId, today, safePageable)
+                : repository.findActiveByProductIdAndUserId(productId, userId, today, safePageable);
         return promotions.map(PromotionResponse::from);
     }
 
@@ -185,6 +188,14 @@ public class PromotionService {
             return BigDecimal.ZERO;
         }
         return value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private Pageable createSafePageable(Pageable pageable) {
+        return PageRequest.of(
+                Math.max(0, pageable.getPageNumber()),
+                Math.max(1, pageable.getPageSize()),
+                pageable.getSort()
+        );
     }
 
 }

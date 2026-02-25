@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 
 public class PercentagePromotionRequest extends PromotionRequest {
 
@@ -30,22 +29,5 @@ public class PercentagePromotionRequest extends PromotionRequest {
 
     public void setDiscountPercentage(BigDecimal discountPercentage) {
         this.discountPercentage = discountPercentage;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PercentagePromotionRequest that = (PercentagePromotionRequest) o;
-        return Objects.equals(discountPercentage, that.discountPercentage) &&
-               Objects.equals(description, that.description) &&
-               Objects.equals(startDate, that.startDate) &&
-               Objects.equals(endDate, that.endDate) &&
-               Objects.equals(productId, that.productId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(description, startDate, endDate, productId, discountPercentage);
     }
 }
