@@ -9,18 +9,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import static org.mockito.Mockito.*;
 
 class JwtAuthenticationFilterTest {
 
     private JwtProvider jwtProvider;
+    private UserDetailsService userDetailsService;
     private JwtAuthenticationFilter filter;
 
     @BeforeEach
     void setUp() {
         jwtProvider = mock(JwtProvider.class);
-        filter = new JwtAuthenticationFilter(jwtProvider);
+        userDetailsService = mock(UserDetailsService.class);
+        filter = new JwtAuthenticationFilter(jwtProvider, userDetailsService);
         SecurityContextHolder.clearContext();
     }
 
@@ -32,14 +35,12 @@ class JwtAuthenticationFilterTest {
 
         when(request.getHeader("Authorization")).thenReturn("Bearer validtoken");
 
-        Jws<Claims> jwsMock = mock(Jws.class);
-        Claims claims = mock(Claims.class);
-        when(jwsMock.getBody()).thenReturn(claims);
-        when(claims.getSubject()).thenReturn("user@example.com");
-        when(claims.get("role")).thenReturn("USER");
-
         when(jwtProvider.getEmailFromToken("validtoken")).thenReturn("user@example.com");
-        when(jwtProvider.getRoleFromToken("validtoken")).thenReturn("USER");
+        when(userDetailsService.loadUserByUsername("user@example.com"))
+                .thenReturn(org.springframework.security.core.userdetails.User.withUsername("user@example.com")
+                        .password("hashed")
+                        .roles("USER")
+                        .build());
 
         filter.doFilter(request, response, chain);
 
