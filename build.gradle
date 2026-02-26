@@ -18,6 +18,10 @@ springBoot {
     mainClass = 'com.bakery.bakery_api.BakeryApiApplication'
 }
 
+tasks.named('bootJar') {
+    archiveFileName = 'bakery-api.jar'
+}
+
 repositories {
     mavenCentral()
 }
