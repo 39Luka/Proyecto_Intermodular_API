@@ -3,6 +3,7 @@ package org.example.bakeryapi.auth;
 import org.example.bakeryapi.auth.dto.LoginResponse;
 import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.auth.exception.InvalidCredentialsException;
+import org.example.bakeryapi.auth.refresh.RefreshTokenService;
 import org.example.bakeryapi.security.JwtProvider;
 import org.example.bakeryapi.user.UserService;
 import org.example.bakeryapi.user.domain.Role;
@@ -22,11 +23,18 @@ public class AuthService {
     private final UserService userService;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
+    public AuthService(
+            UserService userService,
+            JwtProvider jwtProvider,
+            PasswordEncoder passwordEncoder,
+            RefreshTokenService refreshTokenService
+    ) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public LoginResponse register(String email, String password, Role role) {
@@ -40,8 +48,9 @@ public class AuthService {
 
         User user = userService.createInternal(email, password, role);
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String refreshToken = refreshTokenService.issueFor(user);
 
-        return new LoginResponse(token);
+        return new LoginResponse(token, refreshToken);
     }
 
 
@@ -62,8 +71,16 @@ public class AuthService {
         }
 
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String refreshToken = refreshTokenService.issueFor(user);
 
-        return new LoginResponse(token);
+        return new LoginResponse(token, refreshToken);
+    }
+
+    public LoginResponse refresh(String refreshToken) {
+        RefreshTokenService.RotationResult rotation = refreshTokenService.rotate(refreshToken);
+        User user = rotation.user();
+        String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        return new LoginResponse(token, rotation.refreshToken());
     }
 }
 

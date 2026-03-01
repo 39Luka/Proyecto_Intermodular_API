@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.auth.dto.LoginRequest;
 import org.example.bakeryapi.auth.dto.LoginResponse;
 import org.example.bakeryapi.auth.dto.RegisterRequest;
+import org.example.bakeryapi.auth.refresh.RefreshTokenService;
 import org.example.bakeryapi.common.exception.GlobalExceptionHandler;
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.exception.EmailAlreadyExistsException;
@@ -26,6 +27,9 @@ class AuthControllerTest {
 
     @Mock
     private AuthService authService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private AuthController authController;

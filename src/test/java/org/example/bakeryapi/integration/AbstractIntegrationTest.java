@@ -2,6 +2,7 @@ package org.example.bakeryapi.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.category.CategoryRepository;
+import org.example.bakeryapi.auth.refresh.RefreshTokenRepository;
 import org.example.bakeryapi.product.ProductRepository;
 import org.example.bakeryapi.promotion.PromotionRepository;
 import org.example.bakeryapi.promotion.PromotionUsageRepository;
@@ -49,6 +50,9 @@ abstract class AbstractIntegrationTest {
     protected UserRepository userRepository;
 
     @Autowired
+    protected RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
     protected BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
@@ -68,6 +72,7 @@ abstract class AbstractIntegrationTest {
         promotionRepository.deleteAll();
         productRepository.deleteAll();
         categoryRepository.deleteAll();
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
     }
 

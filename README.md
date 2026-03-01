@@ -35,6 +35,12 @@ Using Swagger with JWT:
 1. Call `POST /auth/login` and copy the `token`.
 2. Click `Authorize` and paste the JWT (usually without the `Bearer` prefix).
 
+Token lifecycle:
+
+- `POST /auth/login` returns an access token (`token`) and a `refreshToken`.
+- `POST /auth/refresh` rotates the refresh token and returns a new access token + refresh token.
+- `POST /auth/logout` revokes a refresh token.
+
 ## Configuration (Environment Variables)
 
 Configuration comes from `src/main/resources/application.properties` and `src/main/resources/application-prod.properties`.
@@ -44,6 +50,7 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `DB_USERNAME`, `DB_PASSWORD`
 - `JWT_SECRET`: JWT signing secret (required in prod)
 - `JWT_EXPIRATION_MS`: access token lifetime (milliseconds). In prod the default is 15 minutes.
+- `REFRESH_TOKEN_EXPIRATION_MS`: refresh token lifetime (milliseconds). Default is 30 days.
 - `SHOW_SQL`: `true|false`
 - `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
 - `spring.flyway.baseline-on-migrate`: enabled by default in this project to support existing schemas and empty DB bootstraps
