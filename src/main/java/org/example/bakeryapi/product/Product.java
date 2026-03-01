@@ -45,10 +45,6 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
-    // "system" is a reserved keyword in MySQL; use a safe column name.
-    @Column(name = "is_system", nullable = false, columnDefinition = "boolean default false")
-    private boolean system = false;
-
     protected Product() {
         // Constructor for JPA
     }
@@ -59,22 +55,6 @@ public class Product {
         this.price = price;
         this.stock = stock;
         this.category = category;
-    }
-
-    public Product(
-            String name,
-            String description,
-            BigDecimal price,
-            int stock,
-            Category category,
-            boolean system
-    ) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.stock = stock;
-        this.category = category;
-        this.system = system;
     }
 
     public void update(String name, String description, BigDecimal price, int stock, Category category) {
@@ -130,10 +110,6 @@ public class Product {
 
     public boolean isActive() {
         return active;
-    }
-
-    public boolean isSystem() {
-        return system;
     }
 }
 

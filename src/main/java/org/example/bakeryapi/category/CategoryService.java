@@ -4,7 +4,6 @@ import org.example.bakeryapi.category.dto.CategoryRequest;
 import org.example.bakeryapi.category.dto.CategoryResponse;
 import org.example.bakeryapi.category.exception.CategoryAlreadyExistsException;
 import org.example.bakeryapi.category.exception.CategoryNotFoundException;
-import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.common.pagination.PageableUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,9 +48,6 @@ public class CategoryService {
     @Transactional
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = getEntityById(id);
-        if (category.isSystem()) {
-            throw new ForbiddenOperationException("System categories cannot be modified");
-        }
         if (!category.getName().equalsIgnoreCase(request.name())
                 && repository.existsByNameIgnoreCase(request.name())) {
             throw new CategoryAlreadyExistsException(request.name());

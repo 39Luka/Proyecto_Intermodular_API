@@ -80,12 +80,12 @@ public class DefaultDataSeeder implements ApplicationRunner {
 
     private Map<String, Category> seedCategories() {
         Map<String, Category> categories = new LinkedHashMap<>();
-        categories.put("Pan", categoryRepository.save(new Category("Pan", true)));
-        categories.put("Bolleria", categoryRepository.save(new Category("Bolleria", true)));
-        categories.put("Tartas", categoryRepository.save(new Category("Tartas", true)));
-        categories.put("Galletas", categoryRepository.save(new Category("Galletas", true)));
-        categories.put("Salado", categoryRepository.save(new Category("Salado", true)));
-        categories.put("Bebidas", categoryRepository.save(new Category("Bebidas", true)));
+        categories.put("Pan", categoryRepository.save(new Category("Pan")));
+        categories.put("Bolleria", categoryRepository.save(new Category("Bolleria")));
+        categories.put("Tartas", categoryRepository.save(new Category("Tartas")));
+        categories.put("Galletas", categoryRepository.save(new Category("Galletas")));
+        categories.put("Salado", categoryRepository.save(new Category("Salado")));
+        categories.put("Bebidas", categoryRepository.save(new Category("Bebidas")));
         return categories;
     }
 
@@ -95,57 +95,49 @@ public class DefaultDataSeeder implements ApplicationRunner {
                 "Pan tradicional del dia",
                 new BigDecimal("1.20"),
                 50,
-                categories.get("Pan"),
-                true
+                categories.get("Pan")
         ));
         productRepository.save(new Product(
                 "Croissant",
                 "Croissant de mantequilla",
                 new BigDecimal("1.50"),
                 40,
-                categories.get("Bolleria"),
-                true
+                categories.get("Bolleria")
         ));
         productRepository.save(new Product(
                 "Napolitana de chocolate",
                 "Hojaldre relleno de chocolate",
                 new BigDecimal("1.80"),
                 35,
-                categories.get("Bolleria"),
-                true
+                categories.get("Bolleria")
         ));
         productRepository.save(new Product(
                 "Tarta de queso",
                 "Porcion de tarta de queso",
                 new BigDecimal("3.50"),
                 15,
-                categories.get("Tartas"),
-                true
+                categories.get("Tartas")
         ));
         productRepository.save(new Product(
                 "Cookie",
                 "Galleta con pepitas de chocolate",
                 new BigDecimal("1.00"),
                 60,
-                categories.get("Galletas"),
-                true
+                categories.get("Galletas")
         ));
         productRepository.save(new Product(
                 "Empanada de atun",
                 "Empanada individual",
                 new BigDecimal("2.20"),
                 25,
-                categories.get("Salado"),
-                true
+                categories.get("Salado")
         ));
         productRepository.save(new Product(
                 "Cafe",
                 "Cafe solo",
                 new BigDecimal("1.30"),
                 100,
-                categories.get("Bebidas"),
-                true
+                categories.get("Bebidas")
         ));
     }
 }
-
