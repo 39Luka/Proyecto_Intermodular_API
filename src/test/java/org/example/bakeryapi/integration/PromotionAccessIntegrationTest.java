@@ -1,29 +1,14 @@
 package org.example.bakeryapi.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.category.Category;
-import org.example.bakeryapi.category.CategoryRepository;
 import org.example.bakeryapi.product.Product;
-import org.example.bakeryapi.product.ProductRepository;
-import org.example.bakeryapi.promotion.PromotionRepository;
-import org.example.bakeryapi.promotion.PromotionUsageRepository;
 import org.example.bakeryapi.promotion.domain.PercentagePromotion;
-import org.example.bakeryapi.purchase.PurchaseRepository;
 import org.example.bakeryapi.purchase.dto.PurchaseItemRequest;
 import org.example.bakeryapi.purchase.dto.PurchaseRequest;
-import org.example.bakeryapi.security.JwtProvider;
-import org.example.bakeryapi.user.UserRepository;
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,50 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-class PromotionAccessIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private PromotionRepository promotionRepository;
-
-    @Autowired
-    private PromotionUsageRepository promotionUsageRepository;
-
-    @Autowired
-    private PurchaseRepository purchaseRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        purchaseRepository.deleteAll();
-        promotionUsageRepository.deleteAll();
-        promotionRepository.deleteAll();
-        productRepository.deleteAll();
-        categoryRepository.deleteAll();
-        userRepository.deleteAll();
-        objectMapper = new ObjectMapper();
-    }
+class PromotionAccessIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void promotionsList_asUser_returnsForbidden_butActiveEndpointWorks() throws Exception {
@@ -195,11 +137,6 @@ class PromotionAccessIntegrationTest {
         promotion = (PercentagePromotion) promotionRepository.save(promotion);
 
         return new PromotionFixture(product, promotion.getId());
-    }
-
-    private String createToken(Role role) {
-        User user = createUser(role, role.name().toLowerCase() + "@example.com");
-        return jwtProvider.generateToken(user.getEmail(), user.getRole().name());
     }
 
     private User createUser(Role role, String email) {

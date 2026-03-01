@@ -1,21 +1,11 @@
 package org.example.bakeryapi.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.auth.dto.LoginRequest;
 import org.example.bakeryapi.auth.dto.RegisterRequest;
-import org.example.bakeryapi.security.JwtProvider;
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.domain.User;
-import org.example.bakeryapi.user.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,30 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-class AuthIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-        objectMapper = new ObjectMapper();
-    }
+class AuthIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void register_userRole_withoutAuth_createsUserAndReturnsToken() throws Exception {

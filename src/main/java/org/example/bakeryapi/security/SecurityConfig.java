@@ -75,7 +75,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         // Comma-separated list, e.g.: https://myapp.com,http://localhost:5173
         // Use "*" to allow any origin (not recommended for production).
-        String raw = environment.getProperty("app.cors.allowed-origins", "*");
+        String raw = environment.getProperty("app.cors.allowed-origins", "");
         List<String> origins = Arrays.stream(raw.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())

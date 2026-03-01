@@ -1,10 +1,10 @@
 package org.example.bakeryapi.security;
 
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,8 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
+        Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (header != null && header.startsWith("Bearer ")) {
+        if ((existingAuth == null || !existingAuth.isAuthenticated()) && header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
 
             try {
@@ -47,9 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-            } catch (JwtException | IllegalArgumentException e) {
-                SecurityContextHolder.clearContext();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 SecurityContextHolder.clearContext();
             }
         }

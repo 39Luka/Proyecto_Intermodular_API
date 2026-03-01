@@ -1,7 +1,8 @@
 package org.example.bakeryapi.common.security;
 
-import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public final class SecurityUtils {
@@ -11,8 +12,8 @@ public final class SecurityUtils {
 
     public static Authentication requireAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            throw new ForbiddenOperationException();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            throw new AuthenticationCredentialsNotFoundException("Unauthorized");
         }
         return auth;
     }
