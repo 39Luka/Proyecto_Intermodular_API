@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 public final class PageableUtils {
 
+    // Hard limit to protect the service from unbounded "size" requests.
     private static final int MAX_PAGE_SIZE = 100;
 
     private PageableUtils() {

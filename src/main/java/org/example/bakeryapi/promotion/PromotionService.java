@@ -108,7 +108,8 @@ public class PromotionService {
         Authentication auth = SecurityUtils.requireAuthentication();
         Long effectiveUserId = resolveUserIdForPromotionFiltering(auth, userId);
 
-        // effectiveUserId == null: todas las promociones activas. Si no: solo las que el usuario no ha usado
+        // If effectiveUserId is null: return all active promotions.
+        // Otherwise: return only promotions the user has not used yet.
         Page<Promotion> promotions = effectiveUserId == null
                 ? repository.findActiveByProductId(productId, today, safePageable)
                 : repository.findActiveByProductIdAndUserId(productId, effectiveUserId, today, safePageable);
@@ -144,6 +145,8 @@ public class PromotionService {
         }
 
         try {
+            // Unique constraint (promotion_id, user_id) guarantees "use once".
+            // saveAndFlush triggers the constraint violation inside this method so we can return a 400-style domain error.
             usageRepository.saveAndFlush(new PromotionUsage(promotion, user, LocalDateTime.now()));
         } catch (DataIntegrityViolationException e) {
             throw new InvalidPromotionException("Promotion has already been used by this user");

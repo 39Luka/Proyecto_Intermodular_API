@@ -18,13 +18,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-// @Index acelera búsquedas por product_id, fechas y active
-// @Inheritance SINGLE_TABLE: todas las subclases (PercentagePromotion, BuyXPayYPromotion) en una sola tabla
-// @DiscriminatorColumn type: columna que identifica qué tipo de promoción es cada fila (PERCENTAGE, BUY_X_PAY_Y)
+// Indexes speed up lookups by product, date range and active flag.
+// SINGLE_TABLE inheritance: PercentagePromotion and BuyXPayYPromotion share one "promotions" table.
 @Table(name = "promotions", indexes = {
-    @Index(name = "idx_promotion_product", columnList = "product_id"),
-    @Index(name = "idx_promotion_dates", columnList = "start_date, end_date"),
-    @Index(name = "idx_promotion_active", columnList = "active")
+        @Index(name = "idx_promotion_product", columnList = "product_id"),
+        @Index(name = "idx_promotion_dates", columnList = "start_date, end_date"),
+        @Index(name = "idx_promotion_active", columnList = "active")
 })
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
@@ -100,3 +99,4 @@ public abstract class Promotion {
         return product;
     }
 }
+

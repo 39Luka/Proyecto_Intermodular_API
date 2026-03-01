@@ -1,84 +1,84 @@
 # Bakery API
 
-API REST (Spring Boot) para una panaderia: usuarios con roles, catalogo (categorias/productos), promociones y compras. La autenticacion es JWT.
+REST API (Spring Boot) for a bakery: users/roles, catalog (categories/products), promotions and purchases. Authentication is JWT-based.
 
 ## Stack
 
 - Java 21 + Gradle
 - Spring Boot 4 (WebMVC, Security, Validation, Data JPA)
-- MySQL en produccion/desarrollo
-- H2 en tests
+- MySQL for dev/production
+- H2 for tests
 - Swagger/OpenAPI (springdoc)
 
-## Arranque rapido (local)
+## Quick Start (Local)
 
-Prerequisitos: Java 21.
+Prerequisites: Java 21.
 
-1. Configura variables de entorno (ejemplo en `.env.example`).
-2. Arranca MySQL (local o remoto).
-3. Ejecuta:
+1. Configure environment variables (see `.env.example`).
+2. Start MySQL (local or remote).
+3. Run:
 
 ```powershell
 ./gradlew bootRun
 ```
 
-La API queda en `http://localhost:8080` (o el puerto que definas en `PORT`).
+API base URL: `http://localhost:8080` (or the port in `PORT`).
 
 ## Swagger / OpenAPI
 
 - UI: `http://localhost:8080/swagger-ui/index.html`
 - JSON: `http://localhost:8080/v3/api-docs`
 
-Autenticacion en Swagger:
+Using Swagger with JWT:
 
-1. Haz login en `POST /auth/login` y copia el `token`.
-2. En Swagger pulsa `Authorize` y pega el JWT (normalmente sin el prefijo `Bearer`).
+1. Call `POST /auth/login` and copy the `token`.
+2. Click `Authorize` and paste the JWT (usually without the `Bearer` prefix).
 
-## Variables de entorno (principal)
+## Configuration (Environment Variables)
 
-La app lee la configuracion desde `src/main/resources/application.properties` y `src/main/resources/application-prod.properties`.
+Configuration comes from `src/main/resources/application.properties` and `src/main/resources/application-prod.properties`.
 
-- `PORT`: puerto HTTP (default `8080`)
-- `DB_URL`: JDBC url. Ejemplo: `jdbc:mysql://localhost:3306/bakery_db?useSSL=false&serverTimezone=UTC`
+- `PORT`: HTTP port (default `8080`)
+- `DB_URL`: JDBC url. Example: `jdbc:mysql://localhost:3306/bakery_db?useSSL=false&serverTimezone=UTC`
 - `DB_USERNAME`, `DB_PASSWORD`
-- `JWT_SECRET`: secreto para firmar JWT (en prod es obligatorio)
+- `JWT_SECRET`: JWT signing secret (required in prod)
 - `SHOW_SQL`: `true|false`
-- `HIBERNATE_DDL_AUTO`: `update|validate|...` (en prod el default es `validate`)
-- `CORS_ALLOWED_ORIGINS`: lista separada por comas. Ejemplo: `http://localhost:5173,https://tu-frontend.com`
-- `app.seed.enabled`: `true|false` (por defecto `true`)
+- `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
+- `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
+- `app.seed.enabled`: `true|false` (default `true`)
 
-Bootstrap admin (solo si no hay ningun usuario en BD):
+Admin bootstrap (only when there are no users in the DB):
 
 - `INITIAL_ADMIN_EMAIL`
 - `INITIAL_ADMIN_PASSWORD`
 
-## Seed de datos por defecto
+## Default Data Seeding
 
-En el arranque (excepto perfil `test`) se ejecuta `DefaultDataSeeder`:
+On startup (except `test` profile) `DefaultDataSeeder` runs:
 
-- Si no hay usuarios y existen `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD`, crea el primer usuario `ADMIN`.
-- Si `categories` y `products` estan vacias, inserta un catalogo basico (categorias/productos) para empezar rapido.
-- Se puede desactivar con `app.seed.enabled=false`.
+- If there are no users and `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD` are set, it creates the first `ADMIN`.
+- If `categories` and `products` are empty, it inserts a small starter catalog to speed up setup.
+- Disable with `app.seed.enabled=false`.
 
-## Autenticacion y permisos (resumen)
+## Auth & Permissions (Summary)
 
-El token se envia en `Authorization: Bearer <token>`.
+Send the token as `Authorization: Bearer <token>`.
 
-- Publico:
+- Public:
   - `POST /auth/login`
-  - `POST /auth/register` (crear `ADMIN` requiere ya ser `ADMIN`)
+  - `POST /auth/register` (creating an `ADMIN` requires being `ADMIN` already)
   - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
-- Requiere token:
+- Requires auth:
   - `GET /categories`, `GET /categories/{id}`
   - `GET /products`, `GET /products/{id}`, `GET /products/top-selling`
   - `GET /purchases`, `GET /purchases/{id}`, `POST /purchases`, `PATCH /purchases/{id}/pay|cancel`
   - `GET /promotions/active`
-- Solo `ADMIN`:
-  - `POST|PUT|PATCH|DELETE` sobre `/categories/**`, `/products/**`, `/promotions/**`
-  - `GET /promotions` y `GET /promotions/{id}`
+- ADMIN only:
+  - `POST|PUT|PATCH|DELETE` on `/categories/**`, `/products/**`, `/promotions/**`
+  - `GET /promotions` and `GET /promotions/{id}`
   - `/users/**`
 
-## Flujo tipico (manual con curl)
+## Typical Flow (curl)
 
 Login:
 
@@ -88,7 +88,7 @@ curl -X POST http://localhost:8080/auth/login \
   -d '{"email":"user@example.com","password":"password123"}'
 ```
 
-Listar productos (con token):
+List products (with token):
 
 ```bash
 curl http://localhost:8080/products \
@@ -101,18 +101,17 @@ curl http://localhost:8080/products \
 ./gradlew test
 ```
 
-Notas:
+Notes:
 
-- Los tests usan H2 en memoria (`src/test/resources/application.properties`).
-- Gradle fuerza `spring.profiles.active=test` para evitar que CI use la configuracion de MySQL por defecto.
+- Tests use in-memory H2 (`src/test/resources/application.properties`).
+- Gradle forces `spring.profiles.active=test` so CI does not attempt to boot with MySQL settings.
 
-## Produccion (Railway)
+## Production (Railway)
 
-Recomendado:
+Recommended:
 
 1. `SPRING_PROFILES_ACTIVE=prod`
-2. Define `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`.
-3. Si es primera vez (BD vacia) y quieres bootstrap del admin: define `INITIAL_ADMIN_EMAIL` y `INITIAL_ADMIN_PASSWORD`.
+2. Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`.
+3. On first deploy (empty DB), if you want admin bootstrap set `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD`.
 
-Si no usas migraciones aun y la BD esta vacia, temporalmente puedes setear `HIBERNATE_DDL_AUTO=update` para que cree tablas; luego vuelve a `validate`.
-
+If you do not have migrations yet and the DB is empty, temporarily set `HIBERNATE_DDL_AUTO=update` to create tables, then switch back to `validate`.

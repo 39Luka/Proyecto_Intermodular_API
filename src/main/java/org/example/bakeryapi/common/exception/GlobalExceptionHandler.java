@@ -14,34 +14,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Manejador global de excepciones para toda la aplicación.
+ * Global exception handler for all controllers.
  *
- * @RestControllerAdvice intercepta excepciones lanzadas en CUALQUIER @RestController
- * y las convierte en respuestas HTTP estructuradas (JSON con código y mensaje).
- *
- * Ventajas:
- * 1. Centraliza el manejo de errores (no repetir try-catch en cada controller)
- * 2. Respuestas consistentes en toda la API
- * 3. Oculta detalles internos al cliente (no se ven stack traces)
- *
- * Códigos HTTP principales:
- * - 400 Bad Request: datos inválidos del cliente
- * - 401 Unauthorized: no está autenticado (falta token o es inválido)
- * - 403 Forbidden: está autenticado pero no tiene permisos
- * - 404 Not Found: recurso no existe
- * - 409 Conflict: operación genera conflicto (ej: email duplicado)
- * - 500 Internal Server Error: error inesperado del servidor
+ * Normalizes errors into {@link ErrorResponse} so clients always receive a predictable JSON structure.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Maneja excepciones de negocio personalizadas (ApiException y sus subclases).
-     * Ej: UserNotFoundException, EmailAlreadyExistsException, etc.
-     */
+    /** Domain errors (ApiException and subclasses). */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
-
         ErrorResponse response = new ErrorResponse(
                 ex.getStatus().value(),
                 ex.getMessage()
@@ -52,10 +34,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    /**
-     * Maneja errores de JWT (token inválido, expirado, mal formado).
-     * Retorna 401 Unauthorized.
-     */
+    /** JWT parsing/validation errors. */
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex) {
         ErrorResponse response = new ErrorResponse(
@@ -68,11 +47,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    /**
-     * Maneja errores de autenticación de Spring Security.
-     * Se lanza cuando no hay token o el token no es válido.
-     * Retorna 401 Unauthorized.
-     */
+    /** Spring Security authentication errors. */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
         ErrorResponse response = new ErrorResponse(
@@ -85,12 +60,7 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    /**
-     * Maneja errores de autorización de Spring Security.
-     * Se lanza cuando el usuario está autenticado pero no tiene permisos para el recurso.
-     * Ej: un USER intenta acceder a un endpoint de ADMIN.
-     * Retorna 403 Forbidden.
-     */
+    /** Spring Security authorization errors. */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
         ErrorResponse response = new ErrorResponse(
@@ -104,23 +74,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja errores de validación de datos (Bean Validation).
-     * Se lanza cuando un @Valid falla en un @RequestBody.
-     * Ej: @NotBlank, @Email, @Min, @Max, etc.
+     * Bean Validation errors from @Valid request bodies.
      *
-     * Retorna 400 Bad Request con la lista de campos inválidos.
+     * Returns 400 with a list of invalid fields: [{ field, message }].
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
-        // Extrae todos los errores de validación en una lista
+        // Flatten all validation errors into a simple list for clients.
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> Map.of(
-                        "field", err.getField(),              // Campo que falló (ej: "email")
-                        "message", err.getDefaultMessage()    // Mensaje de error (ej: "must not be blank")
+                        "field", err.getField(),
+                        "message", err.getDefaultMessage()
                 ))
                 .toList();
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors));
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors));
     }
 
     /**
@@ -133,5 +102,4 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict"));
     }
 }
-
 

@@ -39,6 +39,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
               and (p.endDate is null or p.endDate >= :date)
               and pu.id is null
             """)
+    // "pu.id is null" filters out promotions already used by the user.
     @EntityGraph(attributePaths = "product")
     Page<Promotion> findActiveByProductIdAndUserId(
             @Param("productId") Long productId,

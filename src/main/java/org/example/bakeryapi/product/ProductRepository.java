@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // @EntityGraph carga category en la misma query porque se usa en ProductResponse (evita N+1)
+    // Load category in the same query because ProductResponse includes it (avoids N+1).
     @EntityGraph(attributePaths = {"category"})
     Page<Product> findAll(Pageable pageable);
 

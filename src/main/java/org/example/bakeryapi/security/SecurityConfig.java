@@ -26,6 +26,13 @@ import java.util.stream.Collectors;
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * HTTP security rules:
+     * - /auth/** and Swagger are public
+     * - /users/** is ADMIN-only
+     * - write operations on categories/products/promotions are ADMIN-only
+     * - everything else requires authentication
+     */
     private final HandlerExceptionResolver exceptionResolver;
     private final Environment environment;
 
@@ -74,7 +81,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         // Comma-separated list, e.g.: https://myapp.com,http://localhost:5173
-        // Use "*" to allow any origin (not recommended for production).
+        // When empty, CORS is effectively disabled (no allowed origins).
         String raw = environment.getProperty("app.cors.allowed-origins", "");
         List<String> origins = Arrays.stream(raw.split(","))
                 .map(String::trim)

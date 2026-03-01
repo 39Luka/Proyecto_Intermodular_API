@@ -11,30 +11,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuración de OpenAPI/Swagger para documentación automática de la API REST.
+ * OpenAPI/Swagger configuration.
  *
- * Swagger genera una interfaz web interactiva donde puedes:
- * - Ver todos los endpoints disponibles
- * - Probar las peticiones directamente desde el navegador
- * - Ver los modelos de datos (DTOs)
+ * Swagger UI:
+ * - http://localhost:8080/swagger-ui/index.html
  *
- * Acceso: http://localhost:8080/swagger-ui.html
- * En Springdoc moderno: http://localhost:8080/swagger-ui/index.html
+ * OpenAPI JSON:
+ * - http://localhost:8080/v3/api-docs
  */
 @Configuration
 public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        // Define el esquema de seguridad JWT (Bearer token en header Authorization)
+        // JWT "Bearer" token in the Authorization header.
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-                // Información general del proyecto
                 .info(new Info()
                         .title("Bakery API")
-                        .description("API REST para gestión de panadería con autenticación JWT. " +
-                                "Permite gestionar categorías, productos, promociones y compras.")
+                        .description("REST API for a bakery with JWT auth. Manages categories, products, promotions and purchases.")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Bakery Team")
@@ -42,19 +38,15 @@ public class OpenApiConfig {
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
-
-                // Configuración de seguridad: todos los endpoints requieren JWT
-                .addSecurityItem(new SecurityRequirement()
-                        .addList(securitySchemeName))
-
-                // Define cómo se envía el token JWT
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
                                 new SecurityScheme()
                                         .name(securitySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
-                                        .bearerFormat("JWT") // Token en formato: "Bearer <token>"
-                                        .description("Introduce el token JWT obtenido del endpoint /auth/login")));
+                                        .bearerFormat("JWT")
+                                        .description("Use the JWT from POST /auth/login in the Authorization header: Bearer <token>")));
     }
 }
+

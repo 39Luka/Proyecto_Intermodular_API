@@ -15,10 +15,10 @@ import org.example.bakeryapi.product.exception.InsufficientStockException;
 import java.math.BigDecimal;
 
 @Entity
-// @Index crea índices en BD para acelerar búsquedas por category_id y active
+// Indexes speed up queries by category and active flag.
 @Table(name = "products", indexes = {
-    @Index(name = "idx_product_category", columnList = "category_id"),
-    @Index(name = "idx_product_active", columnList = "active")
+        @Index(name = "idx_product_category", columnList = "category_id"),
+        @Index(name = "idx_product_active", columnList = "active")
 })
 public class Product {
 
@@ -112,5 +112,4 @@ public class Product {
         return active;
     }
 }
-
 

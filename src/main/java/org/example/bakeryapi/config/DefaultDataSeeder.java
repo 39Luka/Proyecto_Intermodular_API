@@ -26,6 +26,14 @@ import java.util.Map;
 @ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true", matchIfMissing = true)
 public class DefaultDataSeeder implements ApplicationRunner {
 
+    /**
+     * Seeds minimal default data when the database is empty.
+     *
+     * This is meant to reduce manual setup in new environments, while remaining safe:
+     * - Only runs outside the "test" profile.
+     * - Only inserts catalog data when both categories and products are empty.
+     * - Only bootstraps an admin user when there are no users.
+     */
     private static final Logger log = LoggerFactory.getLogger(DefaultDataSeeder.class);
 
     private final Environment environment;

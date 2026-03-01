@@ -15,8 +15,8 @@ import org.example.bakeryapi.purchase.dto.PurchaseRequest;
 import org.example.bakeryapi.purchase.dto.PurchaseResponse;
 import org.example.bakeryapi.purchase.exception.InvalidPurchaseException;
 import org.example.bakeryapi.purchase.exception.PurchaseNotFoundException;
-import org.example.bakeryapi.user.domain.User;
 import org.example.bakeryapi.user.UserService;
+import org.example.bakeryapi.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -26,8 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
 
+/**
+ * Purchase application service.
+ *
+ * Key rules:
+ * - Users can only create/access their own purchases.
+ * - Admins can create/access purchases for any user.
+ * - Stock and promotion usage are updated inside a single transaction so failures roll back cleanly.
+ */
 @Service
 public class PurchaseService {
 
@@ -54,19 +61,7 @@ public class PurchaseService {
             throw new InvalidPurchaseException("Purchase must include at least one item");
         }
 
-        Authentication auth = SecurityUtils.requireAuthentication();
-        boolean admin = SecurityUtils.isAdmin(auth);
-        User user;
-        if (admin) {
-            user = userService.getEntityById(request.userId());
-        } else {
-            User currentUser = userService.getEntityByEmail(auth.getName());
-            if (!currentUser.getId().equals(request.userId())) {
-                throw new ForbiddenOperationException("Cannot create a purchase for another user");
-            }
-            user = currentUser;
-        }
-
+        User user = resolvePurchaseUser(request.userId());
         Purchase purchase = new Purchase(user, LocalDateTime.now(), PurchaseStatus.CREATED);
 
         for (PurchaseItemRequest itemRequest : request.items()) {
@@ -76,7 +71,7 @@ public class PurchaseService {
 
             Product product = productService.getActiveEntityById(itemRequest.productId());
 
-            // Decrementar stock primero, luego aplicar promoción (orden importante para rollback)
+            // Decrease stock first, then apply promotion. If anything fails afterwards, the transaction rolls back.
             product.decreaseStock(itemRequest.quantity());
 
             Promotion promotion = null;
@@ -116,6 +111,7 @@ public class PurchaseService {
     public Page<PurchaseResponse> getAll(Pageable pageable, Long userId) {
         Pageable safePageable = PageableUtils.safe(pageable);
         Authentication auth = SecurityUtils.requireAuthentication();
+
         if (SecurityUtils.isAdmin(auth)) {
             if (userId != null) {
                 userService.getEntityById(userId);
@@ -125,6 +121,7 @@ public class PurchaseService {
             return repository.findAllDetailed(safePageable)
                     .map(PurchaseResponse::from);
         }
+
         User currentUser = userService.getEntityByEmail(auth.getName());
         return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
                 .map(PurchaseResponse::from);
@@ -143,7 +140,7 @@ public class PurchaseService {
             throw new InvalidPurchaseException("Only pending purchases can be cancelled");
         }
 
-        // Liberar promociones primero, luego restaurar stock (orden importante para rollback)
+        // Release promotion usage first, then restore stock. If something fails, the transaction rolls back.
         for (PurchaseItem item : purchase.getItems()) {
             if (item.getPromotion() != null) {
                 promotionService.releaseUsage(item.getPromotion(), purchase.getUser());
@@ -178,6 +175,19 @@ public class PurchaseService {
         repository.save(purchase);
     }
 
+    private User resolvePurchaseUser(Long requestedUserId) {
+        Authentication auth = SecurityUtils.requireAuthentication();
+        if (SecurityUtils.isAdmin(auth)) {
+            return userService.getEntityById(requestedUserId);
+        }
+
+        User currentUser = userService.getEntityByEmail(auth.getName());
+        if (!currentUser.getId().equals(requestedUserId)) {
+            throw new ForbiddenOperationException("Cannot create a purchase for another user");
+        }
+        return currentUser;
+    }
+
     private BigDecimal calculateSubtotal(BigDecimal unitPrice, int quantity, BigDecimal discountAmount) {
         BigDecimal gross = unitPrice.multiply(BigDecimal.valueOf(quantity));
         BigDecimal subtotal = gross.subtract(discountAmount);
@@ -197,5 +207,5 @@ public class PurchaseService {
             throw new ForbiddenOperationException("Cannot access purchases from another user");
         }
     }
-
 }
+

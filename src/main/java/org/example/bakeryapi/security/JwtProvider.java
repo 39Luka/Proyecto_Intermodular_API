@@ -15,6 +15,13 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
+    /**
+     * JWT HMAC provider.
+     *
+     * Configuration:
+     * - jwt.secret: HMAC secret (use a long random value; >= 32 bytes recommended for HS256)
+     * - jwt.expiration: token lifetime in milliseconds
+     */
     @Value("${jwt.secret}")
     private String secret;
 
@@ -34,6 +41,7 @@ public class JwtProvider {
 
     @PostConstruct
     public void init() {
+        // Derive the signing key once at startup. If the secret is invalid/too short, it should fail fast.
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
