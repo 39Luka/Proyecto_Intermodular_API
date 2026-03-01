@@ -9,6 +9,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import org.example.bakeryapi.category.Category;
 import org.example.bakeryapi.product.exception.InsufficientStockException;
 
@@ -25,6 +26,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private long version;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -112,4 +116,3 @@ public class Product {
         return active;
     }
 }
-

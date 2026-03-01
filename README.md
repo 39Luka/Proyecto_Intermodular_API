@@ -121,3 +121,7 @@ Schema behavior in prod:
 - Default is Flyway migrations + `HIBERNATE_DDL_AUTO=validate`.
 - The app fails fast in `prod` if required env vars are missing (`DB_*`, `JWT_SECRET`).
 - If you must bootstrap using Hibernate temporarily: set `APP_ALLOW_UNSAFE_DDL_AUTO=true` together with `HIBERNATE_DDL_AUTO=update`, then remove both afterwards.
+
+## Concurrency Notes (Stock)
+
+`products` use optimistic locking (`@Version`) so concurrent purchases cannot silently oversell inventory. If two requests try to update the same product stock at the same time, one may fail with `409 Concurrent update, please retry`.
