@@ -70,7 +70,7 @@ class AuthControllerTest {
 
     @Test
     void register_validRequest_returnsCreatedToken() throws Exception {
-        RegisterRequest request = new RegisterRequest("new@example.com", "pass123", Role.USER);
+        RegisterRequest request = new RegisterRequest("new@example.com", "pass12345", Role.USER);
         LoginResponse response = new LoginResponse("new.jwt.token");
 
         when(authService.register(request.email(), request.password(), request.role())).thenReturn(response);
@@ -86,7 +86,7 @@ class AuthControllerTest {
 
     @Test
     void register_existingEmail_returnsConflict() throws Exception {
-        RegisterRequest request = new RegisterRequest("existing@example.com", "pass123", Role.USER);
+        RegisterRequest request = new RegisterRequest("existing@example.com", "pass12345", Role.USER);
 
         when(authService.register(anyString(), anyString(), any()))
                 .thenThrow(new EmailAlreadyExistsException(request.email()));

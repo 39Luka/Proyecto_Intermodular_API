@@ -43,10 +43,12 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `DB_URL`: JDBC url. Example: `jdbc:mysql://localhost:3306/bakery_db?useSSL=false&serverTimezone=UTC`
 - `DB_USERNAME`, `DB_PASSWORD`
 - `JWT_SECRET`: JWT signing secret (required in prod)
+- `JWT_EXPIRATION_MS`: access token lifetime (milliseconds). In prod the default is 15 minutes.
 - `SHOW_SQL`: `true|false`
 - `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
 - `spring.flyway.baseline-on-migrate`: enabled by default in this project to support existing schemas and empty DB bootstraps
 - `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
+- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`: basic rate limiting for `/auth/login` and `/auth/register`
 - `app.seed.enabled`: `true|false` (default `true`)
 
 Admin bootstrap (only when there are no users in the DB):

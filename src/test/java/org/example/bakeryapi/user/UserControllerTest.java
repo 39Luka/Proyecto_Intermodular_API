@@ -71,7 +71,7 @@ class UserControllerTest {
 
     @Test
     void createUser_validRequest_createsUser() throws Exception {
-        UserRequest request = new UserRequest("new@example.com", "pass", Role.USER);
+        UserRequest request = new UserRequest("new@example.com", "password123", Role.USER);
         UserResponse createdUser = new UserResponse(1L, request.email(), request.role(), true);
 
         when(userService.create(any(UserRequest.class))).thenReturn(createdUser);
@@ -126,7 +126,7 @@ class UserControllerTest {
 
     @Test
     void createUser_existingEmail_returnsConflict() throws Exception {
-        UserRequest request = new UserRequest("existing@example.com", "pass", Role.USER);
+        UserRequest request = new UserRequest("existing@example.com", "password123", Role.USER);
         when(userService.create(any(UserRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException(request.email()));
 

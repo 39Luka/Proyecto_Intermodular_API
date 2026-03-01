@@ -45,7 +45,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            RateLimitingFilter rateLimitingFilter,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -73,7 +77,8 @@ public class SecurityConfig {
                                 exceptionResolver.resolveException(request, response, null, accessDeniedException)
                         )
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class);
 
         return http.build();
     }
