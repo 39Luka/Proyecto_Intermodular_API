@@ -54,4 +54,8 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    // CI safety: ensure tests run with the in-memory DB + test settings.
+    // This avoids accidentally booting the app with production datasource placeholders.
+    systemProperty 'spring.profiles.active', 'test'
 }
