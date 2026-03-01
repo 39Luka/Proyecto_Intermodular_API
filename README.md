@@ -6,6 +6,7 @@ REST API (Spring Boot) for a bakery: users/roles, catalog (categories/products),
 
 - Java 21 + Gradle
 - Spring Boot 4 (WebMVC, Security, Validation, Data JPA)
+- Flyway (database migrations)
 - MySQL for dev/production
 - H2 for tests
 - Swagger/OpenAPI (springdoc)
@@ -44,6 +45,7 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `JWT_SECRET`: JWT signing secret (required in prod)
 - `SHOW_SQL`: `true|false`
 - `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
+- `spring.flyway.baseline-on-migrate`: enabled by default in this project to support existing schemas and empty DB bootstraps
 - `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
 - `app.seed.enabled`: `true|false` (default `true`)
 
