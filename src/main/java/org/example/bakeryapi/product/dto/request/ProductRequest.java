@@ -1,4 +1,4 @@
-package org.example.bakeryapi.product.dto;
+package org.example.bakeryapi.product.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

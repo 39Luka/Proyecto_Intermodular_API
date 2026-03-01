@@ -3,6 +3,7 @@ package org.example.bakeryapi.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.bakeryapi.category.CategoryRepository;
 import org.example.bakeryapi.auth.refresh.RefreshTokenRepository;
+import org.example.bakeryapi.observability.RequestIdFilter;
 import org.example.bakeryapi.product.ProductRepository;
 import org.example.bakeryapi.promotion.PromotionRepository;
 import org.example.bakeryapi.promotion.PromotionUsageRepository;
@@ -30,6 +31,9 @@ abstract class AbstractIntegrationTest {
     private WebApplicationContext webApplicationContext;
 
     protected MockMvc mockMvc;
+
+    @Autowired
+    private RequestIdFilter requestIdFilter;
 
     @Autowired
     protected PurchaseRepository purchaseRepository;
@@ -63,6 +67,7 @@ abstract class AbstractIntegrationTest {
     @BeforeEach
     void cleanDatabase() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilters(requestIdFilter)
                 .apply(springSecurity())
                 .build();
 

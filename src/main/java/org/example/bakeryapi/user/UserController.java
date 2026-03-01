@@ -1,8 +1,8 @@
 package org.example.bakeryapi.user;
 
 import jakarta.validation.Valid;
-import org.example.bakeryapi.user.dto.UserRequest;
-import org.example.bakeryapi.user.dto.UserResponse;
+import org.example.bakeryapi.user.dto.request.UserRequest;
+import org.example.bakeryapi.user.dto.response.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

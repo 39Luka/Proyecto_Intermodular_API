@@ -1,6 +1,6 @@
 package org.example.bakeryapi.category;
 
-import org.example.bakeryapi.category.dto.CategoryRequest;
+import org.example.bakeryapi.category.dto.request.CategoryRequest;
 import org.example.bakeryapi.category.exception.CategoryAlreadyExistsException;
 import org.example.bakeryapi.category.exception.CategoryNotFoundException;
 import org.junit.jupiter.api.Test;

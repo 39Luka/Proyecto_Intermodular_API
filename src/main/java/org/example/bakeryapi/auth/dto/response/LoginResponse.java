@@ -1,4 +1,4 @@
-package org.example.bakeryapi.auth.dto;
+package org.example.bakeryapi.auth.dto.response;
 
 public record LoginResponse(
         String token,

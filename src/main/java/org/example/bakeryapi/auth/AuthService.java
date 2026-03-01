@@ -1,6 +1,6 @@
 package org.example.bakeryapi.auth;
 
-import org.example.bakeryapi.auth.dto.LoginResponse;
+import org.example.bakeryapi.auth.dto.response.LoginResponse;
 import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.auth.exception.InvalidCredentialsException;
 import org.example.bakeryapi.auth.refresh.RefreshTokenService;
@@ -38,6 +38,10 @@ public class AuthService {
     }
 
     public LoginResponse register(String email, String password, Role role) {
+        return register(email, password, role, null, null);
+    }
+
+    public LoginResponse register(String email, String password, Role role, String ip, String userAgent) {
         if (role == Role.ADMIN) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || auth.getAuthorities().stream()
@@ -48,13 +52,17 @@ public class AuthService {
 
         User user = userService.createInternal(email, password, role);
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
-        String refreshToken = refreshTokenService.issueFor(user);
+        String refreshToken = refreshTokenService.issueFor(user, ip, userAgent);
 
         return new LoginResponse(token, refreshToken);
     }
 
 
     public LoginResponse login(String email, String password) {
+        return login(email, password, null, null);
+    }
+
+    public LoginResponse login(String email, String password, String ip, String userAgent) {
         User user;
         try {
             user = userService.getEntityByEmail(email);
@@ -71,13 +79,17 @@ public class AuthService {
         }
 
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
-        String refreshToken = refreshTokenService.issueFor(user);
+        String refreshToken = refreshTokenService.issueFor(user, ip, userAgent);
 
         return new LoginResponse(token, refreshToken);
     }
 
     public LoginResponse refresh(String refreshToken) {
-        RefreshTokenService.RotationResult rotation = refreshTokenService.rotate(refreshToken);
+        return refresh(refreshToken, null, null);
+    }
+
+    public LoginResponse refresh(String refreshToken, String ip, String userAgent) {
+        RefreshTokenService.RotationResult rotation = refreshTokenService.rotate(refreshToken, ip, userAgent);
         User user = rotation.user();
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
         return new LoginResponse(token, rotation.refreshToken());

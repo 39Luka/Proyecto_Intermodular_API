@@ -38,22 +38,52 @@ public class RefreshToken {
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
+    @Column(name = "last_used_at")
+    private Instant lastUsedAt;
+
     @Column(name = "revoked_at")
     private Instant revokedAt;
+
+    @Column(name = "ip", length = 64)
+    private String ip;
+
+    @Column(name = "user_agent", length = 255)
+    private String userAgent;
 
     protected RefreshToken() {
         // JPA
     }
 
-    public RefreshToken(User user, String tokenHash, Instant createdAt, Instant expiresAt) {
+    public RefreshToken(
+            User user,
+            String tokenHash,
+            Instant createdAt,
+            Instant expiresAt,
+            Instant lastUsedAt,
+            String ip,
+            String userAgent
+    ) {
         this.user = user;
         this.tokenHash = tokenHash;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.lastUsedAt = lastUsedAt;
+        this.ip = ip;
+        this.userAgent = userAgent;
     }
 
     public void revoke(Instant now) {
         this.revokedAt = now;
+    }
+
+    public void touch(Instant now, String ip, String userAgent) {
+        this.lastUsedAt = now;
+        if (ip != null && !ip.isBlank()) {
+            this.ip = ip;
+        }
+        if (userAgent != null && !userAgent.isBlank()) {
+            this.userAgent = userAgent;
+        }
     }
 
     public boolean isRevoked() {
@@ -84,8 +114,19 @@ public class RefreshToken {
         return expiresAt;
     }
 
+    public Instant getLastUsedAt() {
+        return lastUsedAt;
+    }
+
     public Instant getRevokedAt() {
         return revokedAt;
     }
-}
 
+    public String getIp() {
+        return ip;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+}

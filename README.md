@@ -36,6 +36,14 @@ API base URL: `http://localhost:8080` (or the port in `PORT`).
 - Other `/actuator/**` endpoints require an `ADMIN` token.
 - By default only `health` and `info` are exposed. Expand with `MANAGEMENT_ENDPOINTS` if needed.
 
+## Request ID (Log Correlation)
+
+Every response includes an `X-Request-Id` header.
+
+- If the client sends `X-Request-Id`, the API echoes it back.
+- If not, the API generates one.
+- The request id is added to logs (MDC key: `requestId`).
+
 Using Swagger with JWT:
 
 1. Call `POST /auth/login` and copy the `token`.
@@ -46,6 +54,8 @@ Token lifecycle:
 - `POST /auth/login` returns an access token (`token`) and a `refreshToken`.
 - `POST /auth/refresh` rotates the refresh token and returns a new access token + refresh token.
 - `POST /auth/logout` revokes a refresh token.
+- `GET /auth/sessions` lists active sessions for the current user (requires `Authorization: Bearer ...`).
+- `POST /auth/logout-all` revokes all refresh tokens for the current user (requires `Authorization: Bearer ...`).
 
 ## Configuration (Environment Variables)
 

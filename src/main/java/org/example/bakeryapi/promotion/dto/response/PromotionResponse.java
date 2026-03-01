@@ -1,4 +1,4 @@
-package org.example.bakeryapi.promotion.dto;
+package org.example.bakeryapi.promotion.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

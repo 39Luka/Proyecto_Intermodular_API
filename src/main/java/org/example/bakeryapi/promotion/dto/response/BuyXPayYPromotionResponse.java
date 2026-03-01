@@ -1,4 +1,4 @@
-package org.example.bakeryapi.promotion.dto;
+package org.example.bakeryapi.promotion.dto.response;
 
 import org.example.bakeryapi.promotion.domain.BuyXPayYPromotion;
 

@@ -1,4 +1,4 @@
-package org.example.bakeryapi.purchase.dto;
+package org.example.bakeryapi.purchase.dto.response;
 
 import org.example.bakeryapi.purchase.domain.Purchase;
 import org.example.bakeryapi.purchase.domain.PurchaseStatus;

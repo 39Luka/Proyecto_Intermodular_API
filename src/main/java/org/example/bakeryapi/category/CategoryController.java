@@ -1,8 +1,8 @@
 package org.example.bakeryapi.category;
 
 import jakarta.validation.Valid;
-import org.example.bakeryapi.category.dto.CategoryRequest;
-import org.example.bakeryapi.category.dto.CategoryResponse;
+import org.example.bakeryapi.category.dto.request.CategoryRequest;
+import org.example.bakeryapi.category.dto.response.CategoryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

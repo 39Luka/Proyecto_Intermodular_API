@@ -1,6 +1,6 @@
 package org.example.bakeryapi.auth;
 
-import org.example.bakeryapi.auth.dto.LoginResponse;
+import org.example.bakeryapi.auth.dto.response.LoginResponse;
 import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.auth.exception.InvalidCredentialsException;
 import org.example.bakeryapi.auth.refresh.RefreshTokenService;
@@ -62,7 +62,7 @@ class AuthServiceTest {
 
         when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("fake-jwt-token");
-        when(refreshTokenService.issueFor(any(User.class))).thenReturn("refresh-token");
+        when(refreshTokenService.issueFor(any(User.class), any(), any())).thenReturn("refresh-token");
 
         LoginResponse response = authService.register(email, password, role);
 
@@ -103,7 +103,7 @@ class AuthServiceTest {
         User createdUser = new User(email, passwordEncoder.encode(password), role);
         when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("jwt-token");
-        when(refreshTokenService.issueFor(any(User.class))).thenReturn("refresh-token");
+        when(refreshTokenService.issueFor(any(User.class), any(), any())).thenReturn("refresh-token");
 
         LoginResponse response = authService.register(email, password, role);
 
@@ -124,7 +124,7 @@ class AuthServiceTest {
 
         when(userService.getEntityByEmail(email)).thenReturn(user);
         when(jwtProvider.generateToken(email, Role.USER.name())).thenReturn("jwt-token");
-        when(refreshTokenService.issueFor(any(User.class))).thenReturn("refresh-token");
+        when(refreshTokenService.issueFor(any(User.class), any(), any())).thenReturn("refresh-token");
 
         LoginResponse response = authService.login(email, password);
 
@@ -187,7 +187,7 @@ class AuthServiceTest {
         User createdUser = new User(email, passwordEncoder.encode(password), role);
         when(userService.createInternal(anyString(), anyString(), eq(role))).thenReturn(createdUser);
         when(jwtProvider.generateToken(anyString(), anyString())).thenReturn("jwt-token");
-        when(refreshTokenService.issueFor(any(User.class))).thenReturn("refresh-token");
+        when(refreshTokenService.issueFor(any(User.class), any(), any())).thenReturn("refresh-token");
 
         LoginResponse response = authService.register(email, password, role);
 

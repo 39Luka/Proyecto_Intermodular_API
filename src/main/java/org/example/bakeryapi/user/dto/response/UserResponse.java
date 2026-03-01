@@ -1,4 +1,4 @@
-package org.example.bakeryapi.user.dto;
+package org.example.bakeryapi.user.dto.response;
 
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.domain.User;

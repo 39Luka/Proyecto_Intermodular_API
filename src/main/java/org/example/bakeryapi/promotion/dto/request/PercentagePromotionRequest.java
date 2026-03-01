@@ -1,4 +1,4 @@
-package org.example.bakeryapi.promotion.dto;
+package org.example.bakeryapi.promotion.dto.request;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;

@@ -2,7 +2,7 @@ package org.example.bakeryapi.integration;
 
 import org.example.bakeryapi.category.Category;
 import org.example.bakeryapi.product.Product;
-import org.example.bakeryapi.product.dto.ProductRequest;
+import org.example.bakeryapi.product.dto.request.ProductRequest;
 import org.example.bakeryapi.user.domain.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

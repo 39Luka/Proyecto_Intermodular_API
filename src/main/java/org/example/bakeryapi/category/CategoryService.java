@@ -1,7 +1,7 @@
 package org.example.bakeryapi.category;
 
-import org.example.bakeryapi.category.dto.CategoryRequest;
-import org.example.bakeryapi.category.dto.CategoryResponse;
+import org.example.bakeryapi.category.dto.request.CategoryRequest;
+import org.example.bakeryapi.category.dto.response.CategoryResponse;
 import org.example.bakeryapi.category.exception.CategoryAlreadyExistsException;
 import org.example.bakeryapi.category.exception.CategoryNotFoundException;
 import org.example.bakeryapi.common.pagination.PageableUtils;

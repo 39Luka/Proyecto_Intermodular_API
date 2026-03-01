@@ -1,4 +1,4 @@
-package org.example.bakeryapi.promotion.dto;
+package org.example.bakeryapi.promotion.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

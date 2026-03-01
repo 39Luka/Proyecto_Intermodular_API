@@ -1,9 +1,9 @@
 package org.example.bakeryapi.product;
 
 import jakarta.validation.Valid;
-import org.example.bakeryapi.product.dto.ProductRequest;
-import org.example.bakeryapi.product.dto.ProductResponse;
-import org.example.bakeryapi.product.dto.ProductSalesResponse;
+import org.example.bakeryapi.product.dto.request.ProductRequest;
+import org.example.bakeryapi.product.dto.response.ProductResponse;
+import org.example.bakeryapi.product.dto.response.ProductSalesResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;

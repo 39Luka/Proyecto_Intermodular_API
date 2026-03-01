@@ -2,8 +2,8 @@ package org.example.bakeryapi.user;
 
 import org.example.bakeryapi.user.domain.Role;
 import org.example.bakeryapi.user.domain.User;
-import org.example.bakeryapi.user.dto.UserRequest;
-import org.example.bakeryapi.user.dto.UserResponse;
+import org.example.bakeryapi.user.dto.request.UserRequest;
+import org.example.bakeryapi.user.dto.response.UserResponse;
 import org.example.bakeryapi.user.exception.EmailAlreadyExistsException;
 import org.example.bakeryapi.user.exception.UserNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

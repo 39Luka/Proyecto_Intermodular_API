@@ -1,7 +1,11 @@
 package org.example.bakeryapi.promotion;
 
 import jakarta.validation.Valid;
-import org.example.bakeryapi.promotion.dto.*;
+import org.example.bakeryapi.promotion.dto.request.BuyXPayYPromotionRequest;
+import org.example.bakeryapi.promotion.dto.request.PercentagePromotionRequest;
+import org.example.bakeryapi.promotion.dto.response.BuyXPayYPromotionResponse;
+import org.example.bakeryapi.promotion.dto.response.PercentagePromotionResponse;
+import org.example.bakeryapi.promotion.dto.response.PromotionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

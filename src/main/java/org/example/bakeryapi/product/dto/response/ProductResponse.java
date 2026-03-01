@@ -1,4 +1,4 @@
-package org.example.bakeryapi.product.dto;
+package org.example.bakeryapi.product.dto.response;
 
 import org.example.bakeryapi.product.Product;
 

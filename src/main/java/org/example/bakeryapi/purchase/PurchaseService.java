@@ -10,9 +10,9 @@ import org.example.bakeryapi.promotion.domain.Promotion;
 import org.example.bakeryapi.purchase.domain.Purchase;
 import org.example.bakeryapi.purchase.domain.PurchaseItem;
 import org.example.bakeryapi.purchase.domain.PurchaseStatus;
-import org.example.bakeryapi.purchase.dto.PurchaseItemRequest;
-import org.example.bakeryapi.purchase.dto.PurchaseRequest;
-import org.example.bakeryapi.purchase.dto.PurchaseResponse;
+import org.example.bakeryapi.purchase.dto.request.PurchaseItemRequest;
+import org.example.bakeryapi.purchase.dto.request.PurchaseRequest;
+import org.example.bakeryapi.purchase.dto.response.PurchaseResponse;
 import org.example.bakeryapi.purchase.exception.InvalidPurchaseException;
 import org.example.bakeryapi.purchase.exception.PurchaseNotFoundException;
 import org.example.bakeryapi.user.UserService;
@@ -208,4 +208,3 @@ public class PurchaseService {
         }
     }
 }
-
