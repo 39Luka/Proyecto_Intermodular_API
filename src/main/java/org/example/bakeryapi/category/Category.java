@@ -18,7 +18,8 @@ public class Category {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    // "system" is a reserved keyword in MySQL; use a safe column name.
+    @Column(name = "is_system", nullable = false, columnDefinition = "boolean default false")
     private boolean system = false;
 
     protected Category() {

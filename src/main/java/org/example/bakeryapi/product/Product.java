@@ -45,7 +45,8 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    // "system" is a reserved keyword in MySQL; use a safe column name.
+    @Column(name = "is_system", nullable = false, columnDefinition = "boolean default false")
     private boolean system = false;
 
     protected Product() {
