@@ -30,6 +30,12 @@ API base URL: `http://localhost:8080` (or the port in `PORT`).
 - UI: `http://localhost:8080/swagger-ui/index.html`
 - JSON: `http://localhost:8080/v3/api-docs`
 
+## Health (Actuator)
+
+- `GET /actuator/health` is public (for uptime checks).
+- Other `/actuator/**` endpoints require an `ADMIN` token.
+- By default only `health` and `info` are exposed. Expand with `MANAGEMENT_ENDPOINTS` if needed.
+
 Using Swagger with JWT:
 
 1. Call `POST /auth/login` and copy the `token`.
