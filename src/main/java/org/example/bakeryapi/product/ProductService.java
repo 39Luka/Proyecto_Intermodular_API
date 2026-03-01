@@ -2,6 +2,7 @@ package org.example.bakeryapi.product;
 
 import org.example.bakeryapi.category.Category;
 import org.example.bakeryapi.category.CategoryService;
+import org.example.bakeryapi.auth.exception.ForbiddenOperationException;
 import org.example.bakeryapi.common.pagination.PageableUtils;
 import org.example.bakeryapi.common.security.SecurityUtils;
 import org.example.bakeryapi.product.dto.ProductSalesResponse;
@@ -90,6 +91,9 @@ public class ProductService {
     @Transactional
     public ProductResponse update(Long id, ProductRequest request) {
         Product product = getEntityById(id);
+        if (product.isSystem()) {
+            throw new ForbiddenOperationException("System products cannot be modified");
+        }
         Category category = categoryService.getEntityById(request.categoryId());
         product.update(
                 request.name(),
@@ -104,6 +108,9 @@ public class ProductService {
     @Transactional
     public void disable(Long id) {
         Product product = getActiveEntityById(id);
+        if (product.isSystem()) {
+            throw new ForbiddenOperationException("System products cannot be modified");
+        }
         product.disable();
         repository.save(product);
     }
@@ -111,6 +118,9 @@ public class ProductService {
     @Transactional
     public void enable(Long id) {
         Product product = getEntityById(id);
+        if (product.isSystem()) {
+            throw new ForbiddenOperationException("System products cannot be modified");
+        }
         product.enable();
         repository.save(product);
     }

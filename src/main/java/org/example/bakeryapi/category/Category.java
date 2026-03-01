@@ -18,12 +18,20 @@ public class Category {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean system = false;
+
     protected Category() {
         // Constructor for JPA
     }
 
     public Category(String name) {
         this.name = name;
+    }
+
+    public Category(String name, boolean system) {
+        this.name = name;
+        this.system = system;
     }
 
     public void update(String name) {
@@ -36,6 +44,10 @@ public class Category {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSystem() {
+        return system;
     }
 }
 
