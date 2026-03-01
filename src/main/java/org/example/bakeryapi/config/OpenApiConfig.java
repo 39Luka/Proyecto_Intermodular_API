@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
  * - Ver los modelos de datos (DTOs)
  *
  * Acceso: http://localhost:8080/swagger-ui.html
+ * En Springdoc moderno: http://localhost:8080/swagger-ui/index.html
  */
 @Configuration
 public class OpenApiConfig {
