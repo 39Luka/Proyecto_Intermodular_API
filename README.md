@@ -116,4 +116,8 @@ Recommended:
 2. Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`.
 3. On first deploy (empty DB), if you want admin bootstrap set `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD`.
 
-If you do not have migrations yet and the DB is empty, temporarily set `HIBERNATE_DDL_AUTO=update` to create tables, then switch back to `validate`.
+Schema behavior in prod:
+
+- Default is Flyway migrations + `HIBERNATE_DDL_AUTO=validate`.
+- The app fails fast in `prod` if required env vars are missing (`DB_*`, `JWT_SECRET`).
+- If you must bootstrap using Hibernate temporarily: set `APP_ALLOW_UNSAFE_DDL_AUTO=true` together with `HIBERNATE_DDL_AUTO=update`, then remove both afterwards.
