@@ -36,14 +36,6 @@ API base URL: `http://localhost:8080` (or the port in `PORT`).
 - Other `/actuator/**` endpoints require an `ADMIN` token.
 - By default only `health` and `info` are exposed. Expand with `MANAGEMENT_ENDPOINTS` if needed.
 
-## Request ID (Log Correlation)
-
-Every response includes an `X-Request-Id` header.
-
-- If the client sends `X-Request-Id`, the API echoes it back.
-- If not, the API generates one.
-- The request id is added to logs (MDC key: `requestId`).
-
 Using Swagger with JWT:
 
 1. Call `POST /auth/login` and copy the `token`.
@@ -54,8 +46,6 @@ Token lifecycle:
 - `POST /auth/login` returns an access token (`token`) and a `refreshToken`.
 - `POST /auth/refresh` rotates the refresh token and returns a new access token + refresh token.
 - `POST /auth/logout` revokes a refresh token.
-- `GET /auth/sessions` lists active sessions for the current user (requires `Authorization: Bearer ...`).
-- `POST /auth/logout-all` revokes all refresh tokens for the current user (requires `Authorization: Bearer ...`).
 
 ## Configuration (Environment Variables)
 
@@ -72,20 +62,14 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `spring.flyway.baseline-on-migrate`: enabled by default in this project to support existing schemas and empty DB bootstraps
 - `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
 - `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`: basic rate limiting for `/auth/login` and `/auth/register`
-- `app.seed.enabled`: `true|false` (default `true`)
-
 Admin bootstrap (only when there are no users in the DB):
 
 - `INITIAL_ADMIN_EMAIL`
 - `INITIAL_ADMIN_PASSWORD`
 
-## Default Data Seeding
+Notes:
 
-On startup (except `test` profile) `DefaultDataSeeder` runs:
-
-- If there are no users and `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD` are set, it creates the first `ADMIN`.
-- If `categories` and `products` are empty, it inserts a small starter catalog to speed up setup.
-- Disable with `app.seed.enabled=false`.
+- `/auth/register` always creates a `USER`. Create admins via the bootstrap env vars above or via `/users/**` as an existing `ADMIN`.
 
 ## Auth & Permissions (Summary)
 
@@ -93,7 +77,7 @@ Send the token as `Authorization: Bearer <token>`.
 
 - Public:
   - `POST /auth/login`
-  - `POST /auth/register` (creating an `ADMIN` requires being `ADMIN` already)
+  - `POST /auth/register` (always creates a `USER`)
   - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
 - Requires auth:
   - `GET /categories`, `GET /categories/{id}`
@@ -145,7 +129,6 @@ Schema behavior in prod:
 
 - Default is Flyway migrations + `HIBERNATE_DDL_AUTO=validate`.
 - The app fails fast in `prod` if required env vars are missing (`DB_*`, `JWT_SECRET`).
-- If you must bootstrap using Hibernate temporarily: set `APP_ALLOW_UNSAFE_DDL_AUTO=true` together with `HIBERNATE_DDL_AUTO=update`, then remove both afterwards.
 
 ## Concurrency Notes (Stock)
 

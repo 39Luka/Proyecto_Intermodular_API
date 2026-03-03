@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'org.example'
+group = 'com.bakery'
 version = '0.0.1-SNAPSHOT'
 description = 'bakery-api'
 
@@ -15,7 +15,7 @@ java {
 }
 
 springBoot {
-    mainClass = 'org.example.bakeryapi.BakeryApiApplication'
+    mainClass = 'com.bakery.api.BakeryApiApplication'
 }
 
 tasks.named('bootJar') {
