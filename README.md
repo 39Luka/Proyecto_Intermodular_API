@@ -145,3 +145,4 @@ Schema behavior in prod:
 
 - Tutorial reference: https://www.youtube.com/watch?v=yluGdM1Wiow&t=641s
 - Tutorial reference: https://www.youtube.com/watch?v=Cm8AOEiE0ZI&t=378s
+- Tutorial reference: https://www.geeksforgeeks.org/advance-java/rate-limiting-a-spring-api-using-bucket4j/

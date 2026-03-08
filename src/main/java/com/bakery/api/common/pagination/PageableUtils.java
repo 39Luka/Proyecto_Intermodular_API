@@ -13,8 +13,8 @@ public final class PageableUtils {
 
     public static Pageable safe(Pageable pageable) {
         return PageRequest.of(
-                Math.max(0, pageable.getPageNumber()),
-                Math.min(MAX_PAGE_SIZE, Math.max(1, pageable.getPageSize())),
+                Math.clamp(pageable.getPageNumber(), 0, Integer.MAX_VALUE),
+                Math.clamp(pageable.getPageSize(), 1, MAX_PAGE_SIZE),
                 pageable.getSort()
         );
     }
