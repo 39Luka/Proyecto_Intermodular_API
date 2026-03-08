@@ -1,25 +1,13 @@
 package com.bakery.api.promotion.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.bakery.api.promotion.domain.BuyXPayYPromotion;
 import com.bakery.api.promotion.domain.PercentagePromotion;
 import com.bakery.api.promotion.domain.Promotion;
 
 import java.time.LocalDate;
 
-// @JsonTypeInfo: configura cÃ³mo Jackson serializa/deserializa subclases usando el campo "type"
-// @JsonSubTypes: mapea valores de "type" a clases concretas (PERCENTAGE -> PercentagePromotionResponse)
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true
-)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = PercentagePromotionResponse.class, name = "PERCENTAGE"),
-        @JsonSubTypes.Type(value = BuyXPayYPromotionResponse.class, name = "BUY_X_PAY_Y")
-})
+/**
+ * Promotions are intentionally restricted to percentage-based discounts in this project.
+ */
 public abstract class PromotionResponse {
 
     protected Long id;
@@ -34,8 +22,16 @@ public abstract class PromotionResponse {
     protected PromotionResponse() {
     }
 
-    protected PromotionResponse(Long id, String description, String type, LocalDate startDate,
-                                 LocalDate endDate, boolean active, Long productId, String productName) {
+    protected PromotionResponse(
+            Long id,
+            String description,
+            String type,
+            LocalDate startDate,
+            LocalDate endDate,
+            boolean active,
+            Long productId,
+            String productName
+    ) {
         this.id = id;
         this.description = description;
         this.type = type;
@@ -113,9 +109,8 @@ public abstract class PromotionResponse {
     public static PromotionResponse from(Promotion promotion) {
         if (promotion instanceof PercentagePromotion percentagePromotion) {
             return PercentagePromotionResponse.from(percentagePromotion);
-        } else if (promotion instanceof BuyXPayYPromotion buyXPayYPromotion) {
-            return BuyXPayYPromotionResponse.from(buyXPayYPromotion);
         }
-        throw new IllegalArgumentException("Unknown promotion type: " + promotion.getClass());
+        throw new IllegalArgumentException("Only PERCENTAGE promotions are supported. Got: " + promotion.getClass());
     }
 }
+

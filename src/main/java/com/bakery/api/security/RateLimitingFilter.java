@@ -7,18 +7,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.bakery.api.common.exception.ErrorResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Simple in-memory rate limiting for public auth endpoints.
+ * Simple in-memory rate limiting.
  *
  * This is not meant to be perfect across multiple replicas. For that, use a shared store (Redis) or gateway rate limiting.
  * It is still useful to protect against accidental abuse and basic brute-force attempts.
@@ -50,16 +54,27 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     @Value("${app.rate-limit.cleanup-interval-seconds:30}")
     private int cleanupIntervalSeconds;
 
+    /**
+     * Comma-separated list of URI prefixes to exclude from rate limiting.
+     * Example: /swagger-ui,/v3/api-docs,/actuator/health,/actuator/info
+     */
+    @Value("${app.rate-limit.excluded-path-prefixes:}")
+    private String excludedPathPrefixes;
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         if (!enabled) {
             return true;
         }
-        if (!HttpMethod.POST.matches(request.getMethod())) {
-            return true;
-        }
+
         String path = request.getRequestURI();
-        return !path.equals("/auth/login") && !path.equals("/auth/register");
+        for (String prefix : excludedPrefixes()) {
+            if (!prefix.isBlank() && path.startsWith(prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -96,6 +111,16 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private List<String> excludedPrefixes() {
+        if (excludedPathPrefixes == null || excludedPathPrefixes.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(excludedPathPrefixes.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
+    }
+
     private void cleanupIfNeeded(long nowSeconds) {
         int interval = cleanupIntervalSeconds <= 0 ? 30 : cleanupIntervalSeconds;
         if ((nowSeconds - lastCleanupSeconds) < interval) {
@@ -123,13 +148,23 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String clientKey(HttpServletRequest request) {
+        // Prefer authenticated identity when available; fall back to client IP.
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.getName() != null
+                && !authentication.getName().isBlank()) {
+            return "user:" + authentication.getName();
+        }
+
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
             // If multiple IPs are present, the first one is the original client.
             int comma = forwardedFor.indexOf(',');
-            return (comma >= 0 ? forwardedFor.substring(0, comma) : forwardedFor).trim();
+            return "ip:" + (comma >= 0 ? forwardedFor.substring(0, comma) : forwardedFor).trim();
         }
-        return request.getRemoteAddr();
+        return "ip:" + request.getRemoteAddr();
     }
 
     private record WindowCounter(long windowStartSeconds, AtomicInteger count) {

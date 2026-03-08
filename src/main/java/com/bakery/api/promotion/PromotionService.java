@@ -2,13 +2,10 @@ package com.bakery.api.promotion;
 
 import com.bakery.api.product.Product;
 import com.bakery.api.product.ProductService;
-import com.bakery.api.promotion.domain.BuyXPayYPromotion;
 import com.bakery.api.promotion.domain.PercentagePromotion;
 import com.bakery.api.promotion.domain.Promotion;
 import com.bakery.api.promotion.domain.PromotionUsage;
-import com.bakery.api.promotion.dto.request.BuyXPayYPromotionRequest;
 import com.bakery.api.promotion.dto.request.PercentagePromotionRequest;
-import com.bakery.api.promotion.dto.response.BuyXPayYPromotionResponse;
 import com.bakery.api.promotion.dto.response.PercentagePromotionResponse;
 import com.bakery.api.promotion.dto.response.PromotionResponse;
 import com.bakery.api.promotion.exception.InvalidPromotionException;
@@ -68,25 +65,6 @@ public class PromotionService {
         );
 
         return PercentagePromotionResponse.from(repository.save(promotion));
-    }
-
-    @Transactional
-    public BuyXPayYPromotionResponse createBuyXPayY(BuyXPayYPromotionRequest request) {
-        validateDates(request.getStartDate(), request.getEndDate());
-        validateBuyXPayY(request.getBuyQuantity(), request.getPayQuantity());
-
-        Product product = productService.getActiveEntityById(request.getProductId());
-
-        BuyXPayYPromotion promotion = new BuyXPayYPromotion(
-                request.getDescription(),
-                request.getBuyQuantity(),
-                request.getPayQuantity(),
-                request.getStartDate(),
-                request.getEndDate(),
-                product
-        );
-
-        return BuyXPayYPromotionResponse.from(repository.save(promotion));
     }
 
     public Promotion getEntityById(Long id) {
@@ -179,18 +157,6 @@ public class PromotionService {
         if (discountPercentage.compareTo(BigDecimal.ZERO) < 0
                 || discountPercentage.compareTo(new BigDecimal("100")) > 0) {
             throw new InvalidPromotionException("discountPercentage must be between 0 and 100");
-        }
-    }
-
-    private void validateBuyXPayY(Integer buyQuantity, Integer payQuantity) {
-        if (buyQuantity == null || payQuantity == null) {
-            throw new InvalidPromotionException("BUY_X_PAY_Y promotion requires buyQuantity and payQuantity");
-        }
-        if (buyQuantity <= 0 || payQuantity <= 0) {
-            throw new InvalidPromotionException("buyQuantity and payQuantity must be greater than zero");
-        }
-        if (buyQuantity <= payQuantity) {
-            throw new InvalidPromotionException("buyQuantity must be greater than payQuantity");
         }
     }
 

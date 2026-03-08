@@ -89,6 +89,13 @@ Send the token as `Authorization: Bearer <token>`.
   - `GET /promotions` and `GET /promotions/{id}`
   - `/users/**`
 
+## Promotions
+
+This project intentionally supports a single promotion type: percentage discounts.
+
+- Create: `POST /promotions/percentage`
+- Query active promotions for a product: `GET /promotions/active?productId=...`
+
 ## Typical Flow (curl)
 
 Login:
@@ -133,3 +140,8 @@ Schema behavior in prod:
 ## Concurrency Notes (Stock)
 
 `products` use optimistic locking (`@Version`) so concurrent purchases cannot silently oversell inventory. If two requests try to update the same product stock at the same time, one may fail with `409 Concurrent update, please retry`.
+
+## Credits
+
+- Tutorial reference: https://www.youtube.com/watch?v=yluGdM1Wiow&t=641s
+- Tutorial reference: https://www.youtube.com/watch?v=Cm8AOEiE0ZI&t=378s

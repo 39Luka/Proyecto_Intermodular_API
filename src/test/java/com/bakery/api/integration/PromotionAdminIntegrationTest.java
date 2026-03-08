@@ -49,21 +49,24 @@ class PromotionAdminIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void createBuyXPayY_asAdmin_returnsCreated() throws Exception {
+    void createBuyXPayY_endpointIsNotAvailable() throws Exception {
         Product product = createProduct();
         String adminToken = createToken(Role.ADMIN);
-        Map<String, Object> request = buyXPayYRequestBody(product.getId(), LocalDate.now(), null, 3, 2);
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("description", "Buy X Pay Y");
+        request.put("startDate", LocalDate.now().toString());
+        request.put("endDate", null);
+        request.put("productId", product.getId());
+        request.put("buyQuantity", 3);
+        request.put("payQuantity", 2);
 
         mockMvc.perform(post("/promotions/buy-x-pay-y")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.type").value("BUY_X_PAY_Y"))
-                .andExpect(jsonPath("$.productId").value(product.getId()))
-                .andExpect(jsonPath("$.productName").value(product.getName()))
-                .andExpect(jsonPath("$.buyQuantity").value(3))
-                .andExpect(jsonPath("$.payQuantity").value(2));
+                // The path is matched by "/promotions/{id}" (GET) but POST is not supported.
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -108,20 +111,6 @@ class PromotionAdminIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void createBuyXPayY_withInvalidQuantities_returnsBadRequest() throws Exception {
-        Product product = createProduct();
-        String adminToken = createToken(Role.ADMIN);
-        Map<String, Object> request = buyXPayYRequestBody(product.getId(), LocalDate.now(), null, 2, 2);
-
-        mockMvc.perform(post("/promotions/buy-x-pay-y")
-                        .header("Authorization", "Bearer " + adminToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("buyQuantity must be greater than payQuantity"));
-    }
-
-    @Test
     void getPromotionById_asUser_returnsForbidden_asAdmin_returnsOk() throws Exception {
         Product product = createProduct();
         String adminToken = createToken(Role.ADMIN);
@@ -161,17 +150,6 @@ class PromotionAdminIntegrationTest extends AbstractIntegrationTest {
         body.put("endDate", endDate == null ? null : endDate.toString());
         body.put("productId", productId);
         body.put("discountPercentage", discountPercentage);
-        return body;
-    }
-
-    private Map<String, Object> buyXPayYRequestBody(Long productId, LocalDate startDate, LocalDate endDate, int buyQuantity, int payQuantity) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("description", "Buy X Pay Y");
-        body.put("startDate", startDate.toString());
-        body.put("endDate", endDate == null ? null : endDate.toString());
-        body.put("productId", productId);
-        body.put("buyQuantity", buyQuantity);
-        body.put("payQuantity", payQuantity);
         return body;
     }
 }

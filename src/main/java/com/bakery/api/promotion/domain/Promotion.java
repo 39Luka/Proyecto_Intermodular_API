@@ -19,7 +19,7 @@ import java.time.LocalDate;
 
 @Entity
 // Indexes speed up lookups by product, date range and active flag.
-// SINGLE_TABLE inheritance: PercentagePromotion and BuyXPayYPromotion share one "promotions" table.
+// SINGLE_TABLE inheritance: promotions share one "promotions" table. This project only exposes percentage promotions.
 @Table(name = "promotions", indexes = {
         @Index(name = "idx_promotion_product", columnList = "product_id"),
         @Index(name = "idx_promotion_dates", columnList = "start_date, end_date"),
@@ -99,4 +99,3 @@ public abstract class Promotion {
         return product;
     }
 }
-

@@ -28,7 +28,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Bakery API")
-                        .description("REST API for a bakery with JWT auth. Manages categories, products, promotions and purchases.")
+                        .description("REST API for a bakery with JWT auth. Manages categories, products, percentage promotions and purchases.")
                         .version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()

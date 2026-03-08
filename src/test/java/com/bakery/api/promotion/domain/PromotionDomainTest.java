@@ -35,14 +35,5 @@ class PromotionDomainTest {
         PercentagePromotion promo = new PercentagePromotion("10% OFF", new BigDecimal("10.00"), LocalDate.now(), null, product);
         assertEquals(new BigDecimal("0.40000"), promo.calculateDiscountAmount(product.getPrice(), 2).setScale(5));
     }
-
-    @Test
-    void buyXPayYPromotion_calculatesDiscountInFreeUnits() {
-        Product product = new Product("Baguette", null, new BigDecimal("2.00"), 10, new Category("Bread"));
-        BuyXPayYPromotion promo = new BuyXPayYPromotion("Buy 3 pay 2", 3, 2, LocalDate.now(), null, product);
-
-        // quantity=6 => 2 groups => freeUnits=2*(3-2)=2 => discount=2*2.00=4.00
-        assertEquals(new BigDecimal("4.00"), promo.calculateDiscountAmount(product.getPrice(), 6));
-    }
 }
 

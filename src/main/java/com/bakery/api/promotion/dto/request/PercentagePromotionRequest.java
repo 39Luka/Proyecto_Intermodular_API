@@ -1,5 +1,6 @@
 package com.bakery.api.promotion.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 
 public class PercentagePromotionRequest extends PromotionRequest {
 
+    @Schema(description = "Discount percentage (0-100)", example = "10.00")
     @NotNull(message = "Discount percentage is required")
     @DecimalMin(value = "0.0", message = "Discount percentage must be at least 0")
     @DecimalMax(value = "100.0", message = "Discount percentage must not exceed 100")

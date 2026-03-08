@@ -81,8 +81,9 @@ public class SecurityConfig {
                                 exceptionResolver.resolveException(request, response, null, accessDeniedException)
                         )
                 )
-                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class);
+                // Authenticate first so rate limiting can key off the user identity when available.
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(rateLimitingFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
