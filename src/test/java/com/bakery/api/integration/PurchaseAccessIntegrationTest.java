@@ -36,7 +36,7 @@ class PurchaseAccessIntegrationTest extends AbstractIntegrationTest {
 
         User owner = createUser(Role.USER, "owner@example.com");
         User other = createUser(Role.USER, "other@example.com");
-        String otherToken = jwtProvider.generateToken(other.getEmail(), other.getRole().name());
+        String otherToken = jwtTokenService.generateToken(other.getEmail(), other.getRole().name());
 
         Purchase purchase = new Purchase(owner, LocalDateTime.now(), PurchaseStatus.CREATED);
         purchase.addItem(new PurchaseItem(
@@ -67,7 +67,7 @@ class PurchaseAccessIntegrationTest extends AbstractIntegrationTest {
 
         User owner = createUser(Role.USER, "owner@example.com");
         User other = createUser(Role.USER, "other@example.com");
-        String otherToken = jwtProvider.generateToken(other.getEmail(), other.getRole().name());
+        String otherToken = jwtTokenService.generateToken(other.getEmail(), other.getRole().name());
 
         PurchaseRequest request = new PurchaseRequest(
                 owner.getId(),
@@ -95,7 +95,7 @@ class PurchaseAccessIntegrationTest extends AbstractIntegrationTest {
 
         User owner = createUser(Role.USER, "owner@example.com");
         User other = createUser(Role.USER, "other@example.com");
-        String otherToken = jwtProvider.generateToken(other.getEmail(), other.getRole().name());
+        String otherToken = jwtTokenService.generateToken(other.getEmail(), other.getRole().name());
 
         Purchase purchase = new Purchase(owner, LocalDateTime.now(), PurchaseStatus.CREATED);
         purchase.addItem(new PurchaseItem(
@@ -128,7 +128,7 @@ class PurchaseAccessIntegrationTest extends AbstractIntegrationTest {
 
         User owner = createUser(Role.USER, "owner@example.com");
         User admin = createUser(Role.ADMIN, "admin@example.com");
-        String adminToken = jwtProvider.generateToken(admin.getEmail(), admin.getRole().name());
+        String adminToken = jwtTokenService.generateToken(admin.getEmail(), admin.getRole().name());
 
         Purchase purchase = new Purchase(owner, LocalDateTime.now(), PurchaseStatus.CREATED);
         purchase.addItem(new PurchaseItem(

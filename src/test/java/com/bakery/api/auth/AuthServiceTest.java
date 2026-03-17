@@ -3,7 +3,7 @@ package com.bakery.api.auth;
 import com.bakery.api.auth.dto.response.LoginResponse;
 import com.bakery.api.auth.exception.InvalidCredentialsException;
 import com.bakery.api.auth.refresh.RefreshTokenService;
-import com.bakery.api.security.JwtProvider;
+import com.bakery.api.security.JwtTokenService;
 import com.bakery.api.user.UserService;
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;
@@ -32,7 +32,7 @@ class AuthServiceTest {
     private UserService userService;
 
     @Mock
-    private JwtProvider jwtProvider;
+    private JwtTokenService jwtTokenService;
 
     @Mock
     private RefreshTokenService refreshTokenService;
@@ -43,7 +43,7 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         passwordEncoder = new BCryptPasswordEncoder();
-        authService = new AuthService(userService, jwtProvider, passwordEncoder, refreshTokenService);
+        authService = new AuthService(userService, jwtTokenService, passwordEncoder, refreshTokenService);
     }
 
     @Test
@@ -54,10 +54,10 @@ class AuthServiceTest {
         User createdUser = new User(email, passwordEncoder.encode(password), Role.USER);
 
         when(userService.createInternal(eq(email), eq(password), eq(Role.USER))).thenReturn(createdUser);
-        when(jwtProvider.generateToken(eq(email), eq(Role.USER.name()))).thenReturn("jwt-token");
+        when(jwtTokenService.generateToken(eq(email), eq(Role.USER.name()))).thenReturn("jwt-token");
         when(refreshTokenService.issueFor(eq(createdUser))).thenReturn("refresh-token");
 
-        LoginResponse response = authService.register(email, password, "1.2.3.4", "ua");
+        LoginResponse response = authService.register(email, password);
 
         assertEquals("jwt-token", response.token());
         assertEquals("refresh-token", response.refreshToken());
@@ -72,7 +72,7 @@ class AuthServiceTest {
         User user = new User(email, hashedPassword, Role.USER);
 
         when(userService.getEntityByEmail(email)).thenReturn(user);
-        when(jwtProvider.generateToken(email, Role.USER.name())).thenReturn("jwt-token");
+        when(jwtTokenService.generateToken(email, Role.USER.name())).thenReturn("jwt-token");
         when(refreshTokenService.issueFor(eq(user))).thenReturn("refresh-token");
 
         LoginResponse response = authService.login(email, password);
@@ -91,7 +91,7 @@ class AuthServiceTest {
         assertThrows(InvalidCredentialsException.class,
                 () -> authService.login(email, "wrongPassword"));
 
-        verify(jwtProvider, never()).generateToken(anyString(), anyString());
+        verify(jwtTokenService, never()).generateToken(anyString(), anyString());
     }
 
     @Test
@@ -103,7 +103,7 @@ class AuthServiceTest {
         assertThrows(InvalidCredentialsException.class,
                 () -> authService.login(email, "anyPassword"));
 
-        verify(jwtProvider, never()).generateToken(any(), any());
+        verify(jwtTokenService, never()).generateToken(any(), any());
     }
 
     @Test
@@ -118,6 +118,6 @@ class AuthServiceTest {
         assertThrows(UserDisabledException.class,
                 () -> authService.login(email, password));
 
-        verify(jwtProvider, never()).generateToken(anyString(), anyString());
+        verify(jwtTokenService, never()).generateToken(anyString(), anyString());
     }
 }

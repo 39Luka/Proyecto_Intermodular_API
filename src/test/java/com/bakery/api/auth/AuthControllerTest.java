@@ -54,7 +54,7 @@ class AuthControllerTest {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
         LoginResponse response = new LoginResponse("fake.jwt.token");
 
-        when(authService.login(eq(request.email()), eq(request.password()), any(), any())).thenReturn(response);
+        when(authService.login(eq(request.email()), eq(request.password()))).thenReturn(response);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(response.token()));
 
-        verify(authService).login(eq(request.email()), eq(request.password()), any(), any());
+        verify(authService).login(eq(request.email()), eq(request.password()));
     }
 
     @Test
@@ -80,7 +80,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest("new@example.com", "pass12345");
         LoginResponse response = new LoginResponse("new.jwt.token");
 
-        when(authService.register(eq(request.email()), eq(request.password()), any(), any()))
+        when(authService.register(eq(request.email()), eq(request.password())))
                 .thenReturn(response);
 
         mockMvc.perform(post("/auth/register")
@@ -89,22 +89,22 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value(response.token()));
 
-        verify(authService).register(eq(request.email()), eq(request.password()), any(), any());
+        verify(authService).register(eq(request.email()), eq(request.password()));
     }
 
     @Test
     void register_existingEmail_returnsConflict() throws Exception {
         RegisterRequest request = new RegisterRequest("existing@example.com", "pass12345");
 
-        when(authService.register(anyString(), anyString(), any(), any()))
+        when(authService.register(anyString(), anyString()))
                 .thenThrow(new EmailAlreadyExistsException(request.email()));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict());
 
-        verify(authService).register(eq(request.email()), eq(request.password()), any(), any());
+        verify(authService).register(eq(request.email()), eq(request.password()));
     }
 
     @Test

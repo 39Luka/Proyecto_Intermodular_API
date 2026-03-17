@@ -1,8 +1,8 @@
 package com.bakery.api.common.exception;
 
-import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -11,67 +11,49 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Global exception handler for all controllers.
  *
- * Normalizes errors into {@link ErrorResponse} so clients always receive a predictable JSON structure.
+ * Normalizes errors into ProblemDetail. For backward compatibility, responses also include a top-level
+ * {@code message} property for clients.
+ *
+ * ADR: docs/adr/0008-error-format-problemdetail.md
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /** Domain errors (ApiException and subclasses). */
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
-        ErrorResponse response = new ErrorResponse(
-                ex.getStatus().value(),
-                ex.getMessage()
-        );
-
-        return ResponseEntity
-                .status(ex.getStatus())
-                .body(response);
-    }
-
-    /** JWT parsing/validation errors. */
-    @ExceptionHandler(JwtException.class)
-    public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.UNAUTHORIZED.value(),
-                "Invalid or expired token"
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+    public ResponseEntity<ProblemDetail> handleApiException(ApiException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
+        problem.setTitle(ex.getStatus().getReasonPhrase());
+        problem.setProperty("message", ex.getMessage());
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(ex.getStatus()).body(problem);
     }
 
     /** Spring Security authentication errors. */
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.UNAUTHORIZED.value(),
-                "Unauthorized"
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+    public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        problem.setTitle(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        problem.setProperty("message", "Unauthorized");
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
     /** Spring Security authorization errors. */
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.FORBIDDEN.value(),
-                "Forbidden"
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
+    public ResponseEntity<ProblemDetail> handleAccessDeniedException(AccessDeniedException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Forbidden");
+        problem.setTitle(HttpStatus.FORBIDDEN.getReasonPhrase());
+        problem.setProperty("message", "Forbidden");
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
 
     /**
@@ -80,7 +62,7 @@ public class GlobalExceptionHandler {
      * Returns 400 with a list of invalid fields: [{ field, message }].
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ProblemDetail> handleValidationErrors(MethodArgumentNotValidException ex) {
         // Flatten all validation errors into a simple list for clients.
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> Map.of(
@@ -89,8 +71,11 @@ public class GlobalExceptionHandler {
                 ))
                 .toList();
 
-        return ResponseEntity.badRequest()
-                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        problem.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        problem.setProperty("message", errors);
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.badRequest().body(problem);
     }
 
     /**
@@ -98,9 +83,12 @@ public class GlobalExceptionHandler {
      * Return 409 instead of a generic 500.
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict"));
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Conflict");
+        problem.setTitle(HttpStatus.CONFLICT.getReasonPhrase());
+        problem.setProperty("message", "Conflict");
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
     /**
@@ -108,8 +96,12 @@ public class GlobalExceptionHandler {
      * Clients should retry the operation.
      */
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<ErrorResponse> handleOptimisticLocking(ObjectOptimisticLockingFailureException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Concurrent update, please retry"));
+    public ResponseEntity<ProblemDetail> handleOptimisticLocking(ObjectOptimisticLockingFailureException ex) {
+        String message = "Concurrent update, please retry";
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
+        problem.setTitle(HttpStatus.CONFLICT.getReasonPhrase());
+        problem.setProperty("message", message);
+        problem.setProperty("timestamp", Instant.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 }

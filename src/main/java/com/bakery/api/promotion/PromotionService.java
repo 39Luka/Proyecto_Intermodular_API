@@ -2,11 +2,11 @@ package com.bakery.api.promotion;
 
 import com.bakery.api.product.Product;
 import com.bakery.api.product.ProductService;
+import com.bakery.api.promotion.dto.PromotionMapper;
 import com.bakery.api.promotion.domain.PercentagePromotion;
 import com.bakery.api.promotion.domain.Promotion;
 import com.bakery.api.promotion.domain.PromotionUsage;
 import com.bakery.api.promotion.dto.request.PercentagePromotionRequest;
-import com.bakery.api.promotion.dto.response.PercentagePromotionResponse;
 import com.bakery.api.promotion.dto.response.PromotionResponse;
 import com.bakery.api.promotion.exception.InvalidPromotionException;
 import com.bakery.api.promotion.exception.PromotionNotFoundException;
@@ -15,6 +15,9 @@ import com.bakery.api.common.pagination.PageableUtils;
 import com.bakery.api.common.security.SecurityUtils;
 import com.bakery.api.user.UserService;
 import com.bakery.api.user.domain.User;
+import com.bakery.api.config.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,21 +38,25 @@ public class PromotionService {
     private final ProductService productService;
     private final PromotionUsageRepository usageRepository;
     private final UserService userService;
+    private final PromotionMapper mapper;
 
     public PromotionService(
             PromotionRepository repository,
             ProductService productService,
             PromotionUsageRepository usageRepository,
-            UserService userService
+            UserService userService,
+            PromotionMapper mapper
     ) {
         this.repository = repository;
         this.productService = productService;
         this.usageRepository = usageRepository;
         this.userService = userService;
+        this.mapper = mapper;
     }
 
     @Transactional
-    public PercentagePromotionResponse createPercentage(PercentagePromotionRequest request) {
+    @CacheEvict(cacheNames = {CacheConfig.PROMOTIONS_BY_ID, CacheConfig.PROMOTIONS_ADMIN_LIST}, allEntries = true)
+    public PromotionResponse createPercentage(PercentagePromotionRequest request) {
         validateDates(request.getStartDate(), request.getEndDate());
         validatePercentage(request.getDiscountPercentage());
 
@@ -64,7 +71,7 @@ public class PromotionService {
                 product
         );
 
-        return PercentagePromotionResponse.from(repository.save(promotion));
+        return mapper.toResponse(repository.save(promotion));
     }
 
     public Promotion getEntityById(Long id) {
@@ -72,14 +79,23 @@ public class PromotionService {
                 .orElseThrow(() -> new PromotionNotFoundException(id));
     }
 
+    @Cacheable(cacheNames = CacheConfig.PROMOTIONS_BY_ID, key = "#id")
     public PromotionResponse getById(Long id) {
-        return PromotionResponse.from(getEntityById(id));
+        return mapper.toResponse(getEntityById(id));
     }
 
+    @Cacheable(
+            cacheNames = CacheConfig.PROMOTIONS_ADMIN_LIST,
+            key = "new org.springframework.cache.interceptor.SimpleKey(" +
+                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).pageNumber," +
+                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).pageSize," +
+                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).sort.toString()" +
+                    ")"
+    )
     public Page<PromotionResponse> getAll(Pageable pageable) {
         Pageable safePageable = PageableUtils.safe(pageable);
         return repository.findAll(safePageable)
-                .map(PromotionResponse::from);
+                .map(mapper::toResponse);
     }
 
     public Page<PromotionResponse> getActiveByProduct(Long productId, Long userId, Pageable pageable) {
@@ -95,10 +111,11 @@ public class PromotionService {
         Page<Promotion> promotions = effectiveUserId == null
                 ? repository.findActiveByProductId(productId, today, safePageable)
                 : repository.findActiveByProductIdAndUserId(productId, effectiveUserId, today, safePageable);
-        return promotions.map(PromotionResponse::from);
+        return promotions.map(mapper::toResponse);
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {CacheConfig.PROMOTIONS_BY_ID, CacheConfig.PROMOTIONS_ADMIN_LIST}, allEntries = true)
     public void disable(Long id) {
         Promotion promotion = getEntityById(id);
         promotion.disable();
@@ -106,6 +123,7 @@ public class PromotionService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {CacheConfig.PROMOTIONS_BY_ID, CacheConfig.PROMOTIONS_ADMIN_LIST}, allEntries = true)
     public void enable(Long id) {
         Promotion promotion = getEntityById(id);
         promotion.enable();

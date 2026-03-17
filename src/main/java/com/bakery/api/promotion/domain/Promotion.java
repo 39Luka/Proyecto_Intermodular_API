@@ -63,6 +63,10 @@ public abstract class Promotion {
 
     public abstract String getType();
 
+    public BigDecimal getDiscountPercentage() {
+        return BigDecimal.ZERO;
+    }
+
     public boolean isActiveOn(LocalDate date) {
         return active && !date.isBefore(startDate) && (endDate == null || !date.isAfter(endDate));
     }

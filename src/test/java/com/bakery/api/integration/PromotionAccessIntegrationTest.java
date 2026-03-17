@@ -43,7 +43,7 @@ class PromotionAccessIntegrationTest extends AbstractIntegrationTest {
     void activePromotions_afterUsingPromotion_disappearsForThatUser() throws Exception {
         PromotionFixture fixture = createPromotionFixture();
         User user = createUser(Role.USER, "user@example.com");
-        String userToken = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String userToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
 
         mockMvc.perform(get("/promotions/active")
                         .param("productId", fixture.product().getId().toString())
@@ -76,7 +76,7 @@ class PromotionAccessIntegrationTest extends AbstractIntegrationTest {
         PromotionFixture fixture = createPromotionFixture();
         User user = createUser(Role.USER, "user@example.com");
         User other = createUser(Role.USER, "other@example.com");
-        String userToken = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String userToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
 
         mockMvc.perform(get("/promotions/active")
                         .param("productId", fixture.product().getId().toString())
@@ -90,8 +90,8 @@ class PromotionAccessIntegrationTest extends AbstractIntegrationTest {
         PromotionFixture fixture = createPromotionFixture();
         User user = createUser(Role.USER, "user@example.com");
         User admin = createUser(Role.ADMIN, "admin@example.com");
-        String userToken = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
-        String adminToken = jwtProvider.generateToken(admin.getEmail(), admin.getRole().name());
+        String userToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
+        String adminToken = jwtTokenService.generateToken(admin.getEmail(), admin.getRole().name());
 
         PurchaseRequest purchaseRequest = new PurchaseRequest(
                 user.getId(),

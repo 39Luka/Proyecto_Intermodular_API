@@ -1,20 +1,20 @@
 package com.bakery.api.security;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import com.bakery.api.config.properties.CorsProperties;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import com.bakery.api.user.UserRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,21 +34,21 @@ public class SecurityConfig {
      * - everything else requires authentication
      */
     private final HandlerExceptionResolver exceptionResolver;
-    private final Environment environment;
+    private final CorsProperties corsProperties;
 
     public SecurityConfig(
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver,
-            Environment environment
+            CorsProperties corsProperties
     ) {
         this.exceptionResolver = exceptionResolver;
-        this.environment = environment;
+        this.corsProperties = corsProperties;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             RateLimitingFilter rateLimitingFilter,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter
     ) throws Exception {
 
         http
@@ -62,7 +62,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/auth/refresh", "/auth/logout").permitAll()
                         .requestMatchers("/auth/**").authenticated()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // ADR: docs/adr/0005-observability-actuator-prometheus.md (public health + Prometheus scraping)
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/promotions/active").authenticated()
@@ -73,6 +75,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/products/**", "/categories/**", "/promotions/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                // ADR: docs/adr/0002-jwt-validation-resource-server-hs256.md
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) ->
                                 exceptionResolver.resolveException(request, response, null, authException)
@@ -82,8 +88,7 @@ public class SecurityConfig {
                         )
                 )
                 // Authenticate first so rate limiting can key off the user identity when available.
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(rateLimitingFilter, JwtAuthenticationFilter.class);
+                .addFilterAfter(rateLimitingFilter, BearerTokenAuthenticationFilter.class);
 
         return http.build();
     }
@@ -92,7 +97,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         // Comma-separated list, e.g.: https://myapp.com,http://localhost:5173
         // When empty, CORS is effectively disabled (no allowed origins).
-        String raw = environment.getProperty("app.cors.allowed-origins", "");
+        String raw = corsProperties.allowedOrigins() == null ? "" : corsProperties.allowedOrigins();
         List<String> origins = Arrays.stream(raw.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
@@ -113,18 +118,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return username -> userRepository.findByEmail(username)
-                .map(user -> org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-                        .password(user.getPassword())
-                        .disabled(!user.isEnabled())
-                        .roles(user.getRole().name())
-                        .build()
-                )
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     @Bean

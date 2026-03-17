@@ -2,7 +2,6 @@ package com.bakery.api.promotion;
 
 import jakarta.validation.Valid;
 import com.bakery.api.promotion.dto.request.PercentagePromotionRequest;
-import com.bakery.api.promotion.dto.response.PercentagePromotionResponse;
 import com.bakery.api.promotion.dto.response.PromotionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -75,7 +74,7 @@ public class PromotionController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<PercentagePromotionResponse> createPercentage(@Valid @RequestBody PercentagePromotionRequest request) {
+    public ResponseEntity<PromotionResponse> createPercentage(@Valid @RequestBody PercentagePromotionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.createPercentage(request));
     }

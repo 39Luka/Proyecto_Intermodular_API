@@ -1,6 +1,5 @@
 package com.bakery.api.auth;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import com.bakery.api.auth.dto.request.LoginRequest;
 import com.bakery.api.auth.dto.request.LogoutRequest;
@@ -37,14 +36,11 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest request,
-            HttpServletRequest httpRequest
+            @Valid @RequestBody LoginRequest request
     ) {
         return ResponseEntity.ok(authService.login(
                 request.email(),
-                request.password(),
-                clientIp(httpRequest),
-                userAgent(httpRequest)
+                request.password()
         ));
     }
 
@@ -56,16 +52,13 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "Email already exists")
     })
     public ResponseEntity<LoginResponse> register(
-            @Valid @RequestBody RegisterRequest request,
-            HttpServletRequest httpRequest
+            @Valid @RequestBody RegisterRequest request
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.register(
                         request.email(),
-                        request.password(),
-                        clientIp(httpRequest),
-                        userAgent(httpRequest)
+                        request.password()
                 ));
     }
 
@@ -76,13 +69,10 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid refresh token")
     })
     public ResponseEntity<LoginResponse> refresh(
-            @Valid @RequestBody RefreshRequest request,
-            HttpServletRequest httpRequest
+            @Valid @RequestBody RefreshRequest request
     ) {
         return ResponseEntity.ok(authService.refresh(
-                request.refreshToken(),
-                clientIp(httpRequest),
-                userAgent(httpRequest)
+                request.refreshToken()
         ));
     }
 
@@ -97,18 +87,6 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    private static String userAgent(HttpServletRequest request) {
-        return request.getHeader("User-Agent");
-    }
-
-    private static String clientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            // "client, proxy1, proxy2" -> take the original client.
-            return forwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
 }
 
 

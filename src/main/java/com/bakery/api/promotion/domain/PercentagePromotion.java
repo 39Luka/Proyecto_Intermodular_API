@@ -45,6 +45,7 @@ public class PercentagePromotion extends Promotion {
         return "PERCENTAGE";
     }
 
+    @Override
     public BigDecimal getDiscountPercentage() {
         return discountPercentage;
     }

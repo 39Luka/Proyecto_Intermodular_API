@@ -9,8 +9,11 @@ import com.bakery.api.promotion.domain.Promotion;
 import com.bakery.api.purchase.domain.Purchase;
 import com.bakery.api.purchase.domain.PurchaseItem;
 import com.bakery.api.purchase.domain.PurchaseStatus;
+import com.bakery.api.purchase.dto.PurchaseMapper;
 import com.bakery.api.purchase.dto.request.PurchaseItemRequest;
 import com.bakery.api.purchase.dto.request.PurchaseRequest;
+import com.bakery.api.purchase.dto.response.PurchaseItemResponse;
+import com.bakery.api.purchase.dto.response.PurchaseResponse;
 import com.bakery.api.purchase.exception.InvalidPurchaseException;
 import com.bakery.api.user.UserService;
 import com.bakery.api.user.domain.Role;
@@ -55,6 +58,9 @@ class PurchaseServiceTest {
     @Mock
     private PromotionService promotionService;
 
+    @Mock
+    private PurchaseMapper mapper;
+
     @InjectMocks
     private PurchaseService service;
 
@@ -91,6 +97,28 @@ class PurchaseServiceTest {
         Product product = new Product("Baguette", null, new BigDecimal("1.00"), 10, category);
         when(productService.getActiveEntityById(10L)).thenReturn(product);
         when(repository.save(any(Purchase.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(mapper.toResponse(any(Purchase.class))).thenAnswer(inv -> {
+            Purchase p = inv.getArgument(0);
+            List<PurchaseItemResponse> items = p.getItems().stream()
+                    .map(i -> new PurchaseItemResponse(
+                            i.getProduct().getId(),
+                            i.getProduct().getName(),
+                            i.getQuantity(),
+                            i.getUnitPrice(),
+                            i.getDiscountAmount(),
+                            i.getSubtotal(),
+                            i.getPromotion() == null ? null : i.getPromotion().getId()
+                    ))
+                    .toList();
+            return new PurchaseResponse(
+                    p.getId(),
+                    p.getUser().getId(),
+                    p.getCreatedAt(),
+                    p.getStatus(),
+                    p.getTotal(),
+                    items
+            );
+        });
 
         PurchaseRequest request = new PurchaseRequest(2L, List.of(new PurchaseItemRequest(10L, 2, null)));
         var response = service.create(request);

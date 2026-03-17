@@ -1,7 +1,7 @@
 package com.bakery.api.auth.refresh;
 
+import com.bakery.api.config.properties.RefreshTokenProperties;
 import com.bakery.api.user.domain.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,23 +16,27 @@ import java.util.Base64;
 @Service
 public class RefreshTokenService {
 
+    /**
+     * Refresh token issuance/rotation/revocation (hashed, opaque tokens).
+     *
+     * ADR: docs/adr/0001-jwt-access-refresh-tokens.md
+     */
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private final RefreshTokenRepository repository;
+    private final RefreshTokenProperties properties;
 
-    @Value("${app.refresh-token.expiration-ms:2592000000}") // 30 days
-    private long refreshTokenExpirationMs;
-
-    public RefreshTokenService(RefreshTokenRepository repository) {
+    public RefreshTokenService(RefreshTokenRepository repository, RefreshTokenProperties properties) {
         this.repository = repository;
+        this.properties = properties;
     }
 
     @Transactional
     public String issueFor(User user) {
         Instant now = Instant.now();
-        Instant expiresAt = now.plusMillis(refreshTokenExpirationMs);
+        Instant expiresAt = now.plusMillis(properties.expirationMs());
 
-        // Generate a random opaque token (not a JWT).
+        // Generate a random opaque token (not a JWT). Only return the raw token to the client.
         String raw = generateRawToken();
         String hash = sha256Hex(raw);
 
@@ -50,6 +54,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RotationResult rotate(String rawRefreshToken) {
+        // Look up by hash so we never have to store raw tokens server-side.
         String hash = sha256Hex(rawRefreshToken);
         RefreshToken existing = repository.findByTokenHash(hash)
                 .orElseThrow(InvalidRefreshTokenException::new);
@@ -59,6 +64,7 @@ public class RefreshTokenService {
             throw new InvalidRefreshTokenException();
         }
 
+        // Revoke first, then issue a new one. If anything fails, the transaction rolls back.
         existing.revoke(now);
         repository.save(existing);
 
@@ -68,6 +74,7 @@ public class RefreshTokenService {
 
     @Transactional
     public void revoke(String rawRefreshToken) {
+        // Logout: mark the token as revoked so it can't be used again.
         String hash = sha256Hex(rawRefreshToken);
         RefreshToken existing = repository.findByTokenHash(hash)
                 .orElseThrow(InvalidRefreshTokenException::new);

@@ -2,6 +2,7 @@ package com.bakery.api.user;
 
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;
+import com.bakery.api.user.dto.UserMapper;
 import com.bakery.api.user.dto.request.UserRequest;
 import com.bakery.api.user.dto.response.UserResponse;
 import com.bakery.api.user.exception.EmailAlreadyExistsException;
@@ -27,6 +28,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserMapper mapper;
+
     @InjectMocks
     private UserService userService;
 
@@ -34,6 +38,10 @@ class UserServiceTest {
     void getById_existingUser_returnsUser() {
         User user = new User("silvia@example.com", "1234", Role.USER);
         when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(mapper.toResponse(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            return new UserResponse(u.getId(), u.getEmail(), u.getRole(), u.isEnabled());
+        });
 
         UserResponse result = userService.getById(1L);
 
@@ -53,6 +61,10 @@ class UserServiceTest {
         when(passwordEncoder.encode("1234")).thenReturn("hashed");
         User user = new User("silvia@example.com", "hashed", Role.USER);
         when(repository.save(any(User.class))).thenReturn(user);
+        when(mapper.toResponse(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            return new UserResponse(u.getId(), u.getEmail(), u.getRole(), u.isEnabled());
+        });
 
         UserResponse result = userService.create(new UserRequest("silvia@example.com", "1234", Role.USER));
 

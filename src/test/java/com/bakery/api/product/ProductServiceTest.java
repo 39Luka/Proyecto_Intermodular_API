@@ -2,6 +2,8 @@ package com.bakery.api.product;
 
 import com.bakery.api.category.Category;
 import com.bakery.api.category.CategoryService;
+import com.bakery.api.product.dto.ProductMapper;
+import com.bakery.api.product.dto.response.ProductResponse;
 import com.bakery.api.product.exception.ProductNotFoundException;
 import com.bakery.api.purchase.domain.PurchaseStatus;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +38,9 @@ class ProductServiceTest {
 
     @Mock
     private CategoryService categoryService;
+
+    @Mock
+    private ProductMapper mapper;
 
     @InjectMocks
     private ProductService service;
@@ -81,6 +86,11 @@ class ProductServiceTest {
         Product inactive = new Product("Old", null, new BigDecimal("1.00"), 1, new Category("Bread"));
         inactive.disable();
         when(repository.findById(1L)).thenReturn(Optional.of(inactive));
+        when(mapper.toResponse(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            Long categoryId = p.getCategory() != null ? p.getCategory().getId() : null;
+            return new ProductResponse(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getStock(), p.isActive(), categoryId);
+        });
 
         var response = service.getById(1L);
 

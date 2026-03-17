@@ -33,8 +33,9 @@ API base URL: `http://localhost:8080` (or the port in `PORT`).
 ## Health (Actuator)
 
 - `GET /actuator/health` is public (for uptime checks).
+- `GET /actuator/prometheus` is public (for Prometheus scraping).
 - Other `/actuator/**` endpoints require an `ADMIN` token.
-- By default only `health` and `info` are exposed. Expand with `MANAGEMENT_ENDPOINTS` if needed.
+- By default `health`, `info` and `prometheus` are exposed. Expand/reduce with `MANAGEMENT_ENDPOINTS` if needed.
 
 Using Swagger with JWT:
 
@@ -61,15 +62,22 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
 - `spring.flyway.baseline-on-migrate`: enabled by default in this project to support existing schemas and empty DB bootstraps
 - `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
-- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`: basic rate limiting for `/auth/login` and `/auth/register`
-Admin bootstrap (only when there are no users in the DB):
+- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`: basic rate limiting (in-memory token bucket; applies to all endpoints by default)
+- `RATE_LIMIT_EXCLUDED_PATH_PREFIXES`: comma-separated list of excluded path prefixes (optional). Example: `/swagger-ui,/v3/api-docs,/actuator/health,/actuator/info`
+- `CACHE_MAX_SIZE`: max entries for local cache (Caffeine). Default `10000`.
+- `CACHE_TTL`: ISO-8601 duration for cache TTL. Default `PT10M`.
+Admin bootstrap (only when there are no users in the DB and BOTH vars are set):
 
 - `INITIAL_ADMIN_EMAIL`
 - `INITIAL_ADMIN_PASSWORD`
 
 Notes:
 
-- `/auth/register` always creates a `USER`. Create admins via the bootstrap env vars above or via `/users/**` as an existing `ADMIN`.
+- `/auth/register` always creates a `USER`. Create admins via the bootstrap env vars above (only on empty DB) or via `/users/**` as an existing `ADMIN`.
+- If you set only one of `INITIAL_ADMIN_EMAIL` or `INITIAL_ADMIN_PASSWORD`, the app fails fast at startup with a clear error.
+- The app uses a local in-memory cache (Caffeine) for some read endpoints (safe for single-instance deployments).
+  - Cached reads (default TTL 10 min): `GET /categories`, `GET /categories/{id}`, `GET /products`, `GET /products/{id}` (active products view), `GET /promotions`, `GET /promotions/{id}`.
+  - Cached admin reads: `GET /users/{id}`, `GET /users?email=...`.
 
 ## Auth & Permissions (Summary)
 
@@ -123,6 +131,22 @@ Notes:
 
 - Tests use in-memory H2 (`src/test/resources/application.properties`).
 - Gradle forces `spring.profiles.active=test` so CI does not attempt to boot with MySQL settings.
+- Integration tests against MySQL (Testcontainers) run when Docker is available.
+
+## Architecture Decisions (ADR)
+
+- `docs/adr/0001-jwt-access-refresh-tokens.md` (index -> EN/ES)
+- `docs/adr/0002-jwt-validation-resource-server-hs256.md` (index -> EN/ES)
+- `docs/adr/0003-rate-limiting-bucket4j.md` (index -> EN/ES)
+- `docs/adr/0004-caching-caffeine.md` (index -> EN/ES)
+- `docs/adr/0005-observability-actuator-prometheus.md` (index -> EN/ES)
+- `docs/adr/0006-dto-mapping-mapstruct.md` (index -> EN/ES)
+- `docs/adr/0007-initial-admin-bootstrap.md` (index -> EN/ES)
+- `docs/adr/0008-error-format-problemdetail.md` (index -> EN/ES)
+- `docs/adr/0009-configuration-properties-and-prod-checks.md` (index -> EN/ES)
+- `docs/adr/0010-testing-h2-and-mysql-testcontainers.md` (index -> EN/ES)
+- `docs/adr/0011-stock-concurrency-optimistic-locking.md` (index -> EN/ES)
+- `docs/adr/0012-schema-management-flyway.md` (index -> EN/ES)
 
 ## Production (Railway)
 

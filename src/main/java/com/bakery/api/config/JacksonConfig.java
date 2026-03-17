@@ -1,6 +1,7 @@
 package com.bakery.api.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,9 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class JacksonConfig {
 
     @Bean
+    @ConditionalOnMissingBean(ObjectMapper.class)
     public ObjectMapper objectMapper() {
-        // Ensure java.time types (Instant, etc.) serialize correctly in filter-generated responses.
         return new ObjectMapper().findAndRegisterModules();
     }
 }
-

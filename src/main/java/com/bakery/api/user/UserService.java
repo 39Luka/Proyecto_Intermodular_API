@@ -2,10 +2,14 @@ package com.bakery.api.user;
 
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;
+import com.bakery.api.user.dto.UserMapper;
 import com.bakery.api.user.dto.request.UserRequest;
 import com.bakery.api.user.dto.response.UserResponse;
 import com.bakery.api.user.exception.EmailAlreadyExistsException;
 import com.bakery.api.user.exception.UserNotFoundException;
+import com.bakery.api.config.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +20,12 @@ public class UserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper mapper;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, UserMapper mapper) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.mapper = mapper;
     }
 
     public User getEntityById(Long id) {
@@ -32,18 +38,21 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
+    @Cacheable(cacheNames = CacheConfig.USERS_BY_ID, key = "#id")
     public UserResponse getById(Long id) {
-        return UserResponse.from(getEntityById(id));
+        return mapper.toResponse(getEntityById(id));
     }
 
+    @Cacheable(cacheNames = CacheConfig.USERS_BY_EMAIL, key = "#email.toLowerCase()")
     public UserResponse getByEmail(String email) {
-        return UserResponse.from(getEntityByEmail(email));
+        return mapper.toResponse(getEntityByEmail(email));
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {CacheConfig.USERS_BY_ID, CacheConfig.USERS_BY_EMAIL}, allEntries = true)
     public UserResponse create(UserRequest request) {
         User user = createInternal(request.email(), request.password(), request.role());
-        return UserResponse.from(user);
+        return mapper.toResponse(user);
     }
 
     @Transactional
@@ -58,6 +67,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {CacheConfig.USERS_BY_ID, CacheConfig.USERS_BY_EMAIL}, allEntries = true)
     public void enableUser(Long id) {
         User user = getEntityById(id);
         user.enable();
@@ -65,6 +75,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {CacheConfig.USERS_BY_ID, CacheConfig.USERS_BY_EMAIL}, allEntries = true)
     public void disableUser(Long id) {
         User user = getEntityById(id);
         user.disable();

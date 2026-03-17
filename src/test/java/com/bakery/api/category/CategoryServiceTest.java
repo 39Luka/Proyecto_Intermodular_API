@@ -1,6 +1,8 @@
 package com.bakery.api.category;
 
+import com.bakery.api.category.dto.CategoryMapper;
 import com.bakery.api.category.dto.request.CategoryRequest;
+import com.bakery.api.category.dto.response.CategoryResponse;
 import com.bakery.api.category.exception.CategoryAlreadyExistsException;
 import com.bakery.api.category.exception.CategoryNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,9 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository repository;
 
+    @Mock
+    private CategoryMapper mapper;
+
     @InjectMocks
     private CategoryService service;
 
@@ -40,6 +45,10 @@ class CategoryServiceTest {
         when(repository.existsByNameIgnoreCase("Bread")).thenReturn(false);
         Category saved = new Category("Bread");
         when(repository.save(any(Category.class))).thenReturn(saved);
+        when(mapper.toResponse(any(Category.class))).thenAnswer(inv -> {
+            Category c = inv.getArgument(0);
+            return new CategoryResponse(c.getId(), c.getName());
+        });
 
         var response = service.create(new CategoryRequest("Bread"));
 
@@ -56,6 +65,10 @@ class CategoryServiceTest {
     @Test
     void getAll_returnsPage() {
         when(repository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(new Category("Bread"))));
+        when(mapper.toResponse(any(Category.class))).thenAnswer(inv -> {
+            Category c = inv.getArgument(0);
+            return new CategoryResponse(c.getId(), c.getName());
+        });
         var page = service.getAll(PageRequest.of(0, 10));
         assertEquals(1, page.getContent().size());
         assertEquals("Bread", page.getContent().get(0).name());

@@ -42,7 +42,7 @@ class PurchaseFlowIntegrationTest extends AbstractIntegrationTest {
         promotion = (PercentagePromotion) promotionRepository.save(promotion);
 
         User user = userRepository.save(new User("user@example.com", passwordEncoder.encode("password123"), Role.USER));
-        String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
 
         mockMvc.perform(get("/promotions/active")
                         .param("productId", product.getId().toString())
@@ -102,7 +102,7 @@ class PurchaseFlowIntegrationTest extends AbstractIntegrationTest {
         ));
 
         User user = userRepository.save(new User("user@example.com", passwordEncoder.encode("password123"), Role.USER));
-        String token = jwtProvider.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
 
         PurchaseRequest request = new PurchaseRequest(
                 user.getId(),
@@ -142,14 +142,14 @@ class PurchaseFlowIntegrationTest extends AbstractIntegrationTest {
 
         User owner = userRepository.save(new User("owner@example.com", passwordEncoder.encode("password123"), Role.USER));
         User other = userRepository.save(new User("other@example.com", passwordEncoder.encode("password123"), Role.USER));
-        String otherToken = jwtProvider.generateToken(other.getEmail(), other.getRole().name());
+        String otherToken = jwtTokenService.generateToken(other.getEmail(), other.getRole().name());
 
         PurchaseRequest request = new PurchaseRequest(
                 owner.getId(),
                 List.of(new PurchaseItemRequest(product.getId(), 1, null))
         );
 
-        String ownerToken = jwtProvider.generateToken(owner.getEmail(), owner.getRole().name());
+        String ownerToken = jwtTokenService.generateToken(owner.getEmail(), owner.getRole().name());
         String purchaseResponse = mockMvc.perform(post("/purchases")
                         .header("Authorization", "Bearer " + ownerToken)
                         .contentType(MediaType.APPLICATION_JSON)
