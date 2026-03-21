@@ -1,9 +1,9 @@
 package com.bakery.api.product;
 
 import jakarta.validation.Valid;
-import com.bakery.api.product.dto.request.ProductRequest;
-import com.bakery.api.product.dto.response.ProductResponse;
-import com.bakery.api.product.dto.response.ProductSalesResponse;
+import com.bakery.api.product.dto.ProductRequest;
+import com.bakery.api.product.dto.ProductResponse;
+import com.bakery.api.product.dto.ProductSalesResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -119,4 +119,3 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 }
-

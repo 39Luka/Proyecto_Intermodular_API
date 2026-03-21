@@ -1,9 +1,9 @@
 package com.bakery.api.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.bakery.api.auth.dto.request.LoginRequest;
-import com.bakery.api.auth.dto.request.RegisterRequest;
-import com.bakery.api.auth.dto.response.LoginResponse;
+import com.bakery.api.auth.dto.LoginRequest;
+import com.bakery.api.auth.dto.RegisterRequest;
+import com.bakery.api.auth.dto.LoginResponse;
 import com.bakery.api.auth.refresh.RefreshTokenService;
 import com.bakery.api.common.exception.GlobalExceptionHandler;
 import com.bakery.api.user.UserService;

@@ -1,7 +1,7 @@
 package com.bakery.api.product;
 
-import com.bakery.api.product.dto.response.ProductSalesResponse;
-import com.bakery.api.purchase.domain.PurchaseStatus;
+import com.bakery.api.product.dto.ProductSalesResponse;
+import com.bakery.api.purchase.PurchaseStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -25,7 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
 
     @Query("""
-            select new com.bakery.api.product.dto.response.ProductSalesResponse(
+            select new com.bakery.api.product.dto.ProductSalesResponse(
                 p.id,
                 p.name,
                 sum(pi.quantity)
@@ -43,7 +43,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     @Query("""
-            select new com.bakery.api.product.dto.response.ProductSalesResponse(
+            select new com.bakery.api.product.dto.ProductSalesResponse(
                 p.id,
                 p.name,
                 sum(pi.quantity)

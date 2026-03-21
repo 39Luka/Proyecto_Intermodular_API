@@ -1,7 +1,6 @@
 package com.bakery.api.config;
 
 import com.bakery.api.config.properties.CorsProperties;
-import com.bakery.api.config.properties.CacheProperties;
 import com.bakery.api.config.properties.InitialAdminProperties;
 import com.bakery.api.config.properties.JpaHibernateProperties;
 import com.bakery.api.config.properties.JwtProperties;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
         RefreshTokenProperties.class,
         InitialAdminProperties.class,
         JpaHibernateProperties.class,
-        CacheProperties.class,
         AppDataSourceProperties.class
 })
 public class PropertiesConfig {

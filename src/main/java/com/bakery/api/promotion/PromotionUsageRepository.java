@@ -1,6 +1,6 @@
 package com.bakery.api.promotion;
 
-import com.bakery.api.promotion.domain.PromotionUsage;
+import com.bakery.api.promotion.PromotionUsage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PromotionUsageRepository extends JpaRepository<PromotionUsage, Long> {

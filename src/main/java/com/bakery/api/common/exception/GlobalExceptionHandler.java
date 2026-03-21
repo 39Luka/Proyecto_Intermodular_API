@@ -21,7 +21,7 @@ import java.util.Map;
  * Normalizes errors into ProblemDetail. For backward compatibility, responses also include a top-level
  * {@code message} property for clients.
  *
- * ADR: docs/adr/0008-error-format-problemdetail.md
+ * ADR: docs/adr/0007-error-format-problemdetail.md
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

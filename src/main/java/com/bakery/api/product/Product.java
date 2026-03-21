@@ -28,7 +28,7 @@ public class Product {
     private Long id;
 
     @Version
-    // ADR: docs/adr/0011-stock-concurrency-optimistic-locking.md (prevents lost updates / overselling under concurrency)
+    // ADR: docs/adr/0010-stock-concurrency-optimistic-locking.md (prevents lost updates / overselling under concurrency)
     private long version;
 
     @Column(nullable = false, length = 100)

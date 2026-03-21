@@ -6,14 +6,11 @@ import com.bakery.api.common.security.SecurityUtils;
 import com.bakery.api.product.Product;
 import com.bakery.api.product.ProductService;
 import com.bakery.api.promotion.PromotionService;
-import com.bakery.api.promotion.domain.Promotion;
-import com.bakery.api.purchase.domain.Purchase;
-import com.bakery.api.purchase.domain.PurchaseItem;
-import com.bakery.api.purchase.domain.PurchaseStatus;
+import com.bakery.api.promotion.Promotion;
 import com.bakery.api.purchase.dto.PurchaseMapper;
-import com.bakery.api.purchase.dto.request.PurchaseItemRequest;
-import com.bakery.api.purchase.dto.request.PurchaseRequest;
-import com.bakery.api.purchase.dto.response.PurchaseResponse;
+import com.bakery.api.purchase.dto.PurchaseItemRequest;
+import com.bakery.api.purchase.dto.PurchaseRequest;
+import com.bakery.api.purchase.dto.PurchaseResponse;
 import com.bakery.api.purchase.exception.InvalidPurchaseException;
 import com.bakery.api.purchase.exception.PurchaseNotFoundException;
 import com.bakery.api.user.UserService;
@@ -26,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 /**
@@ -44,19 +42,22 @@ public class PurchaseService {
     private final ProductService productService;
     private final PromotionService promotionService;
     private final PurchaseMapper mapper;
+    private final Clock clock;
 
     public PurchaseService(
             PurchaseRepository repository,
             UserService userService,
             ProductService productService,
             PromotionService promotionService,
-            PurchaseMapper mapper
+            PurchaseMapper mapper,
+            Clock clock
     ) {
         this.repository = repository;
         this.userService = userService;
         this.productService = productService;
         this.promotionService = promotionService;
         this.mapper = mapper;
+        this.clock = clock;
     }
 
     @Transactional
@@ -66,7 +67,7 @@ public class PurchaseService {
         }
 
         User user = resolvePurchaseUser(request.userId());
-        Purchase purchase = new Purchase(user, LocalDateTime.now(), PurchaseStatus.CREATED);
+        Purchase purchase = new Purchase(user, LocalDateTime.now(clock), PurchaseStatus.CREATED);
 
         for (PurchaseItemRequest itemRequest : request.items()) {
             if (itemRequest.quantity() <= 0) {

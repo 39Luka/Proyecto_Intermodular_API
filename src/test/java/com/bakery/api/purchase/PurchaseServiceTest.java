@@ -5,15 +5,15 @@ import com.bakery.api.category.Category;
 import com.bakery.api.product.Product;
 import com.bakery.api.product.ProductService;
 import com.bakery.api.promotion.PromotionService;
-import com.bakery.api.promotion.domain.Promotion;
-import com.bakery.api.purchase.domain.Purchase;
-import com.bakery.api.purchase.domain.PurchaseItem;
-import com.bakery.api.purchase.domain.PurchaseStatus;
+import com.bakery.api.promotion.Promotion;
+import com.bakery.api.purchase.Purchase;
+import com.bakery.api.purchase.PurchaseItem;
+import com.bakery.api.purchase.PurchaseStatus;
 import com.bakery.api.purchase.dto.PurchaseMapper;
-import com.bakery.api.purchase.dto.request.PurchaseItemRequest;
-import com.bakery.api.purchase.dto.request.PurchaseRequest;
-import com.bakery.api.purchase.dto.response.PurchaseItemResponse;
-import com.bakery.api.purchase.dto.response.PurchaseResponse;
+import com.bakery.api.purchase.dto.PurchaseItemRequest;
+import com.bakery.api.purchase.dto.PurchaseRequest;
+import com.bakery.api.purchase.dto.PurchaseItemResponse;
+import com.bakery.api.purchase.dto.PurchaseResponse;
 import com.bakery.api.purchase.exception.InvalidPurchaseException;
 import com.bakery.api.user.UserService;
 import com.bakery.api.user.domain.Role;
@@ -31,6 +31,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +64,9 @@ class PurchaseServiceTest {
     @Mock
     private PurchaseMapper mapper;
 
+    @Mock
+    private Clock clock;
+
     @InjectMocks
     private PurchaseService service;
 
@@ -90,6 +96,8 @@ class PurchaseServiceTest {
     @Test
     void create_asAdmin_forAnotherUser_loadsUserById() {
         setAuth(Role.ADMIN, "admin@example.com");
+        when(clock.instant()).thenReturn(Instant.parse("2026-03-21T00:00:00Z"));
+        when(clock.getZone()).thenReturn(ZoneOffset.UTC);
         User target = userWithId(2L, "target@example.com", Role.USER);
         when(userService.getEntityById(2L)).thenReturn(target);
 

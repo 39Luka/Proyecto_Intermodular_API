@@ -1,6 +1,6 @@
 package com.bakery.api.promotion;
 
-import com.bakery.api.promotion.domain.Promotion;
+import com.bakery.api.promotion.Promotion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

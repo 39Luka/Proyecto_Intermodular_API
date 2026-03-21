@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  *
  * Runs only when BOTH INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD are set AND there are no users yet.
  *
- * ADR: docs/adr/0007-initial-admin-bootstrap.md
+ * ADR: docs/adr/0006-initial-admin-bootstrap.md
  */
 @Component
 public class InitialAdminBootstrap implements ApplicationRunner {

@@ -1,11 +1,11 @@
 package com.bakery.api.auth;
 
 import jakarta.validation.Valid;
-import com.bakery.api.auth.dto.request.LoginRequest;
-import com.bakery.api.auth.dto.request.LogoutRequest;
-import com.bakery.api.auth.dto.request.RefreshRequest;
-import com.bakery.api.auth.dto.request.RegisterRequest;
-import com.bakery.api.auth.dto.response.LoginResponse;
+import com.bakery.api.auth.dto.LoginRequest;
+import com.bakery.api.auth.dto.LogoutRequest;
+import com.bakery.api.auth.dto.RefreshRequest;
+import com.bakery.api.auth.dto.RegisterRequest;
+import com.bakery.api.auth.dto.LoginResponse;
 import com.bakery.api.auth.refresh.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

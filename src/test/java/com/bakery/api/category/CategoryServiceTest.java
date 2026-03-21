@@ -1,8 +1,8 @@
 package com.bakery.api.category;
 
 import com.bakery.api.category.dto.CategoryMapper;
-import com.bakery.api.category.dto.request.CategoryRequest;
-import com.bakery.api.category.dto.response.CategoryResponse;
+import com.bakery.api.category.dto.CategoryRequest;
+import com.bakery.api.category.dto.CategoryResponse;
 import com.bakery.api.category.exception.CategoryAlreadyExistsException;
 import com.bakery.api.category.exception.CategoryNotFoundException;
 import org.junit.jupiter.api.Test;

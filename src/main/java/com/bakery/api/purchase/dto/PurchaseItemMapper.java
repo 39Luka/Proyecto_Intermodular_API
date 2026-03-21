@@ -1,7 +1,7 @@
 package com.bakery.api.purchase.dto;
 
-import com.bakery.api.purchase.domain.PurchaseItem;
-import com.bakery.api.purchase.dto.response.PurchaseItemResponse;
+import com.bakery.api.purchase.PurchaseItem;
+import com.bakery.api.purchase.dto.PurchaseItemResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,4 +13,3 @@ public interface PurchaseItemMapper {
     @Mapping(target = "promotionId", source = "promotion.id")
     PurchaseItemResponse toResponse(PurchaseItem item);
 }
-

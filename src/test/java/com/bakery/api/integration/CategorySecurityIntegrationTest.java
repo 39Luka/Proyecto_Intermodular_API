@@ -1,7 +1,7 @@
 package com.bakery.api.integration;
 
 import com.bakery.api.category.Category;
-import com.bakery.api.category.dto.request.CategoryRequest;
+import com.bakery.api.category.dto.CategoryRequest;
 import com.bakery.api.user.domain.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

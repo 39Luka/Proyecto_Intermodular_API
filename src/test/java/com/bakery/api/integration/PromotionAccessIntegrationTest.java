@@ -2,9 +2,9 @@ package com.bakery.api.integration;
 
 import com.bakery.api.category.Category;
 import com.bakery.api.product.Product;
-import com.bakery.api.promotion.domain.PercentagePromotion;
-import com.bakery.api.purchase.dto.request.PurchaseItemRequest;
-import com.bakery.api.purchase.dto.request.PurchaseRequest;
+import com.bakery.api.promotion.PercentagePromotion;
+import com.bakery.api.purchase.dto.PurchaseItemRequest;
+import com.bakery.api.purchase.dto.PurchaseRequest;
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;
 import org.junit.jupiter.api.Test;

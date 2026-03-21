@@ -1,8 +1,8 @@
 package com.bakery.api.purchase;
 
 import jakarta.validation.Valid;
-import com.bakery.api.purchase.dto.request.PurchaseRequest;
-import com.bakery.api.purchase.dto.response.PurchaseResponse;
+import com.bakery.api.purchase.dto.PurchaseRequest;
+import com.bakery.api.purchase.dto.PurchaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

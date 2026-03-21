@@ -1,7 +1,7 @@
 package com.bakery.api.promotion.dto;
 
-import com.bakery.api.promotion.domain.Promotion;
-import com.bakery.api.promotion.dto.response.PromotionResponse;
+import com.bakery.api.promotion.Promotion;
+import com.bakery.api.promotion.dto.PromotionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,4 +12,3 @@ public interface PromotionMapper {
     @Mapping(target = "productName", source = "product.name")
     PromotionResponse toResponse(Promotion promotion);
 }
-

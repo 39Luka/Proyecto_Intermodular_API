@@ -18,7 +18,7 @@ import java.util.Locale;
  *
  * Only active in the {@code prod} profile.
  *
- * ADR: docs/adr/0009-configuration-properties-and-prod-checks.md
+ * ADR: docs/adr/0008-configuration-properties-and-prod-checks.md
  */
 @Component
 @Profile("prod")
@@ -46,7 +46,7 @@ public class ProductionStartupChecks implements ApplicationRunner {
         requireNonBlank("jwt.secret", jwtProperties.secret());
 
         // Never allow implicit schema mutations in prod. Recommended path: Flyway migrations + ddl-auto=validate.
-        // ADR: docs/adr/0012-schema-management-flyway.md
+        // ADR: docs/adr/0011-schema-management-flyway.md
         String ddlAuto = properties.ddlAuto();
         ddlAuto = ddlAuto == null || ddlAuto.isBlank() ? "validate" : ddlAuto;
         ddlAuto = ddlAuto.toLowerCase(Locale.ROOT).trim();

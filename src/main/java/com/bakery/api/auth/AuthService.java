@@ -1,6 +1,6 @@
 package com.bakery.api.auth;
 
-import com.bakery.api.auth.dto.response.LoginResponse;
+import com.bakery.api.auth.dto.LoginResponse;
 import com.bakery.api.auth.exception.InvalidCredentialsException;
 import com.bakery.api.auth.refresh.RefreshTokenService;
 import com.bakery.api.security.JwtTokenService;

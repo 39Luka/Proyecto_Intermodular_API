@@ -37,6 +37,13 @@ API base URL: `http://localhost:8080` (or the port in `PORT`).
 - Other `/actuator/**` endpoints require an `ADMIN` token.
 - By default `health`, `info` and `prometheus` are exposed. Expand/reduce with `MANAGEMENT_ENDPOINTS` if needed.
 
+## Dashboard (Business Metrics)
+
+ADMIN-only endpoints intended for a client dashboard:
+
+- `GET /dashboard/summary`: totals and revenue.
+- `GET /dashboard/sales/daily?days=30`: paid purchases grouped by day for the last N days.
+
 Using Swagger with JWT:
 
 1. Call `POST /auth/login` and copy the `token`.
@@ -64,8 +71,6 @@ Configuration comes from `src/main/resources/application.properties` and `src/ma
 - `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
 - `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`: basic rate limiting (in-memory token bucket; applies to all endpoints by default)
 - `RATE_LIMIT_EXCLUDED_PATH_PREFIXES`: comma-separated list of excluded path prefixes (optional). Example: `/swagger-ui,/v3/api-docs,/actuator/health,/actuator/info`
-- `CACHE_MAX_SIZE`: max entries for local cache (Caffeine). Default `10000`.
-- `CACHE_TTL`: ISO-8601 duration for cache TTL. Default `PT10M`.
 Admin bootstrap (only when there are no users in the DB and BOTH vars are set):
 
 - `INITIAL_ADMIN_EMAIL`
@@ -75,9 +80,6 @@ Notes:
 
 - `/auth/register` always creates a `USER`. Create admins via the bootstrap env vars above (only on empty DB) or via `/users/**` as an existing `ADMIN`.
 - If you set only one of `INITIAL_ADMIN_EMAIL` or `INITIAL_ADMIN_PASSWORD`, the app fails fast at startup with a clear error.
-- The app uses a local in-memory cache (Caffeine) for some read endpoints (safe for single-instance deployments).
-  - Cached reads (default TTL 10 min): `GET /categories`, `GET /categories/{id}`, `GET /products`, `GET /products/{id}` (active products view), `GET /promotions`, `GET /promotions/{id}`.
-  - Cached admin reads: `GET /users/{id}`, `GET /users?email=...`.
 
 ## Auth & Permissions (Summary)
 
@@ -135,18 +137,17 @@ Notes:
 
 ## Architecture Decisions (ADR)
 
-- `docs/adr/0001-jwt-access-refresh-tokens.md` (index -> EN/ES)
-- `docs/adr/0002-jwt-validation-resource-server-hs256.md` (index -> EN/ES)
-- `docs/adr/0003-rate-limiting-bucket4j.md` (index -> EN/ES)
-- `docs/adr/0004-caching-caffeine.md` (index -> EN/ES)
-- `docs/adr/0005-observability-actuator-prometheus.md` (index -> EN/ES)
-- `docs/adr/0006-dto-mapping-mapstruct.md` (index -> EN/ES)
-- `docs/adr/0007-initial-admin-bootstrap.md` (index -> EN/ES)
-- `docs/adr/0008-error-format-problemdetail.md` (index -> EN/ES)
-- `docs/adr/0009-configuration-properties-and-prod-checks.md` (index -> EN/ES)
-- `docs/adr/0010-testing-h2-and-mysql-testcontainers.md` (index -> EN/ES)
-- `docs/adr/0011-stock-concurrency-optimistic-locking.md` (index -> EN/ES)
-- `docs/adr/0012-schema-management-flyway.md` (index -> EN/ES)
+- `docs/adr/0001-jwt-access-refresh-tokens.md`
+- `docs/adr/0002-jwt-validation-resource-server-hs256.md`
+- `docs/adr/0003-rate-limiting-bucket4j.md`
+- `docs/adr/0004-observability-actuator-prometheus.md`
+- `docs/adr/0005-dto-mapping-mapstruct.md`
+- `docs/adr/0006-initial-admin-bootstrap.md`
+- `docs/adr/0007-error-format-problemdetail.md`
+- `docs/adr/0008-configuration-properties-and-prod-checks.md`
+- `docs/adr/0009-testing-h2-and-mysql-testcontainers.md`
+- `docs/adr/0010-stock-concurrency-optimistic-locking.md`
+- `docs/adr/0011-schema-management-flyway.md`
 
 ## Production (Railway)
 

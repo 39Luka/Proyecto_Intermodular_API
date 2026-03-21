@@ -3,7 +3,7 @@ package com.bakery.api.promotion;
 import com.bakery.api.auth.exception.ForbiddenOperationException;
 import com.bakery.api.product.ProductService;
 import com.bakery.api.promotion.dto.PromotionMapper;
-import com.bakery.api.promotion.domain.Promotion;
+import com.bakery.api.promotion.Promotion;
 import com.bakery.api.user.UserService;
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;

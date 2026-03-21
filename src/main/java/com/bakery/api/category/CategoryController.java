@@ -1,8 +1,8 @@
 package com.bakery.api.category;
 
 import jakarta.validation.Valid;
-import com.bakery.api.category.dto.request.CategoryRequest;
-import com.bakery.api.category.dto.response.CategoryResponse;
+import com.bakery.api.category.dto.CategoryRequest;
+import com.bakery.api.category.dto.CategoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -74,4 +74,3 @@ public class CategoryController {
         return ResponseEntity.ok(service.update(id, request));
     }
 }
-

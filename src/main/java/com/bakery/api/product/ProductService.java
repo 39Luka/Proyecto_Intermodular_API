@@ -4,16 +4,13 @@ import com.bakery.api.category.Category;
 import com.bakery.api.category.CategoryService;
 import com.bakery.api.common.pagination.PageableUtils;
 import com.bakery.api.common.security.SecurityUtils;
-import com.bakery.api.config.CacheConfig;
 import com.bakery.api.product.dto.ProductMapper;
-import com.bakery.api.product.dto.request.ProductRequest;
-import com.bakery.api.product.dto.response.ProductResponse;
-import com.bakery.api.product.dto.response.ProductSalesResponse;
+import com.bakery.api.product.dto.ProductRequest;
+import com.bakery.api.product.dto.ProductResponse;
+import com.bakery.api.product.dto.ProductSalesResponse;
 import com.bakery.api.product.exception.ProductInactiveException;
 import com.bakery.api.product.exception.ProductNotFoundException;
-import com.bakery.api.purchase.domain.PurchaseStatus;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import com.bakery.api.purchase.PurchaseStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -35,7 +32,6 @@ public class ProductService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {CacheConfig.PRODUCTS_ACTIVE_BY_ID, CacheConfig.PRODUCTS_ACTIVE_LIST}, allEntries = true)
     public ProductResponse create(ProductRequest request) {
         Category category = categoryService.getEntityById(request.categoryId());
         Product product = new Product(
@@ -73,20 +69,10 @@ public class ProductService {
         return getActiveByIdCached(id);
     }
 
-    @Cacheable(cacheNames = CacheConfig.PRODUCTS_ACTIVE_BY_ID, key = "#id")
     public ProductResponse getActiveByIdCached(Long id) {
         return mapper.toResponse(getActiveEntityById(id));
     }
 
-    @Cacheable(
-            cacheNames = CacheConfig.PRODUCTS_ACTIVE_LIST,
-            key = "new org.springframework.cache.interceptor.SimpleKey(" +
-                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).pageNumber," +
-                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).pageSize," +
-                    "T(com.bakery.api.common.pagination.PageableUtils).safe(#pageable).sort.toString()," +
-                    "#categoryId" +
-                    ")"
-    )
     public Page<ProductResponse> getAllActiveCached(Pageable pageable, Long categoryId) {
         Pageable safePageable = PageableUtils.safe(pageable);
         if (categoryId == null) {
@@ -123,7 +109,6 @@ public class ProductService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {CacheConfig.PRODUCTS_ACTIVE_BY_ID, CacheConfig.PRODUCTS_ACTIVE_LIST}, allEntries = true)
     public ProductResponse update(Long id, ProductRequest request) {
         Product product = getEntityById(id);
         Category category = categoryService.getEntityById(request.categoryId());
@@ -138,7 +123,6 @@ public class ProductService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {CacheConfig.PRODUCTS_ACTIVE_BY_ID, CacheConfig.PRODUCTS_ACTIVE_LIST}, allEntries = true)
     public void disable(Long id) {
         Product product = getActiveEntityById(id);
         product.disable();
@@ -146,7 +130,6 @@ public class ProductService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {CacheConfig.PRODUCTS_ACTIVE_BY_ID, CacheConfig.PRODUCTS_ACTIVE_LIST}, allEntries = true)
     public void enable(Long id) {
         Product product = getEntityById(id);
         product.enable();

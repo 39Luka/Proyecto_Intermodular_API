@@ -1,8 +1,8 @@
 package com.bakery.api.promotion;
 
 import jakarta.validation.Valid;
-import com.bakery.api.promotion.dto.request.PercentagePromotionRequest;
-import com.bakery.api.promotion.dto.response.PromotionResponse;
+import com.bakery.api.promotion.dto.PercentagePromotionRequest;
+import com.bakery.api.promotion.dto.PromotionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

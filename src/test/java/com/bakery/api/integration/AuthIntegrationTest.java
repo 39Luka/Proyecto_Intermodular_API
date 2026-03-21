@@ -1,10 +1,10 @@
 package com.bakery.api.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.bakery.api.auth.dto.request.LoginRequest;
-import com.bakery.api.auth.dto.request.LogoutRequest;
-import com.bakery.api.auth.dto.request.RefreshRequest;
-import com.bakery.api.auth.dto.request.RegisterRequest;
+import com.bakery.api.auth.dto.LoginRequest;
+import com.bakery.api.auth.dto.LogoutRequest;
+import com.bakery.api.auth.dto.RefreshRequest;
+import com.bakery.api.auth.dto.RegisterRequest;
 import com.bakery.api.user.domain.Role;
 import com.bakery.api.user.domain.User;
 import org.junit.jupiter.api.Test;
