@@ -25,7 +25,6 @@ import java.util.List;
 @Configuration
 public class JwtConfig {
 
-    // ADR: docs/adr/0002-jwt-validation-resource-server-hs256.md (OAuth2 Resource Server, HS256 shared secret)
     @Bean
     public SecretKey jwtSecretKey(JwtProperties properties) {
         String secret = properties.secret();
