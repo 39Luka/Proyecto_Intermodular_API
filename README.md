@@ -88,12 +88,12 @@ Send the token as `Authorization: Bearer <token>`.
 - Public:
   - `POST /auth/login`
   - `POST /auth/register` (always creates a `USER`)
-  - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
-- Requires auth:
   - `GET /categories`, `GET /categories/{id}`
   - `GET /products`, `GET /products/{id}`, `GET /products/top-selling`
-  - `GET /purchases`, `GET /purchases/{id}`, `POST /purchases`, `PATCH /purchases/{id}/pay|cancel`
   - `GET /promotions/active`
+  - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
+- Requires auth:
+  - `GET /purchases`, `GET /purchases/{id}`, `POST /purchases`, `PATCH /purchases/{id}/pay|cancel`
 - ADMIN only:
   - `POST|PUT|PATCH|DELETE` on `/categories/**`, `/products/**`, `/promotions/**`
   - `GET /promotions` and `GET /promotions/{id}`
@@ -105,6 +105,14 @@ This project intentionally supports a single promotion type: percentage discount
 
 - Create: `POST /promotions/percentage`
 - Query active promotions for a product: `GET /promotions/active?productId=...`
+
+## Enable/Disable (Soft Flags)
+
+Instead of separate `/enable` and `/disable` endpoints, resources expose a single PATCH that toggles the flag:
+
+- Product: `PATCH /products/{id}` with `{ "active": true|false }`
+- Promotion: `PATCH /promotions/{id}` with `{ "active": true|false }`
+- User: `PATCH /users/{id}` with `{ "enabled": true|false }`
 
 ## Typical Flow (curl)
 

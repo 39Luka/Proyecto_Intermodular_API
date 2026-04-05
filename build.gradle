@@ -15,7 +15,7 @@ java {
 }
 
 springBoot {
-    mainClass = 'com.bakery.api.BakeryApiApplication'
+    mainClass = 'com.bakery.bakeryapi.BakeryApiApplication'
 }
 
 tasks.named('bootJar') {
