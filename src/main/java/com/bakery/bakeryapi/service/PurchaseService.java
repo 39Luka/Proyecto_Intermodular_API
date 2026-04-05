@@ -184,10 +184,16 @@ public class PurchaseService {
     private User resolvePurchaseUser(Long requestedUserId) {
         Authentication auth = SecurityUtils.requireAuthentication();
         if (SecurityUtils.isAdmin(auth)) {
+            if (requestedUserId == null) {
+                throw new InvalidPurchaseException("userId is required for admins");
+            }
             return userService.getEntityById(requestedUserId);
         }
 
         User currentUser = userService.getEntityByEmail(auth.getName());
+        if (requestedUserId == null) {
+            return currentUser;
+        }
         if (!currentUser.getId().equals(requestedUserId)) {
             throw new ForbiddenOperationException("Cannot create a purchase for another user");
         }

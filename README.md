@@ -102,6 +102,15 @@ curl http://localhost:8080/products \
   -H "Authorization: Bearer <token>"
 ```
 
+Create purchase (USER: omit userId; ADMIN: include userId):
+
+```bash
+curl -X POST http://localhost:8080/purchases \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"items":[{"productId":10,"quantity":2,"promotionId":null}]}'
+```
+
 ## Tests
 
 ```powershell
