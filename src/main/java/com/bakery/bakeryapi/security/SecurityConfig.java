@@ -57,7 +57,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
+                        // Accept both "/auth/register" and "/auth/register/" (same for login) to avoid accidental 403/401
+                        // when clients include a trailing slash.
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/login/").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/register/").permitAll()
                         .requestMatchers("/auth/**").authenticated()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Public read-only endpoints (catalog + active promotions).
