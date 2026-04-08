@@ -83,7 +83,7 @@ Instead of separate `/enable` and `/disable` endpoints, resources expose a singl
 
 - Product: `PATCH /products/{id}` with `{ "active": true|false }`
 - Promotion: `PATCH /promotions/{id}` with `{ "active": true|false }`
-- User: `PATCH /users/{id}` with `{ "enabled": true|false }`
+- User: `PATCH /users/{id}` with `{ "active": true|false }`
 
 ## Typical Flow (curl)
 

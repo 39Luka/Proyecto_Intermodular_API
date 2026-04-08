@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import com.bakery.bakeryapi.exception.product.InsufficientStockException;
+import com.bakery.bakeryapi.product.exception.InsufficientStockException;
 
 import java.math.BigDecimal;
 

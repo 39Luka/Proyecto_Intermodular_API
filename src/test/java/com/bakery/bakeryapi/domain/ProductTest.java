@@ -1,7 +1,7 @@
 package com.bakery.bakeryapi.domain;
 
 import com.bakery.bakeryapi.domain.Category;
-import com.bakery.bakeryapi.exception.product.InsufficientStockException;
+import com.bakery.bakeryapi.product.exception.InsufficientStockException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
