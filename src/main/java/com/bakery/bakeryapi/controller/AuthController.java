@@ -28,7 +28,6 @@ public class AuthController {
     @Operation(summary = "Login", description = "Authenticates a user and returns an access token.", security = {})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authenticated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     public ResponseEntity<LoginResponse> login(
@@ -44,7 +43,6 @@ public class AuthController {
     @Operation(summary = "Register", description = "Creates a new USER account and returns an access token.", security = {})
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "409", description = "Email already exists")
     })
     public ResponseEntity<LoginResponse> register(

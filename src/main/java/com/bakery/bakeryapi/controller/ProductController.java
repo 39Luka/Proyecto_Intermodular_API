@@ -33,8 +33,6 @@ public class ProductController {
     @GetMapping("/{id}")
     @Operation(summary = "Get product by id", description = "Non-admin users cannot access disabled products.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Product found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
@@ -43,10 +41,6 @@ public class ProductController {
 
     @GetMapping("/top-selling")
     @Operation(summary = "Top selling products", description = "Returns the most sold products (from PAID purchases).")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Page of products"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
     public ResponseEntity<Page<ProductSalesResponse>> getTopSelling(
             @PageableDefault(size = 10) Pageable pageable
     ) {
@@ -55,10 +49,6 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "List products", description = "Optional filter by categoryId. Non-admin users only see active products.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Page of products"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
     public ResponseEntity<Page<ProductResponse>> getAll(
             Pageable pageable,
             @Parameter(description = "Optional category filter") @RequestParam(required = false) Long categoryId
@@ -69,10 +59,7 @@ public class ProductController {
     @PostMapping
     @Operation(summary = "Create product", description = "Admin-only.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Product created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "201", description = "Product created")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
@@ -84,10 +71,6 @@ public class ProductController {
     @PutMapping("/{id}")
     @Operation(summary = "Update product", description = "Admin-only.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Product updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -102,9 +85,6 @@ public class ProductController {
     @Operation(summary = "Update product flags", description = "Admin-only. Currently supports updating { active }.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")

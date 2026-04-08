@@ -31,9 +31,6 @@ public class PromotionController {
     @GetMapping("/{id}")
     @Operation(summary = "Get promotion by id", description = "Admin-only.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Promotion found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -43,11 +40,6 @@ public class PromotionController {
 
     @GetMapping
     @Operation(summary = "List promotions", description = "Admin-only.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Page of promotions"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PromotionResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
@@ -58,11 +50,6 @@ public class PromotionController {
             summary = "List active promotions for a product",
             description = "Returns active percentage promotions for the given product. If userId is provided, filters out promotions already used by that user."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Page of active promotions"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
     public ResponseEntity<Page<PromotionResponse>> getActiveByProduct(
             @Parameter(description = "Product id") @RequestParam Long productId,
             @Parameter(description = "Optional filter. Admins can query any userId; users can only query their own.") @RequestParam(required = false) Long userId,
@@ -74,10 +61,7 @@ public class PromotionController {
     @PostMapping("/percentage")
     @Operation(summary = "Create percentage promotion", description = "Admin-only. Creates an active percentage discount for a product.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Promotion created"),
-            @ApiResponse(responseCode = "400", description = "Invalid promotion"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "201", description = "Promotion created")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PromotionResponse> createPercentage(@Valid @RequestBody PercentagePromotionRequest request) {
@@ -89,9 +73,6 @@ public class PromotionController {
     @Operation(summary = "Update promotion flags", description = "Admin-only. Currently supports updating { active }.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")

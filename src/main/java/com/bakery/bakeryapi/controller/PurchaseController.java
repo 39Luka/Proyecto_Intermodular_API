@@ -29,9 +29,6 @@ public class PurchaseController {
     @GetMapping("/{id}")
     @Operation(summary = "Get purchase by id", description = "Users can only access their own purchases; admins can access any.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Purchase found"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<PurchaseResponse> getById(@PathVariable Long id) {
@@ -40,10 +37,6 @@ public class PurchaseController {
 
     @GetMapping
     @Operation(summary = "List purchases", description = "Admins can optionally filter by userId. Non-admins always see their own purchases.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Page of purchases"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
     public ResponseEntity<Page<PurchaseResponse>> getAll(
             Pageable pageable,
             @Parameter(description = "Admin-only filter") @RequestParam(required = false) Long userId
@@ -55,9 +48,6 @@ public class PurchaseController {
     @Operation(summary = "Create purchase", description = "Decreases stock, optionally applies a percentage promotion (one-time per user), and creates a purchase.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Purchase created"),
-            @ApiResponse(responseCode = "400", description = "Invalid purchase / promotion"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Concurrent update / conflict")
     })
     public ResponseEntity<PurchaseResponse> create(@Valid @RequestBody PurchaseRequest request) {
@@ -70,9 +60,6 @@ public class PurchaseController {
     @Operation(summary = "Cancel purchase", description = "Only the owner (or admin) can cancel a CREATED purchase. Restores stock and releases promotion usage.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Cancelled"),
-            @ApiResponse(responseCode = "400", description = "Invalid state"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Void> cancel(@PathVariable Long id) {
@@ -84,9 +71,6 @@ public class PurchaseController {
     @Operation(summary = "Mark purchase as paid", description = "Only the owner (or admin) can pay a CREATED purchase.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Paid"),
-            @ApiResponse(responseCode = "400", description = "Invalid state"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Void> pay(@PathVariable Long id) {
