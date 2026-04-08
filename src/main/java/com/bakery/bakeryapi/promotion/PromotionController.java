@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class PromotionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get promotion by id", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Not found")
     })
@@ -40,6 +42,7 @@ public class PromotionController {
 
     @GetMapping
     @Operation(summary = "List promotions", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PromotionResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
@@ -60,6 +63,7 @@ public class PromotionController {
 
     @PostMapping("/percentage")
     @Operation(summary = "Create percentage promotion", description = "Admin-only. Creates an active percentage discount for a product.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Promotion created")
     })
@@ -71,6 +75,7 @@ public class PromotionController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update promotion flags", description = "Admin-only. Currently supports updating { active }.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
             @ApiResponse(responseCode = "404", description = "Not found")

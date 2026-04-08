@@ -5,6 +5,7 @@ import com.bakery.bakeryapi.shared.dto.ActiveUpdateRequest;
 import com.bakery.bakeryapi.user.dto.UserRequest;
 import com.bakery.bakeryapi.user.dto.UserResponse;
 import com.bakery.bakeryapi.user.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 @PreAuthorize("hasRole('ADMIN')")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService service;

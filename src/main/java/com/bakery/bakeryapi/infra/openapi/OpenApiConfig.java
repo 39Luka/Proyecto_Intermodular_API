@@ -8,39 +8,28 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 
-/**
- * OpenAPI/Swagger configuration.
- *
- * Swagger UI:
- * - http://localhost:8080/swagger-ui/index.html
- *
- * OpenAPI JSON:
- * - http://localhost:8080/v3/api-docs
- */
 @Configuration
 public class OpenApiConfig {
 
+    private static final String SECURITY_SCHEME_NAME = "bearerAuth";
+
     @Bean
     public OpenAPI customOpenAPI() {
-
-        final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
                 .info(new Info()
                         .title("Bakery API")
                         .description("REST API for a bakery with JWT auth. Manages categories, products, percentage promotions and purchases.")
                         .version("1.0.0"))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
-                        .addSecuritySchemes(securitySchemeName,
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
                                 new SecurityScheme()
-                                        .name(securitySchemeName)
+                                        .name(SECURITY_SCHEME_NAME)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
@@ -58,8 +47,9 @@ public class OpenApiConfig {
                 return;
             }
 
-            openApi.getPaths().values().forEach(pathItem ->
-                    pathItem.readOperations().forEach(operation -> {
+            openApi.getPaths().forEach((path, pathItem) ->
+                    pathItem.readOperationsMap().forEach((method, operation) -> {
+
                         ApiResponses responses = operation.getResponses();
                         if (responses == null) {
                             responses = new ApiResponses();
@@ -69,8 +59,8 @@ public class OpenApiConfig {
                         addIfMissing(responses, "400", "Bad request", genericJsonContent);
                         addIfMissing(responses, "500", "Internal server error", genericJsonContent);
 
-                        boolean isPublicOperation = operation.getSecurity() != null && operation.getSecurity().isEmpty();
-                        if (!isPublicOperation) {
+                        boolean isSecuredOperation = operation.getSecurity() != null && !operation.getSecurity().isEmpty();
+                        if (isSecuredOperation) {
                             addIfMissing(responses, "401", "Unauthorized", genericJsonContent);
                             addIfMissing(responses, "403", "Forbidden", genericJsonContent);
                         }

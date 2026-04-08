@@ -7,6 +7,7 @@ import com.bakery.bakeryapi.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ public class CategoryController {
 
     @PostMapping
     @Operation(summary = "Create category", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Category created"),
             @ApiResponse(responseCode = "409", description = "Already exists")
@@ -56,6 +58,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update category", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "409", description = "Already exists")

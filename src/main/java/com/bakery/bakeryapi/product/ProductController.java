@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,6 +59,7 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Create product", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Product created")
     })
@@ -70,6 +72,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update product", description = "Admin-only.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Not found")
     })
@@ -83,6 +86,7 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update product flags", description = "Admin-only. Currently supports updating { active }.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
             @ApiResponse(responseCode = "404", description = "Not found")
