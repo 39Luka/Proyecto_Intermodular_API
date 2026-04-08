@@ -75,6 +75,12 @@ class AuthTokenFlowIntegrationTest {
     }
 
     @Test
+    void apiDocs_isPublic() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void user_can_login_get_token_and_filter_active_promotions_for_self() throws Exception {
         String email = "user+" + UUID.randomUUID() + "@example.com";
         String password = "password123";
