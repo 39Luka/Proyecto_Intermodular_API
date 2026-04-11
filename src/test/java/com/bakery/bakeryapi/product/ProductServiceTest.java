@@ -97,7 +97,7 @@ class ProductServiceTest {
         when(mapper.toResponse(any(Product.class))).thenAnswer(inv -> {
             Product p = inv.getArgument(0);
             Long categoryId = p.getCategory() != null ? p.getCategory().getId() : null;
-            return new ProductResponse(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getStock(), p.isActive(), categoryId);
+            return new ProductResponse(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getStock(), p.isActive(), categoryId, null);
         });
 
         var response = service.getById(1L);
