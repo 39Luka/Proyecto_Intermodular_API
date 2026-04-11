@@ -51,6 +51,9 @@ public class ProductService {
                 request.stock(),
                 category
         );
+        if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
+            product.setImage(mapper.imageBase64ToProduct(request.imageBase64()));
+        }
         return mapper.toResponse(repository.save(product));
     }
 
@@ -130,6 +133,9 @@ public class ProductService {
                 request.stock(),
                 category
         );
+        if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
+            product.setImage(mapper.imageBase64ToProduct(request.imageBase64()));
+        }
         return mapper.toResponse(repository.save(product));
     }
 

@@ -18,7 +18,9 @@ public record ProductRequest(
         @Schema(description = "Current stock", example = "50")
         @PositiveOrZero int stock,
         @Schema(description = "Category id", example = "1")
-        @NotNull Long categoryId
+        @NotNull Long categoryId,
+        @Schema(description = "Product image as base64 (optional)", type = "string")
+        String imageBase64
 ) {
 }
 

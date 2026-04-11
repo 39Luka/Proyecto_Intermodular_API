@@ -48,6 +48,9 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] image;
+
     protected Product() {
         // Constructor for JPA
     }
@@ -113,5 +116,13 @@ public class Product {
 
     public boolean isActive() {
         return active;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }
