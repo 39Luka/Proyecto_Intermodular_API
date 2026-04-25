@@ -56,35 +56,22 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        //  Preflight
+                        // Preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        //  Swagger / OpenAPI (IMPORTANTE: completo)
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
+                        // Swagger
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        //  Auth endpoints públicos
-                        .requestMatchers(HttpMethod.POST,
-                                "/auth/login",
-                                "/auth/register",
-                                "/auth/refresh"
-                        ).permitAll()
+                        // AUTH PUBLICO
+                        .requestMatchers("/auth/login", "/auth/register", "/auth/refresh").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
 
-                        //  resto auth
-                        .requestMatchers("/auth/**").authenticated()
-
-                        //  public GET
+                        // PUBLICOS
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/promotions/active").permitAll()
 
-                        //  lo demás
+                        // RESTO
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
