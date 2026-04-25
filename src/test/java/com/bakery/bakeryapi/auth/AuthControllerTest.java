@@ -45,7 +45,7 @@ class AuthControllerTest {
     @Test
     void login_validRequest_returnsToken() throws Exception {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
-        LoginResponse response = new LoginResponse("fake.jwt.token");
+        LoginResponse response = new LoginResponse("fake.jwt.token", "fake.refresh.token", 900000L);
 
         when(authService.login(eq(request.email()), eq(request.password()))).thenReturn(response);
 
@@ -71,7 +71,7 @@ class AuthControllerTest {
     @Test
     void register_validRequest_returnsCreatedToken() throws Exception {
         RegisterRequest request = new RegisterRequest("new@example.com", "pass12345");
-        LoginResponse response = new LoginResponse("new.jwt.token");
+        LoginResponse response = new LoginResponse("new.jwt.token", "new.refresh.token", 900000L);
 
         when(authService.register(eq(request.email()), eq(request.password())))
                 .thenReturn(response);

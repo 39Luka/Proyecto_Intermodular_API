@@ -2,9 +2,7 @@ package com.bakery.bakeryapi.category;
 
 import com.bakery.bakeryapi.infra.config.PaginationProperties;
 import com.bakery.bakeryapi.domain.Category;
-import com.bakery.bakeryapi.category.dto.CategoryMapper;
 import com.bakery.bakeryapi.category.dto.CategoryRequest;
-import com.bakery.bakeryapi.category.dto.CategoryResponse;
 import com.bakery.bakeryapi.category.exception.CategoryAlreadyExistsException;
 import com.bakery.bakeryapi.category.exception.CategoryNotFoundException;
 import com.bakery.bakeryapi.repository.CategoryRepository;
@@ -14,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
@@ -32,9 +31,6 @@ class CategoryServiceTest {
     private CategoryRepository repository;
 
     @Mock
-    private CategoryMapper mapper;
-
-    @Mock
     private PaginationProperties paginationProperties;
 
     @InjectMocks
@@ -51,10 +47,6 @@ class CategoryServiceTest {
         when(repository.existsByNameIgnoreCase("Bread")).thenReturn(false);
         Category saved = new Category("Bread");
         when(repository.save(any(Category.class))).thenReturn(saved);
-        when(mapper.toResponse(any(Category.class))).thenAnswer(inv -> {
-            Category c = inv.getArgument(0);
-            return new CategoryResponse(c.getId(), c.getName());
-        });
 
         var response = service.create(new CategoryRequest("Bread"));
 
@@ -71,11 +63,7 @@ class CategoryServiceTest {
     @Test
     void getAll_returnsPage() {
         when(paginationProperties.maxPageSize()).thenReturn(100);
-        when(repository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(new Category("Bread"))));
-        when(mapper.toResponse(any(Category.class))).thenAnswer(inv -> {
-            Category c = inv.getArgument(0);
-            return new CategoryResponse(c.getId(), c.getName());
-        });
+        when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new Category("Bread"))));
         var page = service.getAll(PageRequest.of(0, 10));
         assertEquals(1, page.getContent().size());
         assertEquals("Bread", page.getContent().get(0).name());

@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -41,7 +42,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter
+            Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter,
+            AuthRateLimitFilter authRateLimitFilter
     ) throws Exception {
 
         http
@@ -54,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/login/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/register/").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/refresh", "/auth/refresh/").permitAll()
                         .requestMatchers("/auth/**").authenticated()
                         // Swagger/OpenAPI (allow both the base endpoint and nested paths).
                         .requestMatchers("/swagger-ui/**").permitAll()
@@ -74,6 +77,8 @@ public class SecurityConfig {
                                 exceptionResolver.resolveException(request, response, null, accessDeniedException)
                         )
                 );
+
+        http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -2,9 +2,7 @@ package com.bakery.bakeryapi.user;
 
 import com.bakery.bakeryapi.domain.Role;
 import com.bakery.bakeryapi.domain.User;
-import com.bakery.bakeryapi.user.dto.UserMapper;
 import com.bakery.bakeryapi.user.dto.UserRequest;
-import com.bakery.bakeryapi.user.dto.UserResponse;
 import com.bakery.bakeryapi.user.exception.EmailAlreadyExistsException;
 import com.bakery.bakeryapi.user.exception.UserNotFoundException;
 import com.bakery.bakeryapi.repository.UserRepository;
@@ -29,9 +27,6 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private UserMapper mapper;
-
     @InjectMocks
     private UserService userService;
 
@@ -39,12 +34,8 @@ class UserServiceTest {
     void getById_existingUser_returnsUser() {
         User user = new User("silvia@example.com", "1234", Role.USER);
         when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(mapper.toResponse(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            return new UserResponse(u.getId(), u.getEmail(), u.getRole(), u.isEnabled());
-        });
 
-        UserResponse result = userService.getById(1L);
+        var result = userService.getById(1L);
 
         assertEquals("silvia@example.com", result.email());
     }
@@ -62,12 +53,8 @@ class UserServiceTest {
         when(passwordEncoder.encode("1234")).thenReturn("hashed");
         User user = new User("silvia@example.com", "hashed", Role.USER);
         when(repository.save(any(User.class))).thenReturn(user);
-        when(mapper.toResponse(any(User.class))).thenAnswer(inv -> {
-            User u = inv.getArgument(0);
-            return new UserResponse(u.getId(), u.getEmail(), u.getRole(), u.isEnabled());
-        });
 
-        UserResponse result = userService.create(new UserRequest("silvia@example.com", "1234", Role.USER));
+        var result = userService.create(new UserRequest("silvia@example.com", "1234", Role.USER));
 
         assertEquals("silvia@example.com", result.email());
         verify(passwordEncoder).encode("1234");

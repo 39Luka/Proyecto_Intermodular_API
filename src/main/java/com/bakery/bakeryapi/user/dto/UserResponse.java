@@ -8,6 +8,9 @@ public record UserResponse(
         Role role,
         boolean enabled
 ) {
+    public static UserResponse from(com.bakery.bakeryapi.domain.User user) {
+        return new UserResponse(user.getId(), user.getEmail(), user.getRole(), user.isEnabled());
+    }
 }
 
 

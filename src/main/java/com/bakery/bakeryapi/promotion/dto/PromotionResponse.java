@@ -19,4 +19,17 @@ public record PromotionResponse(
         String productName,
         BigDecimal discountPercentage
 ) {
+    public static PromotionResponse from(com.bakery.bakeryapi.domain.Promotion promotion) {
+        return new PromotionResponse(
+                promotion.getId(),
+                promotion.getDescription(),
+                promotion.getType(),
+                promotion.getStartDate(),
+                promotion.getEndDate(),
+                promotion.isActive(),
+                promotion.getProduct() != null ? promotion.getProduct().getId() : null,
+                promotion.getProduct() != null ? promotion.getProduct().getName() : null,
+                promotion.getDiscountPercentage()
+        );
+    }
 }

@@ -2,6 +2,7 @@ package com.bakery.bakeryapi.auth;
 
 import jakarta.validation.Valid;
 import com.bakery.bakeryapi.auth.dto.LoginRequest;
+import com.bakery.bakeryapi.auth.dto.RefreshTokenRequest;
 import com.bakery.bakeryapi.auth.dto.RegisterRequest;
 import com.bakery.bakeryapi.auth.dto.LoginResponse;
 import com.bakery.bakeryapi.auth.AuthService;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth", description = "Login and register (JWT access tokens)")
+@Tag(name = "Auth", description = "Login, register, and refresh JWT tokens")
 public class AuthController {
 
     private final AuthService authService;
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login", description = "Authenticates a user and returns an access token.", security = {})
+    @Operation(summary = "Login", description = "Authenticates a user and returns access and refresh tokens.", security = {})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authenticated"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
@@ -40,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register", description = "Creates a new USER account and returns an access token.", security = {})
+    @Operation(summary = "Register", description = "Creates a new USER account and returns access and refresh tokens.", security = {})
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User created"),
             @ApiResponse(responseCode = "409", description = "Email already exists")
@@ -54,6 +55,18 @@ public class AuthController {
                         request.email(),
                         request.password()
                 ));
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh token", description = "Uses a refresh token to obtain a new access token.", security = {})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "New access token generated"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
+    })
+    public ResponseEntity<LoginResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request.refreshToken()));
     }
 
 }

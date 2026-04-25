@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -126,7 +127,32 @@ class AuthTokenFlowIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
-    private void register(String email, String password) {
+    @Test
+    void refresh_rotates_token_and_rejects_old_refresh_token() throws Exception {
+        String email = "user+" + UUID.randomUUID() + "@example.com";
+        String password = "password123";
+
+        Map<?, ?> registerBody = register(email, password);
+        String originalRefreshToken = registerBody.get("refreshToken").toString();
+
+        MvcResult refreshResult = mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("refreshToken", originalRefreshToken))))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Map<?, ?> refreshBody = objectMapper.readValue(refreshResult.getResponse().getContentAsString(), Map.class);
+        String rotatedRefreshToken = refreshBody.get("refreshToken").toString();
+
+        assertNotEquals(originalRefreshToken, rotatedRefreshToken);
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("refreshToken", originalRefreshToken))))
+                .andExpect(status().isUnauthorized());
+    }
+
+    private Map<?, ?> register(String email, String password) {
         try {
             MvcResult result = mockMvc.perform(post("/auth/register")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -136,6 +162,8 @@ class AuthTokenFlowIntegrationTest {
 
             Map<?, ?> body = objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
             assertNotNull(body.get("token"));
+            assertNotNull(body.get("refreshToken"));
+            return body;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

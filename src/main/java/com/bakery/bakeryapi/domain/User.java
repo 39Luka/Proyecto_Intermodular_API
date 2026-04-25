@@ -30,6 +30,9 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    @Column(nullable = false)
+    private long refreshTokenVersion = 0;
+
     protected User(){
         // Constructor for JPA
     }
@@ -66,6 +69,14 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public long getRefreshTokenVersion() {
+        return refreshTokenVersion;
+    }
+
+    public void rotateRefreshToken() {
+        this.refreshTokenVersion++;
     }
 }
 

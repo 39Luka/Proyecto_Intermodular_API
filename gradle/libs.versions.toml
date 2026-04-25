@@ -1,12 +1,9 @@
 [versions]
-mapstruct = "1.5.5.Final"
 caffeine = "3.1.8"
 bucket4j = "8.10.1"
 testcontainers = "1.19.8"
 
 [libraries]
-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
-mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 bucket4j-core = { module = "com.bucket4j:bucket4j-core", version.ref = "bucket4j" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }

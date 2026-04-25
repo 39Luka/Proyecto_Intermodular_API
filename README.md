@@ -2,6 +2,20 @@
 
 REST API (Spring Boot) for a bakery: users/roles, catalog (categories/products), promotions and purchases. Authentication is JWT-based.
 
+## 🆕 Recent Improvements (April 2026)
+
+**P1 (Critical) - Completed:**
+- ✅ Comprehensive logging (SLF4J + Logback) in all services
+- ✅ JWT Refresh Tokens (7 days expiration) with new `/auth/refresh` endpoint
+- ✅ Controller tests for Categories and Promotions
+
+**P2 (High) - Completed:**
+- ✅ Actuator health checks & Prometheus metrics
+- ✅ Image validation (size 5MB max, MIME type checking)
+- ✅ Rate limiting configuration (Bucket4J)
+
+**P3+ - In Progress:** See `PRODUCTION_GUIDE.md`
+
 ## Stack
 
 - Java 21 + Gradle
@@ -9,6 +23,9 @@ REST API (Spring Boot) for a bakery: users/roles, catalog (categories/products),
 - MySQL for dev/production
 - H2 for tests
 - Swagger/OpenAPI (springdoc)
+- Logging: SLF4J + Logback
+- Metrics: Micrometer + Prometheus
+- Rate Limiting: Bucket4J
 
 ## Quick Start (Local)
 
@@ -38,33 +55,54 @@ Using Swagger with JWT:
 
 Configuration comes from `src/main/resources/application.properties` and `src/main/resources/application-prod.properties`.
 
+### Core Settings
 - `PORT`: HTTP port (default `8080`)
+- `SPRING_PROFILES_ACTIVE`: `dev` or `prod`
+
+### Database
 - `DB_URL`: JDBC url. Example: `jdbc:mysql://localhost:3306/bakery_db?useSSL=false&serverTimezone=UTC`
 - `DB_USERNAME`, `DB_PASSWORD`
-- `JWT_SECRET`: JWT signing secret (required in prod)
-- `JWT_EXPIRATION_MS`: access token lifetime (milliseconds). In prod the default is 15 minutes.
-- `SHOW_SQL`: `true|false`
-- `HIBERNATE_DDL_AUTO`: `update|validate|...` (prod default is `validate`)
-- `CORS_ALLOWED_ORIGINS`: comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
-Memory / prod toggles:
+- `HIBERNATE_DDL_AUTO`: `update` (dev) or `validate` (prod)
 
-- `DB_POOL_MAX`, `DB_POOL_MIN_IDLE`: Hikari pool sizing (smaller saves memory)
-- `LAZY_INIT`: `true|false` (lower startup memory, slower first request)
-- `OPENAPI_ENABLED`: `true|false` (Swagger/OpenAPI in production)
+### JWT & Authentication
+- `JWT_SECRET`: JWT signing secret (required in prod, min 32 chars)
+- `JWT_EXPIRATION_MS`: Access token lifetime in milliseconds (default: `900000` = 15 min)
+- `JWT_REFRESH_EXPIRATION_MS`: Refresh token lifetime (default: `604800000` = 7 days)
+
+### Logging
+- `LOG_FILE`: Path to log file (default: `logs/bakery-api.log`)
+- `SHOW_SQL`: `true|false` (show Hibernate SQL)
+
+### CORS
+- `CORS_ALLOWED_ORIGINS`: Comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
+
+### Actuator & Monitoring
+- `OPENAPI_ENABLED`: `true|false` (Swagger UI enabled, default true for dev, false for prod)
+- `RATE_LIMIT_REQUESTS_PER_MINUTE`: Requests per minute per IP (default: `100`)
+
+### Memory & Connection Pool
+- `LAZY_INIT`: `true|false` (lazy bean initialization)
+- `DB_POOL_MAX`: Max pool size (default: `10`)
+- `DB_POOL_MIN_IDLE`: Min idle connections (default: `0`)
+- `PAGINATION_MAX_PAGE_SIZE`: Max page size for API (default: `100`)
 
 ## Auth & Permissions (Summary)
 
 Send the token as `Authorization: Bearer <token>`.
 
 - Public:
-  - `POST /auth/login`
+  - `POST /auth/login` - Returns access token + refresh token
+  - `POST /auth/refresh` - Refresh access token using refresh token
   - `POST /auth/register` (always creates a `USER`)
   - `GET /categories`, `GET /categories/{id}`
   - `GET /products`, `GET /products/{id}`, `GET /products/top-selling`
   - `GET /promotions/active`
+  - `GET /actuator/health` - Health check (public)
   - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
 - Requires auth:
   - `GET /purchases`, `GET /purchases/{id}`, `POST /purchases`, `PATCH /purchases/{id}/pay|cancel`
+  - `GET /actuator/metrics` - Metrics (ADMIN)
+  - `GET /actuator/prometheus` - Prometheus metrics (ADMIN)
 - ADMIN only:
   - `POST|PUT|PATCH|DELETE` on `/categories/**`, `/products/**`, `/promotions/**`
   - `GET /promotions` and `GET /promotions/{id}`
@@ -87,12 +125,24 @@ Instead of separate `/enable` and `/disable` endpoints, resources expose a singl
 
 ## Typical Flow (curl)
 
-Login:
+Login and get tokens:
 
 ```bash
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
+
+# Response: { "token": "eyJ...", "refreshToken": "eyJ...", "expiresIn": 900000 }
+```
+
+Refresh access token when it expires:
+
+```bash
+curl -X POST http://localhost:8080/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken":"eyJ..."}'
+
+# Response: { "token": "eyJ...", "refreshToken": "eyJ...", "expiresIn": 900000 }
 ```
 
 List products (with token):
@@ -109,6 +159,19 @@ curl -X POST http://localhost:8080/purchases \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"items":[{"productId":10,"quantity":2,"promotionId":null}]}'
+```
+
+Check health:
+
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+Get metrics (requires ADMIN role):
+
+```bash
+curl -H "Authorization: Bearer <admin-token>" \
+  http://localhost:8080/actuator/prometheus
 ```
 
 ## Tests

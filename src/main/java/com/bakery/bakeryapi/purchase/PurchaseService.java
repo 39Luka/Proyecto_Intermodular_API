@@ -11,7 +11,6 @@ import com.bakery.bakeryapi.domain.PurchaseItem;
 import com.bakery.bakeryapi.domain.PurchaseStatus;
 import com.bakery.bakeryapi.domain.Product;
 import com.bakery.bakeryapi.domain.Promotion;
-import com.bakery.bakeryapi.purchase.dto.PurchaseMapper;
 import com.bakery.bakeryapi.purchase.dto.PurchaseItemRequest;
 import com.bakery.bakeryapi.purchase.dto.PurchaseRequest;
 import com.bakery.bakeryapi.purchase.dto.PurchaseResponse;
@@ -48,7 +47,6 @@ public class PurchaseService {
     private final UserService userService;
     private final ProductService productService;
     private final PromotionService promotionService;
-    private final PurchaseMapper mapper;
     private final PaginationProperties paginationProperties;
 
     public PurchaseService(
@@ -56,14 +54,12 @@ public class PurchaseService {
             UserService userService,
             ProductService productService,
             PromotionService promotionService,
-            PurchaseMapper mapper,
             PaginationProperties paginationProperties
     ) {
         this.repository = repository;
         this.userService = userService;
         this.productService = productService;
         this.promotionService = promotionService;
-        this.mapper = mapper;
         this.paginationProperties = paginationProperties;
     }
 
@@ -108,7 +104,7 @@ public class PurchaseService {
             purchase.addItem(item);
         }
 
-        return mapper.toResponse(repository.save(purchase));
+        return PurchaseResponse.from(repository.save(purchase));
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +112,7 @@ public class PurchaseService {
         Purchase purchase = repository.findDetailedById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
         enforceAccess(purchase);
-        return mapper.toResponse(purchase);
+        return PurchaseResponse.from(purchase);
     }
 
     @Transactional(readOnly = true)
@@ -128,15 +124,15 @@ public class PurchaseService {
                 if (userId != null) {
                     userService.getEntityById(userId);
                     return repository.findAllDetailedByUserId(userId, safePageable)
-                        .map(mapper::toResponse);
+                        .map(PurchaseResponse::from);
                 }
             return repository.findAllDetailed(safePageable)
-                    .map(mapper::toResponse);
+                    .map(PurchaseResponse::from);
         }
 
         User currentUser = userService.getEntityByEmail(auth.getName());
         return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
-                .map(mapper::toResponse);
+                .map(PurchaseResponse::from);
     }
 
     @Transactional

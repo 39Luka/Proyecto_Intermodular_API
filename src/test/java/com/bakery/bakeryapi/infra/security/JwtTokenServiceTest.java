@@ -27,7 +27,7 @@ class JwtTokenServiceTest {
         JwtEncoder encoder = new NimbusJwtEncoder(new ImmutableSecret<>(key));
         JwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
 
-        JwtTokenService service = new JwtTokenService(encoder, new JwtProperties(secret, 60_000));
+        JwtTokenService service = new JwtTokenService(encoder, decoder, new JwtProperties(secret, 60_000, 604_800_000L));
         String token = service.generateToken("user@example.com", "ADMIN");
 
         Jwt decoded = decoder.decode(token);

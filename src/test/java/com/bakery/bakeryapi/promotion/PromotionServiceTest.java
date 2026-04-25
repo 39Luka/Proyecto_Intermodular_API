@@ -3,7 +3,6 @@ package com.bakery.bakeryapi.promotion;
 import com.bakery.bakeryapi.infra.config.PaginationProperties;
 import com.bakery.bakeryapi.shared.exception.ForbiddenOperationException;
 import com.bakery.bakeryapi.product.ProductService;
-import com.bakery.bakeryapi.promotion.dto.PromotionMapper;
 import com.bakery.bakeryapi.domain.Promotion;
 import com.bakery.bakeryapi.domain.Role;
 import com.bakery.bakeryapi.domain.User;
@@ -52,9 +51,6 @@ class PromotionServiceTest {
 
     @Mock
     private UserService userService;
-
-    @Mock
-    private PromotionMapper mapper;
 
     @Mock
     private PaginationProperties paginationProperties;

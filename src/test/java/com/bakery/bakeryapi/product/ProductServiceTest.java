@@ -4,8 +4,6 @@ import com.bakery.bakeryapi.category.CategoryService;
 import com.bakery.bakeryapi.infra.config.PaginationProperties;
 import com.bakery.bakeryapi.domain.Category;
 import com.bakery.bakeryapi.domain.Product;
-import com.bakery.bakeryapi.product.dto.ProductMapper;
-import com.bakery.bakeryapi.product.dto.ProductResponse;
 import com.bakery.bakeryapi.product.exception.ProductNotFoundException;
 import com.bakery.bakeryapi.domain.PurchaseStatus;
 import com.bakery.bakeryapi.repository.ProductRepository;
@@ -41,9 +39,6 @@ class ProductServiceTest {
 
     @Mock
     private CategoryService categoryService;
-
-    @Mock
-    private ProductMapper mapper;
 
     @Mock
     private PaginationProperties paginationProperties;
@@ -94,11 +89,6 @@ class ProductServiceTest {
         Product inactive = new Product("Old", null, new BigDecimal("1.00"), 1, new Category("Bread"));
         inactive.disable();
         when(repository.findById(1L)).thenReturn(Optional.of(inactive));
-        when(mapper.toResponse(any(Product.class))).thenAnswer(inv -> {
-            Product p = inv.getArgument(0);
-            Long categoryId = p.getCategory() != null ? p.getCategory().getId() : null;
-            return new ProductResponse(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getStock(), p.isActive(), categoryId, null);
-        });
 
         var response = service.getById(1L);
 

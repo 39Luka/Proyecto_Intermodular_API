@@ -5,7 +5,6 @@ import com.bakery.bakeryapi.domain.Product;
 import com.bakery.bakeryapi.domain.User;
 import com.bakery.bakeryapi.product.ProductService;
 import com.bakery.bakeryapi.user.UserService;
-import com.bakery.bakeryapi.promotion.dto.PromotionMapper;
 import com.bakery.bakeryapi.domain.PercentagePromotion;
 import com.bakery.bakeryapi.domain.Promotion;
 import com.bakery.bakeryapi.domain.PromotionUsage;
@@ -39,7 +38,6 @@ public class PromotionService {
     private final ProductService productService;
     private final PromotionUsageRepository usageRepository;
     private final UserService userService;
-    private final PromotionMapper mapper;
     private final PaginationProperties paginationProperties;
 
     public PromotionService(
@@ -47,14 +45,12 @@ public class PromotionService {
             ProductService productService,
             PromotionUsageRepository usageRepository,
             UserService userService,
-            PromotionMapper mapper,
             PaginationProperties paginationProperties
     ) {
         this.repository = repository;
         this.productService = productService;
         this.usageRepository = usageRepository;
         this.userService = userService;
-        this.mapper = mapper;
         this.paginationProperties = paginationProperties;
     }
 
@@ -74,7 +70,7 @@ public class PromotionService {
                 product
         );
 
-        return mapper.toResponse(repository.save(promotion));
+        return PromotionResponse.from(repository.save(promotion));
     }
 
     public Promotion getEntityById(Long id) {
@@ -83,13 +79,13 @@ public class PromotionService {
     }
 
     public PromotionResponse getById(Long id) {
-        return mapper.toResponse(getEntityById(id));
+        return PromotionResponse.from(getEntityById(id));
     }
 
     public Page<PromotionResponse> getAll(Pageable pageable) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
         return repository.findAll(safePageable)
-                .map(mapper::toResponse);
+                .map(PromotionResponse::from);
     }
 
     public Page<PromotionResponse> getActiveByProduct(Long productId, Long userId, Pageable pageable) {
@@ -111,7 +107,7 @@ public class PromotionService {
         Page<Promotion> promotions = effectiveUserId == null
                 ? repository.findActiveByProductId(productId, today, safePageable)
                 : repository.findActiveByProductIdAndUserId(productId, effectiveUserId, today, safePageable);
-        return promotions.map(mapper::toResponse);
+        return promotions.map(PromotionResponse::from);
     }
 
     @Transactional

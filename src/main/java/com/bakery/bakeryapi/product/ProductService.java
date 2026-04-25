@@ -7,42 +7,52 @@ import com.bakery.bakeryapi.domain.Product;
 import com.bakery.bakeryapi.domain.PurchaseStatus;
 import com.bakery.bakeryapi.shared.PageableUtils;
 import com.bakery.bakeryapi.shared.SecurityUtils;
-import com.bakery.bakeryapi.product.dto.ProductMapper;
+import com.bakery.bakeryapi.shared.ImageValidator;
 import com.bakery.bakeryapi.product.dto.ProductRequest;
 import com.bakery.bakeryapi.product.dto.ProductResponse;
 import com.bakery.bakeryapi.product.dto.ProductSalesResponse;
 import com.bakery.bakeryapi.product.exception.ProductInactiveException;
 import com.bakery.bakeryapi.product.exception.ProductNotFoundException;
 import com.bakery.bakeryapi.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
+
 @Service
 @Transactional(readOnly = true)
 public class ProductService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+
     private final ProductRepository repository;
     private final CategoryService categoryService;
-    private final ProductMapper mapper;
     private final PaginationProperties paginationProperties;
 
     public ProductService(
             ProductRepository repository,
             CategoryService categoryService,
-            ProductMapper mapper,
             PaginationProperties paginationProperties
     ) {
         this.repository = repository;
         this.categoryService = categoryService;
-        this.mapper = mapper;
         this.paginationProperties = paginationProperties;
     }
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
+        log.info("Creating new product: {}", request.name());
+        
+        // Validate image if provided
+        if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
+            ImageValidator.validateImageBase64(request.imageBase64());
+        }
+        
         Category category = categoryService.getEntityById(request.categoryId());
         Product product = new Product(
                 request.name(),
@@ -52,14 +62,20 @@ public class ProductService {
                 category
         );
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
-            product.setImage(mapper.imageBase64ToProduct(request.imageBase64()));
+            product.setImage(decodeImageBase64(request.imageBase64()));
         }
-        return mapper.toResponse(repository.save(product));
+        Product saved = repository.save(product);
+        log.info("Product created successfully with ID: {}", saved.getId());
+        return ProductResponse.from(saved);
     }
 
     public Product getEntityById(Long id) {
+        log.debug("Fetching product entity by ID: {}", id);
         return repository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> {
+                    log.warn("Product not found: {}", id);
+                    return new ProductNotFoundException(id);
+                });
     }
 
     public Product getActiveEntityById(Long id) {
@@ -74,26 +90,26 @@ public class ProductService {
         Authentication auth = SecurityUtils.optionalAuthentication();
         Product product = getEntityById(id);
         if (auth != null && SecurityUtils.isAdmin(auth)) {
-            return mapper.toResponse(product);
+            return ProductResponse.from(product);
         }
         if (!product.isActive()) {
             // Do not leak inactive products to non-admins (including anonymous users).
             throw new ProductNotFoundException(id);
         }
-        return mapper.toResponse(product);
+        return ProductResponse.from(product);
     }
 
     public ProductResponse getActiveByIdCached(Long id) {
-        return mapper.toResponse(getActiveEntityById(id));
+        return ProductResponse.from(getActiveEntityById(id));
     }
 
     public Page<ProductResponse> getAllActiveCached(Pageable pageable, Long categoryId) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
         if (categoryId == null) {
-            return repository.findAllByActiveTrue(safePageable).map(mapper::toResponse);
+            return repository.findAllByActiveTrue(safePageable).map(ProductResponse::from);
         }
         categoryService.getEntityById(categoryId);
-        return repository.findAllByCategoryIdAndActiveTrue(categoryId, safePageable).map(mapper::toResponse);
+        return repository.findAllByCategoryIdAndActiveTrue(categoryId, safePageable).map(ProductResponse::from);
     }
 
     public Page<ProductResponse> getAll(Pageable pageable, Long categoryId) {
@@ -103,13 +119,13 @@ public class ProductService {
 
         if (categoryId == null) {
             if (admin) {
-                return repository.findAll(safePageable).map(mapper::toResponse);
+                return repository.findAll(safePageable).map(ProductResponse::from);
             }
             return getAllActiveCached(safePageable, null);
         }
         categoryService.getEntityById(categoryId);
         if (admin) {
-            return repository.findAllByCategoryId(categoryId, safePageable).map(mapper::toResponse);
+            return repository.findAllByCategoryId(categoryId, safePageable).map(ProductResponse::from);
         }
         return getAllActiveCached(safePageable, categoryId);
     }
@@ -124,6 +140,13 @@ public class ProductService {
 
     @Transactional
     public ProductResponse update(Long id, ProductRequest request) {
+        log.info("Updating product ID: {}", id);
+        
+        // Validate image if provided
+        if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
+            ImageValidator.validateImageBase64(request.imageBase64());
+        }
+        
         Product product = getEntityById(id);
         Category category = categoryService.getEntityById(request.categoryId());
         product.update(
@@ -134,13 +157,16 @@ public class ProductService {
                 category
         );
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
-            product.setImage(mapper.imageBase64ToProduct(request.imageBase64()));
+            product.setImage(decodeImageBase64(request.imageBase64()));
         }
-        return mapper.toResponse(repository.save(product));
+        Product updated = repository.save(product);
+        log.info("Product updated successfully: {}", id);
+        return ProductResponse.from(updated);
     }
 
     @Transactional
     public void setActive(Long id, boolean active) {
+        log.info("Setting product {} active status to: {}", id, active);
         Product product = getEntityById(id);
         if (active) {
             product.enable();
@@ -148,5 +174,14 @@ public class ProductService {
             product.disable();
         }
         repository.save(product);
+        log.info("Product {} active status updated", id);
+    }
+
+    private byte[] decodeImageBase64(String imageBase64) {
+        try {
+            return Base64.getDecoder().decode(imageBase64);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid base64 image encoding", e);
+        }
     }
 }

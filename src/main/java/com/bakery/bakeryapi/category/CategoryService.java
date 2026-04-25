@@ -1,7 +1,6 @@
 package com.bakery.bakeryapi.category;
 
 import com.bakery.bakeryapi.infra.config.PaginationProperties;
-import com.bakery.bakeryapi.category.dto.CategoryMapper;
 import com.bakery.bakeryapi.category.dto.CategoryRequest;
 import com.bakery.bakeryapi.category.dto.CategoryResponse;
 import com.bakery.bakeryapi.domain.Category;
@@ -19,12 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryService {
 
     private final CategoryRepository repository;
-    private final CategoryMapper mapper;
     private final PaginationProperties paginationProperties;
 
-    public CategoryService(CategoryRepository repository, CategoryMapper mapper, PaginationProperties paginationProperties) {
+    public CategoryService(CategoryRepository repository, PaginationProperties paginationProperties) {
         this.repository = repository;
-        this.mapper = mapper;
         this.paginationProperties = paginationProperties;
     }
 
@@ -35,7 +32,7 @@ public class CategoryService {
         }
 
         Category category = new Category(request.name());
-        return mapper.toResponse(repository.save(category));
+        return CategoryResponse.from(repository.save(category));
     }
 
     public Category getEntityById(Long id) {
@@ -44,13 +41,13 @@ public class CategoryService {
     }
 
     public CategoryResponse getById(Long id) {
-        return mapper.toResponse(getEntityById(id));
+        return CategoryResponse.from(getEntityById(id));
     }
 
     public Page<CategoryResponse> getAll(Pageable pageable) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
         return repository.findAll(safePageable)
-                .map(mapper::toResponse);
+                .map(CategoryResponse::from);
     }
 
     @Transactional
@@ -61,7 +58,7 @@ public class CategoryService {
             throw new CategoryAlreadyExistsException(request.name());
         }
         category.update(request.name());
-        return mapper.toResponse(repository.save(category));
+        return CategoryResponse.from(repository.save(category));
     }
 }
 
