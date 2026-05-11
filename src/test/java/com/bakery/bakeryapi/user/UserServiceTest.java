@@ -2,6 +2,7 @@ package com.bakery.bakeryapi.user;
 
 import com.bakery.bakeryapi.domain.Role;
 import com.bakery.bakeryapi.domain.User;
+import com.bakery.bakeryapi.auth.exception.InvalidCredentialsException;
 import com.bakery.bakeryapi.user.dto.UserRequest;
 import com.bakery.bakeryapi.user.exception.EmailAlreadyExistsException;
 import com.bakery.bakeryapi.user.exception.UserNotFoundException;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Base64;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -90,6 +92,63 @@ class UserServiceTest {
 
         assertFalse(user.isEnabled());
         verify(repository).save(user);
+    }
+
+    @Test
+    void updateProfileImage_validImage_savesImage() {
+        String pngBase64 = Base64.getEncoder().encodeToString(new byte[]{
+                (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
+        });
+        User user = new User("silvia@example.com", "1234", Role.USER);
+        when(repository.findByEmail("silvia@example.com")).thenReturn(Optional.of(user));
+        when(repository.save(user)).thenReturn(user);
+
+        var result = userService.updateProfileImage("silvia@example.com", pngBase64);
+
+        assertArrayEquals(Base64.getDecoder().decode(pngBase64), user.getProfileImage());
+        assertEquals(pngBase64, result.profileImageBase64());
+        verify(repository).save(user);
+    }
+
+    @Test
+    void updateProfileImage_blankImage_removesImage() {
+        User user = new User("silvia@example.com", "1234", Role.USER);
+        user.setProfileImage(new byte[]{1, 2, 3});
+        when(repository.findByEmail("silvia@example.com")).thenReturn(Optional.of(user));
+        when(repository.save(user)).thenReturn(user);
+
+        var result = userService.updateProfileImage("silvia@example.com", "");
+
+        assertNull(user.getProfileImage());
+        assertNull(result.profileImageBase64());
+        verify(repository).save(user);
+    }
+
+    @Test
+    void changePassword_correctCurrentPassword_savesEncodedPasswordAndRotatesRefreshToken() {
+        User user = new User("silvia@example.com", "old-hashed", Role.USER);
+        when(repository.findByEmail("silvia@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("oldPassword", "old-hashed")).thenReturn(true);
+        when(passwordEncoder.encode("newPassword123")).thenReturn("new-hashed");
+
+        userService.changePassword("silvia@example.com", "oldPassword", "newPassword123");
+
+        assertEquals("new-hashed", user.getPassword());
+        assertEquals(1, user.getRefreshTokenVersion());
+        verify(repository).save(user);
+    }
+
+    @Test
+    void changePassword_wrongCurrentPassword_throwsInvalidCredentialsException() {
+        User user = new User("silvia@example.com", "old-hashed", Role.USER);
+        when(repository.findByEmail("silvia@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongPassword", "old-hashed")).thenReturn(false);
+
+        assertThrows(InvalidCredentialsException.class,
+                () -> userService.changePassword("silvia@example.com", "wrongPassword", "newPassword123"));
+
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(repository, never()).save(any(User.class));
     }
 
 }

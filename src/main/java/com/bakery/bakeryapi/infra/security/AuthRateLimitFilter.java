@@ -17,6 +17,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Rate-limits public authentication endpoints by client IP and endpoint path.
+ */
 @Component
 public class AuthRateLimitFilter extends OncePerRequestFilter {
 

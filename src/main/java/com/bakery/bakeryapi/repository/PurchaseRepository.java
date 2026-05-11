@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Persistence access for purchases, including detailed fetch queries and sales totals.
+ */
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     interface PurchaseTotalRow {

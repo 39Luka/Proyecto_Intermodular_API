@@ -3,6 +3,9 @@ package com.bakery.bakeryapi.category.exception;
 import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Raised when a category cannot be found.
+ */
 public class CategoryNotFoundException extends ApiException {
 
     public CategoryNotFoundException(Long id) {

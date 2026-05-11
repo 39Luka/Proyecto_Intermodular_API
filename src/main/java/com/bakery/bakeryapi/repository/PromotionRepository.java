@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 
+/**
+ * Persistence access for promotions and active-promotion queries.
+ */
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
     @Override

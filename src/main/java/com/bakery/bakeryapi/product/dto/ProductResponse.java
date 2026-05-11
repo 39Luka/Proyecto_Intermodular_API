@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.Base64;
 
+/**
+ * Product data returned by the API.
+ */
 public record ProductResponse(
         Long id,
         String name,

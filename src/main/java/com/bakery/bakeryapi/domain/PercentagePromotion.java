@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
+/**
+ * Promotion that discounts a percentage of the gross line amount.
+ */
 @Entity
 @DiscriminatorValue("PERCENTAGE")
 public class PercentagePromotion extends Promotion {

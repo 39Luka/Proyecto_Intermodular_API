@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
+/**
+ * Generates and reads JWT access and refresh tokens.
+ */
 @Component
 public class JwtTokenService {
 
@@ -29,6 +32,13 @@ public class JwtTokenService {
                 properties.refreshExpiration() : 7 * 24 * 60 * 60 * 1000L;
     }
 
+    /**
+     * Generates an access token for the authenticated user.
+     *
+     * @param email token subject
+     * @param role role claim without the {@code ROLE_} prefix
+     * @return signed JWT access token
+     */
     public String generateToken(String email, String role) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -43,6 +53,13 @@ public class JwtTokenService {
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
+    /**
+     * Generates a refresh token tied to the user's current refresh-token version.
+     *
+     * @param email token subject
+     * @param refreshTokenVersion version stored on the user record
+     * @return signed JWT refresh token
+     */
     public String generateRefreshToken(String email, long refreshTokenVersion) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -57,6 +74,12 @@ public class JwtTokenService {
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
+    /**
+     * Reads a refresh token and returns its validated payload.
+     *
+     * @param token signed refresh token
+     * @return payload when valid, otherwise {@code null}
+     */
     public RefreshTokenPayload readRefreshToken(String token) {
         try {
             var jwt = jwtDecoder.decode(token);
@@ -77,6 +100,9 @@ public class JwtTokenService {
         return expirationMs;
     }
 
+    /**
+     * Minimal payload extracted from a valid refresh token.
+     */
     public record RefreshTokenPayload(String subject, long refreshTokenVersion) {
     }
 }

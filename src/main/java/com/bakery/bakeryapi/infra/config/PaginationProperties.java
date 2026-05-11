@@ -2,6 +2,9 @@ package com.bakery.bakeryapi.infra.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Pagination limits used to clamp client-provided page sizes.
+ */
 @ConfigurationProperties(prefix = "app.pagination")
 public record PaginationProperties(
         Integer maxPageSize

@@ -3,7 +3,6 @@ package com.bakery.bakeryapi.purchase;
 import com.bakery.bakeryapi.infra.config.PaginationProperties;
 import com.bakery.bakeryapi.product.ProductService;
 import com.bakery.bakeryapi.promotion.PromotionService;
-import com.bakery.bakeryapi.shared.exception.ForbiddenOperationException;
 import com.bakery.bakeryapi.shared.PageableUtils;
 import com.bakery.bakeryapi.shared.SecurityUtils;
 import com.bakery.bakeryapi.domain.Purchase;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
@@ -47,6 +45,8 @@ public class PurchaseService {
     private final UserService userService;
     private final ProductService productService;
     private final PromotionService promotionService;
+    private final PurchaseAccessService purchaseAccessService;
+    private final PurchasePricingService purchasePricingService;
     private final PaginationProperties paginationProperties;
 
     public PurchaseService(
@@ -54,12 +54,16 @@ public class PurchaseService {
             UserService userService,
             ProductService productService,
             PromotionService promotionService,
+            PurchaseAccessService purchaseAccessService,
+            PurchasePricingService purchasePricingService,
             PaginationProperties paginationProperties
     ) {
         this.repository = repository;
         this.userService = userService;
         this.productService = productService;
         this.promotionService = promotionService;
+        this.purchaseAccessService = purchaseAccessService;
+        this.purchasePricingService = purchasePricingService;
         this.paginationProperties = paginationProperties;
     }
 
@@ -69,7 +73,7 @@ public class PurchaseService {
             throw new InvalidPurchaseException("Purchase must include at least one item");
         }
 
-        User user = resolvePurchaseUser(request.userId());
+        User user = purchaseAccessService.resolvePurchaseUser(request.userId());
         Purchase purchase = new Purchase(user, LocalDateTime.now(CLOCK_UTC), PurchaseStatus.CREATED);
 
         for (PurchaseItemRequest itemRequest : request.items()) {
@@ -90,7 +94,11 @@ public class PurchaseService {
             }
 
             BigDecimal unitPrice = product.getPrice();
-            BigDecimal subtotal = calculateSubtotal(unitPrice, itemRequest.quantity(), discountAmount);
+            BigDecimal subtotal = purchasePricingService.calculateSubtotal(
+                    unitPrice,
+                    itemRequest.quantity(),
+                    discountAmount
+            );
 
             PurchaseItem item = new PurchaseItem(
                     product,
@@ -111,7 +119,7 @@ public class PurchaseService {
     public PurchaseResponse getById(Long id) {
         Purchase purchase = repository.findDetailedById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
-        enforceAccess(purchase);
+        purchaseAccessService.enforceAccess(purchase);
         return PurchaseResponse.from(purchase);
     }
 
@@ -130,7 +138,7 @@ public class PurchaseService {
                     .map(PurchaseResponse::from);
         }
 
-        User currentUser = userService.getEntityByEmail(auth.getName());
+        User currentUser = purchaseAccessService.currentUser();
         return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
                 .map(PurchaseResponse::from);
     }
@@ -139,7 +147,7 @@ public class PurchaseService {
     public void cancel(Long id) {
         Purchase purchase = repository.findDetailedById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
-        enforceAccess(purchase);
+        purchaseAccessService.enforceAccess(purchase);
 
         if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
             throw new InvalidPurchaseException("Purchase is already cancelled");
@@ -167,7 +175,7 @@ public class PurchaseService {
     public void pay(Long id) {
         Purchase purchase = repository.findDetailedById(id)
                 .orElseThrow(() -> new PurchaseNotFoundException(id));
-        enforceAccess(purchase);
+        purchaseAccessService.enforceAccess(purchase);
 
         if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
             throw new InvalidPurchaseException("Cancelled purchases cannot be paid");
@@ -183,42 +191,4 @@ public class PurchaseService {
         repository.save(purchase);
     }
 
-    private User resolvePurchaseUser(Long requestedUserId) {
-        Authentication auth = SecurityUtils.requireAuthentication();
-        if (SecurityUtils.isAdmin(auth)) {
-            if (requestedUserId == null) {
-                throw new InvalidPurchaseException("userId is required for admins");
-            }
-            return userService.getEntityById(requestedUserId);
-        }
-
-        User currentUser = userService.getEntityByEmail(auth.getName());
-        if (requestedUserId == null) {
-            return currentUser;
-        }
-        if (!currentUser.getId().equals(requestedUserId)) {
-            throw new ForbiddenOperationException("Cannot create a purchase for another user");
-        }
-        return currentUser;
-    }
-
-    private BigDecimal calculateSubtotal(BigDecimal unitPrice, int quantity, BigDecimal discountAmount) {
-        BigDecimal gross = unitPrice.multiply(BigDecimal.valueOf(quantity));
-        BigDecimal subtotal = gross.subtract(discountAmount);
-        if (subtotal.compareTo(BigDecimal.ZERO) < 0) {
-            subtotal = BigDecimal.ZERO;
-        }
-        return subtotal.setScale(2, RoundingMode.HALF_UP);
-    }
-
-    private void enforceAccess(Purchase purchase) {
-        Authentication auth = SecurityUtils.requireAuthentication();
-        if (SecurityUtils.isAdmin(auth)) {
-            return;
-        }
-        User currentUser = userService.getEntityByEmail(auth.getName());
-        if (!purchase.getUser().getId().equals(currentUser.getId())) {
-            throw new ForbiddenOperationException("Cannot access purchases from another user");
-        }
-    }
 }

@@ -26,10 +26,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Application service for promotions.
+ *
+ * It validates promotion windows, applies discounts, and enforces the one-use-per-user
+ * rule through promotion usage records.
+ */
 @Service
 @Transactional(readOnly = true)
 public class PromotionService {
@@ -39,28 +44,31 @@ public class PromotionService {
     private final PromotionUsageRepository usageRepository;
     private final UserService userService;
     private final PaginationProperties paginationProperties;
+    private final PromotionRules promotionRules;
 
     public PromotionService(
             PromotionRepository repository,
             ProductService productService,
             PromotionUsageRepository usageRepository,
             UserService userService,
-            PaginationProperties paginationProperties
+            PaginationProperties paginationProperties,
+            PromotionRules promotionRules
     ) {
         this.repository = repository;
         this.productService = productService;
         this.usageRepository = usageRepository;
         this.userService = userService;
         this.paginationProperties = paginationProperties;
+        this.promotionRules = promotionRules;
     }
 
     @Transactional
     public PromotionResponse createPercentage(PercentagePromotionRequest request) {
-        validateDates(request.getStartDate(), request.getEndDate());
-        validatePercentage(request.getDiscountPercentage());
+        promotionRules.validateDates(request.getStartDate(), request.getEndDate());
+        promotionRules.validatePercentage(request.getDiscountPercentage());
 
         Product product = productService.getActiveEntityById(request.getProductId());
-        BigDecimal discountPercentage = normalizePercentage(request.getDiscountPercentage());
+        BigDecimal discountPercentage = promotionRules.normalizeAmount(request.getDiscountPercentage());
 
         PercentagePromotion promotion = new PercentagePromotion(
                 request.getDescription(),
@@ -122,18 +130,8 @@ public class PromotionService {
     }
 
     public BigDecimal applyPromotion(Promotion promotion, Product product, int quantity, User user) {
-        if (!promotion.getProduct().getId().equals(product.getId())) {
-            throw new InvalidPromotionException("Promotion does not apply to this product");
-        }
-
-        if (!promotion.isActiveOn(LocalDate.now())) {
-            throw new InvalidPromotionException("Promotion is not active");
-        }
-
+        promotionRules.validateApplicable(promotion, product, quantity);
         BigDecimal discountAmount = promotion.calculateDiscountAmount(product.getPrice(), quantity);
-        if (discountAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidPromotionException("Promotion does not apply to the requested quantity");
-        }
 
         try {
             // Unique constraint (promotion_id, user_id) guarantees "use once".
@@ -143,44 +141,11 @@ public class PromotionService {
             throw new InvalidPromotionException("Promotion has already been used by this user");
         }
 
-        return normalizeAmount(discountAmount);
+        return promotionRules.normalizeAmount(discountAmount);
     }
 
     public void releaseUsage(Promotion promotion, User user) {
         usageRepository.deleteByPromotionIdAndUserId(promotion.getId(), user.getId());
-    }
-
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
-        if (startDate.isBefore(LocalDate.now())) {
-            throw new InvalidPromotionException("Promotion start date cannot be in the past");
-        }
-        if (endDate != null && endDate.isBefore(startDate)) {
-            throw new InvalidPromotionException("Promotion end date cannot be before start date");
-        }
-    }
-
-    private void validatePercentage(BigDecimal discountPercentage) {
-        if (discountPercentage == null) {
-            throw new InvalidPromotionException("Percentage promotion requires discountPercentage");
-        }
-        if (discountPercentage.compareTo(BigDecimal.ZERO) < 0
-                || discountPercentage.compareTo(new BigDecimal("100")) > 0) {
-            throw new InvalidPromotionException("discountPercentage must be between 0 and 100");
-        }
-    }
-
-    private BigDecimal normalizePercentage(BigDecimal value) {
-        if (value == null) {
-            return BigDecimal.ZERO;
-        }
-        return value.setScale(2, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal normalizeAmount(BigDecimal value) {
-        if (value == null) {
-            return BigDecimal.ZERO;
-        }
-        return value.setScale(2, RoundingMode.HALF_UP);
     }
 
     private Long resolveUserIdForPromotionFiltering(Authentication auth, Long requestedUserId) {

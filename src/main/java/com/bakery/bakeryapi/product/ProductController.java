@@ -20,6 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST endpoints for the product catalog.
+ */
 @RestController
 @RequestMapping("/products")
 @Tag(name = "Products", description = "Product catalog")
@@ -34,6 +37,7 @@ public class ProductController {
     @GetMapping("/{id}")
     @Operation(summary = "Get product by id", description = "Non-admin users cannot access disabled products.")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
@@ -42,6 +46,9 @@ public class ProductController {
 
     @GetMapping("/top-selling")
     @Operation(summary = "Top selling products", description = "Returns the most sold products (from PAID purchases).")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok")
+    })
     public ResponseEntity<Page<ProductSalesResponse>> getTopSelling(
             @PageableDefault(size = 10) Pageable pageable
     ) {
@@ -50,6 +57,10 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "List products", description = "Optional filter by categoryId. Non-admin users only see active products.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "404", description = "Category not found")
+    })
     public ResponseEntity<Page<ProductResponse>> getAll(
             Pageable pageable,
             @Parameter(description = "Optional category filter") @RequestParam(required = false) Long categoryId
@@ -61,7 +72,11 @@ public class ProductController {
     @Operation(summary = "Create product", description = "Admin-only.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Product created")
+            @ApiResponse(responseCode = "201", description = "Product created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
@@ -74,6 +89,10 @@ public class ProductController {
     @Operation(summary = "Update product", description = "Admin-only.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -89,11 +108,29 @@ public class ProductController {
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> patch(@PathVariable Long id, @Valid @RequestBody ActiveUpdateRequest request) {
         service.setActive(id, request.active());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete product", description = "Admin-only. If the product has purchases, it will be deactivated instead of deleted.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Deleted or deactivated"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

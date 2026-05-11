@@ -22,6 +22,9 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Spring Security JWT encoder, decoder and authority mapping configuration.
+ */
 @Configuration
 public class JwtConfig {
 

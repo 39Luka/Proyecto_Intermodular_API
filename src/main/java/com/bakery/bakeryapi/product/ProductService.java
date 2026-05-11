@@ -24,6 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 
+/**
+ * Application service for products.
+ *
+ * It applies visibility rules for inactive products, validates optional product images
+ * and prevents hard deletion when purchase history exists.
+ */
 @Service
 @Transactional(readOnly = true)
 public class ProductService {
@@ -175,6 +181,21 @@ public class ProductService {
         }
         repository.save(product);
         log.info("Product {} active status updated", id);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        log.info("Attempting to delete product ID: {}", id);
+        Product product = getEntityById(id);
+        
+        if (repository.existsPurchasesByProductId(id)) {
+            log.info("Product {} has purchases, deactivating instead of deleting", id);
+            product.disable();
+            repository.save(product);
+        } else {
+            log.info("Product {} has no purchases, performing hard delete", id);
+            repository.delete(product);
+        }
     }
 
     private byte[] decodeImageBase64(String imageBase64) {

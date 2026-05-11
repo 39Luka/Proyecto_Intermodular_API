@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Purchase aggregate containing the buyer, status, total and line items.
+ */
 @Entity
 @Table(name = "purchases", indexes = {
     @Index(name = "idx_purchase_user", columnList = "user_id"),
@@ -58,6 +61,11 @@ public class Purchase {
         this.status = status;
     }
 
+    /**
+     * Adds an item and updates the purchase total.
+     *
+     * @param item purchase line to attach to this purchase
+     */
     public void addItem(PurchaseItem item) {
         items.add(item);
         item.assignPurchase(this);

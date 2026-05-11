@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Request body for public account registration.
+ */
 public record RegisterRequest(
         @Schema(description = "Email for the new account", example = "user@example.com")
         @Email @NotBlank String email,

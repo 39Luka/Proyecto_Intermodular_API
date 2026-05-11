@@ -3,6 +3,9 @@ package com.bakery.bakeryapi.purchase.exception;
 import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Raised when a purchase cannot be found.
+ */
 public class PurchaseNotFoundException extends ApiException {
 
     public PurchaseNotFoundException(Long id) {

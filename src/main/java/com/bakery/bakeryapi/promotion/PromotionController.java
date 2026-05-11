@@ -18,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST endpoints for percentage promotions.
+ */
 @RestController
 @RequestMapping("/promotions")
 @Tag(name = "Promotions", description = "Percentage promotions for products")
@@ -33,6 +36,9 @@ public class PromotionController {
     @Operation(summary = "Get promotion by id", description = "Admin-only.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -43,6 +49,11 @@ public class PromotionController {
     @GetMapping
     @Operation(summary = "List promotions", description = "Admin-only.")
     @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PromotionResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
@@ -53,6 +64,12 @@ public class PromotionController {
             summary = "List active promotions for a product",
             description = "Returns active percentage promotions for the given product. If userId is provided, filters out promotions already used by that user."
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Authentication required for user-scoped filtering"),
+            @ApiResponse(responseCode = "403", description = "Cannot query another user's promotions"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<Page<PromotionResponse>> getActiveByProduct(
             @Parameter(description = "Product id") @RequestParam Long productId,
             @Parameter(description = "Optional filter. Admins can query any userId; users can only query their own.") @RequestParam(required = false) Long userId,
@@ -65,7 +82,11 @@ public class PromotionController {
     @Operation(summary = "Create percentage promotion", description = "Admin-only. Creates an active percentage discount for a product.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Promotion created")
+            @ApiResponse(responseCode = "201", description = "Promotion created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PromotionResponse> createPercentage(@Valid @RequestBody PercentagePromotionRequest request) {
@@ -78,6 +99,9 @@ public class PromotionController {
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PreAuthorize("hasRole('ADMIN')")

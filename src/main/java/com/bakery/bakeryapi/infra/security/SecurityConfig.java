@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Main HTTP security configuration for the API.
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -61,6 +64,9 @@ public class SecurityConfig {
 
                         // Swagger
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // AUTH PERSONAL
+                        .requestMatchers("/auth/me/**").authenticated()
 
                         // AUTH PUBLICO
                         .requestMatchers("/auth/login", "/auth/register", "/auth/refresh").permitAll()

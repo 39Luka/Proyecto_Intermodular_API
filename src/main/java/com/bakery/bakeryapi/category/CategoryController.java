@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST endpoints for product categories.
+ */
 @RestController
 @RequestMapping("/categories")
 @Tag(name = "Categories", description = "Product categories")
@@ -30,6 +33,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     @Operation(summary = "Get category by id")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<CategoryResponse> getById(@PathVariable Long id) {
@@ -38,6 +42,9 @@ public class CategoryController {
 
     @GetMapping
     @Operation(summary = "List categories")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok")
+    })
     public ResponseEntity<Page<CategoryResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
     }
@@ -47,6 +54,9 @@ public class CategoryController {
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Category created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Already exists")
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -60,6 +70,10 @@ public class CategoryController {
     @Operation(summary = "Update category", description = "Admin-only.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "409", description = "Already exists")
     })

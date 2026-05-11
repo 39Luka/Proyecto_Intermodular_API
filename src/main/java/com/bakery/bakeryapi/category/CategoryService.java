@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Application service for category creation, lookup and updates.
+ */
 @Service
 @Transactional(readOnly = true)
 public class CategoryService {

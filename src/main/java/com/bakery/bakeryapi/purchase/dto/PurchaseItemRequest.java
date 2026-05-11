@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+/**
+ * Request body for one purchase line.
+ */
 public record PurchaseItemRequest(
         @Schema(description = "Product id", example = "1")
         @NotNull Long productId,

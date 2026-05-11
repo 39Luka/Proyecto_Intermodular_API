@@ -8,6 +8,9 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
+/**
+ * Request body for creating or updating a product.
+ */
 public record ProductRequest(
         @Schema(description = "Product name", example = "Baguette")
         @NotBlank String name,

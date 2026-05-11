@@ -13,6 +13,11 @@ import com.bakery.bakeryapi.domain.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Records that a user has consumed a promotion.
+ *
+ * The unique constraint on promotion and user enforces one use per user.
+ */
 @Entity
 @Table(
         name = "promotion_usage",

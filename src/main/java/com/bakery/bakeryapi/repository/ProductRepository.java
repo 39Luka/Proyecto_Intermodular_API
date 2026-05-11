@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * Persistence access for products and product sales projections.
+ */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Load category in the same query because ProductResponse includes it (avoids N+1).
@@ -24,6 +27,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @EntityGraph(attributePaths = {"category"})
     Page<Product> findAllByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
+
+    @Query("select count(pi) > 0 from PurchaseItem pi where pi.product.id = :productId")
+    boolean existsPurchasesByProductId(@Param("productId") Long productId);
 
     @Query("""
             select new com.bakery.bakeryapi.product.dto.ProductSalesResponse(
@@ -62,4 +68,3 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 }
-

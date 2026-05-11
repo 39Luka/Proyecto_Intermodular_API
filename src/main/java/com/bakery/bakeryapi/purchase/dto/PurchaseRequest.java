@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+/**
+ * Request body for creating a purchase.
+ */
 public record PurchaseRequest(
         @Schema(description = "Optional. Owner user id. Required for admins; ignored/resolved from JWT for regular users.", example = "1")
         Long userId,

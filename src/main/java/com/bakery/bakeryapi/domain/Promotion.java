@@ -17,6 +17,12 @@ import com.bakery.bakeryapi.domain.Product;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Base class for product promotions.
+ *
+ * Promotions use single-table inheritance so every promotion type shares the
+ * same database table and exposes a common activation window.
+ */
 @Entity
 // Indexes speed up lookups by product, date range and active flag.
 // SINGLE_TABLE inheritance: promotions share one "promotions" table. This project only exposes percentage promotions.
@@ -59,6 +65,13 @@ public abstract class Promotion {
         this.product = product;
     }
 
+    /**
+     * Calculates the discount amount for a purchase line.
+     *
+     * @param unitPrice product unit price
+     * @param quantity requested quantity
+     * @return discount amount before final normalization
+     */
     public abstract BigDecimal calculateDiscountAmount(BigDecimal unitPrice, int quantity);
 
     public abstract String getType();
@@ -67,6 +80,12 @@ public abstract class Promotion {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Checks whether this promotion is active on a given date.
+     *
+     * @param date date to evaluate
+     * @return {@code true} when active and inside the configured date range
+     */
     public boolean isActiveOn(LocalDate date) {
         return active && !date.isBefore(startDate) && (endDate == null || !date.isAfter(endDate));
     }

@@ -47,7 +47,7 @@ class UserControllerTest {
 
     @Test
     void getUser_existingId_returnsUser() throws Exception {
-        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true);
+        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true, null);
         when(userService.getById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/users/1"))
@@ -60,7 +60,7 @@ class UserControllerTest {
 
     @Test
     void getByEmail_existingEmail_returnsUser() throws Exception {
-        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true);
+        UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true, null);
         when(userService.getByEmail("test@example.com")).thenReturn(user);
 
         mockMvc.perform(get("/users")
@@ -75,7 +75,7 @@ class UserControllerTest {
     @Test
     void createUser_validRequest_createsUser() throws Exception {
         UserRequest request = new UserRequest("new@example.com", "password123", Role.USER);
-        UserResponse createdUser = new UserResponse(1L, request.email(), request.role(), true);
+        UserResponse createdUser = new UserResponse(1L, request.email(), request.role(), true, null);
 
         when(userService.create(any(UserRequest.class))).thenReturn(createdUser);
 

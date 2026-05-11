@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Request body for creating a percentage-based promotion.
+ */
 public class PercentagePromotionRequest extends PromotionRequest {
 
     @Schema(description = "Discount percentage (0-100)", example = "10.00")

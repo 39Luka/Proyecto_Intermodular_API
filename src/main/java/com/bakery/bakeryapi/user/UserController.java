@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Admin-only REST endpoints for user management.
+ */
 @RestController
 @RequestMapping("/users")
 @PreAuthorize("hasRole('ADMIN')")
@@ -32,6 +35,8 @@ public class UserController {
     @Operation(summary = "Get user by id", description = "Admin-only.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
@@ -42,6 +47,8 @@ public class UserController {
     @Operation(summary = "Get user by email", description = "Admin-only.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<UserResponse> getByEmail(@RequestParam String email) {
@@ -53,6 +60,9 @@ public class UserController {
     @Operation(summary = "Create user", description = "Admin-only. Creates a user with role/flags according to request payload.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Conflict")
     })
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest request) {
@@ -65,6 +75,9 @@ public class UserController {
     @Operation(summary = "Update user flags", description = "Admin-only. Currently supports updating { active } which maps to enabled/disabled.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Void> patchUser(@PathVariable Long id, @RequestBody @Valid ActiveUpdateRequest request) {

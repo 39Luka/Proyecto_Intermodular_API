@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.bakery.bakeryapi.auth.dto.LoginRequest;
 import com.bakery.bakeryapi.auth.dto.RegisterRequest;
 import com.bakery.bakeryapi.auth.dto.LoginResponse;
+import com.bakery.bakeryapi.domain.Role;
 import com.bakery.bakeryapi.shared.exception.GlobalExceptionHandler;
+import com.bakery.bakeryapi.user.UserService;
+import com.bakery.bakeryapi.user.dto.UserResponse;
 import com.bakery.bakeryapi.user.exception.EmailAlreadyExistsException;
-import com.bakery.bakeryapi.auth.AuthService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +17,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -26,6 +35,9 @@ class AuthControllerTest {
 
     @Mock
     private AuthService authService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private AuthController authController;
@@ -40,6 +52,11 @@ class AuthControllerTest {
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
         objectMapper = new ObjectMapper();
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -108,6 +125,27 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getMe_authenticated_returnsCurrentUser() throws Exception {
+        setAuth("user@example.com");
+        UserResponse response = new UserResponse(1L, "user@example.com", Role.USER, true, null);
+        when(userService.getByEmail("user@example.com")).thenReturn(response);
+
+        mockMvc.perform(get("/auth/me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("user@example.com"))
+                .andExpect(jsonPath("$.role").value("USER"));
+
+        verify(userService).getByEmail("user@example.com");
+    }
+
+    private void setAuth(String email) {
+        var auth = new UsernamePasswordAuthenticationToken(email, null, List.of());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
     }
 }
 

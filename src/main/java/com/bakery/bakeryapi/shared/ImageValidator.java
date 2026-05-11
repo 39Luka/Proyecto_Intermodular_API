@@ -2,6 +2,9 @@ package com.bakery.bakeryapi.shared;
 
 import com.bakery.bakeryapi.shared.exception.InvalidImageException;
 
+/**
+ * Validates Base64-encoded images accepted by the API.
+ */
 public class ImageValidator {
 
     private static final long MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -11,6 +14,14 @@ public class ImageValidator {
             "image/webp"
     };
 
+    /**
+     * Validates a Base64 image payload.
+     *
+     * Empty values are accepted so callers can use them to mean "no image".
+     *
+     * @param imageBase64 image encoded as Base64
+     * @throws InvalidImageException when the content is not valid Base64, too large or unsupported
+     */
     public static void validateImageBase64(String imageBase64) {
         if (imageBase64 == null || imageBase64.isBlank()) {
             return;

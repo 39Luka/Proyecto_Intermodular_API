@@ -13,6 +13,9 @@ import com.bakery.bakeryapi.domain.Promotion;
 
 import java.math.BigDecimal;
 
+/**
+ * Line item of a purchase, storing the product, quantity and pricing snapshot.
+ */
 @Entity
 @Table(name = "purchase_items")
 public class PurchaseItem {

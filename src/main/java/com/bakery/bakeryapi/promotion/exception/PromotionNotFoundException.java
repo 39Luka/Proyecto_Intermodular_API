@@ -3,6 +3,9 @@ package com.bakery.bakeryapi.promotion.exception;
 import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Raised when a promotion cannot be found.
+ */
 public class PromotionNotFoundException extends ApiException {
 
     public PromotionNotFoundException(Long id) {

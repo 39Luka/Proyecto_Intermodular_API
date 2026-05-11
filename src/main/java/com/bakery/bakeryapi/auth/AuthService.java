@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Coordinates authentication flows: registration, login and refresh-token rotation.
+ */
 @Service
 public class AuthService {
 
@@ -32,6 +35,13 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Registers a new public account with the {@link Role#USER} role and returns login tokens.
+     *
+     * @param email unique account email
+     * @param password raw password to encode
+     * @return access and refresh tokens for the new account
+     */
     public LoginResponse register(String email, String password) {
         log.info("User registration attempt for email: {}", email);
         User user = userService.rotateRefreshToken(userService.createInternal(email, password, Role.USER));
@@ -42,6 +52,15 @@ public class AuthService {
     }
 
 
+    /**
+     * Authenticates a user by email/password and rotates their refresh token.
+     *
+     * @param email account email
+     * @param password raw password supplied by the client
+     * @return fresh access and refresh tokens
+     * @throws InvalidCredentialsException when the user does not exist or the password is wrong
+     * @throws UserDisabledException when the account is disabled
+     */
     public LoginResponse login(String email, String password) {
         log.info("Login attempt for email: {}", email);
         User user;
@@ -69,6 +88,17 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, jwtTokenService.getExpirationMs());
     }
 
+    /**
+     * Validates a refresh token and returns a new token pair.
+     *
+     * Refresh tokens are single-use because the stored token version is rotated after
+     * every successful refresh.
+     *
+     * @param refreshToken refresh token supplied by the client
+     * @return new access and refresh tokens
+     * @throws InvalidCredentialsException when the token is invalid, expired or already rotated
+     * @throws UserDisabledException when the account is disabled
+     */
     public LoginResponse refreshAccessToken(String refreshToken) {
         log.info("Refresh token request");
         JwtTokenService.RefreshTokenPayload payload = jwtTokenService.readRefreshToken(refreshToken);

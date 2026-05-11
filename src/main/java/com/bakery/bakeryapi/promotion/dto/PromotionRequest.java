@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+/**
+ * Base request fields shared by promotion creation requests.
+ */
 public abstract class PromotionRequest {
 
     @NotBlank(message = "Description is required")

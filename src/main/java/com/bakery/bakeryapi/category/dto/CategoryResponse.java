@@ -1,5 +1,8 @@
 package com.bakery.bakeryapi.category.dto;
 
+/**
+ * Category data returned by the API.
+ */
 public record CategoryResponse(
         Long id,
         String name

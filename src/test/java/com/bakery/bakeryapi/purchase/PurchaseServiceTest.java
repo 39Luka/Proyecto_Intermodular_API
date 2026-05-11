@@ -18,9 +18,9 @@ import com.bakery.bakeryapi.domain.User;
 import com.bakery.bakeryapi.repository.PurchaseRepository;
 import com.bakery.bakeryapi.user.UserService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -60,8 +60,22 @@ class PurchaseServiceTest {
     @Mock
     private PaginationProperties paginationProperties;
 
-    @InjectMocks
     private PurchaseService service;
+
+    @BeforeEach
+    void setUp() {
+        PurchaseAccessService purchaseAccessService = new PurchaseAccessService(userService);
+        PurchasePricingService purchasePricingService = new PurchasePricingService();
+        service = new PurchaseService(
+                repository,
+                userService,
+                productService,
+                promotionService,
+                purchaseAccessService,
+                purchasePricingService,
+                paginationProperties
+        );
+    }
 
     @AfterEach
     void tearDown() {
