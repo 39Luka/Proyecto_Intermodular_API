@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST endpoints for the product catalog.
+ * Puntos finales REST para el catálogo de productos.
  */
 @RestController
 @RequestMapping("/products")
@@ -56,16 +58,42 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "List products", description = "Optional filter by categoryId. Non-admin users only see active products.")
+    @Operation(summary = "List products", description = """
+            Optional filters by categoryId and/or name. Supports sorting. Non-admin users only see active products.
+            
+            Query parameters:
+            - page: Page number (0-indexed, default: 0)
+            - size: Items per page (default: 20, max: 100)
+            - sortBy: Field to sort by (name, price, category, createdAt - default: name)
+            - order: Sort direction (asc, desc - default: asc)
+            - categoryId: Optional category filter
+            - name: Optional name filter (partial match, case-insensitive)
+            
+            Example: /products?page=0&size=10&sortBy=price&order=desc&categoryId=1&name=pan
+            """)
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     public ResponseEntity<Page<ProductResponse>> getAll(
-            Pageable pageable,
-            @Parameter(description = "Optional category filter") @RequestParam(required = false) Long categoryId
+            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Items per page") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Field to sort by (name, price, category, createdAt)") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(required = false) String order,
+            @Parameter(description = "Optional category filter") @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "Optional name filter (partial match)") @RequestParam(required = false) String name
     ) {
-        return ResponseEntity.ok(service.getAll(pageable, categoryId));
+        Sort sort = buildSort(sortBy, order, "name");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(service.getAll(pageable, categoryId, name));
+    }
+
+    private Sort buildSort(String sortBy, String order, String defaultField) {
+        String field = (sortBy == null || sortBy.isBlank()) ? defaultField : sortBy;
+        Sort.Direction direction = (order != null && order.equalsIgnoreCase("desc")) 
+            ? Sort.Direction.DESC 
+            : Sort.Direction.ASC;
+        return Sort.by(direction, field);
     }
 
     @PostMapping

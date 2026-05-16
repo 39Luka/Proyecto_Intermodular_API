@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 /**
- * Resolves and enforces purchase ownership rules.
+ * Resuelve y aplica reglas de propiedad de compra.
  */
 @Service
 public class PurchaseAccessService {
@@ -22,12 +22,12 @@ public class PurchaseAccessService {
     }
 
     /**
-     * Resolves the user that owns a new purchase.
+     * Resuelve el usuario que posee una nueva compra.
      *
-     * Admins must provide a user id. Regular users can only create purchases for themselves.
+     * Los administradores deben proporcionar una identificación de usuario. Los usuarios normales solo pueden crear compras para sí mismos.
      *
-     * @param requestedUserId user id requested by the client
-     * @return owner user for the purchase
+     * @param requestedUserId identificación de usuario solicitada por el cliente
+     * @return usuario propietario de la compra
      */
     public User resolvePurchaseUser(Long requestedUserId) {
         Authentication auth = SecurityUtils.requireAuthentication();

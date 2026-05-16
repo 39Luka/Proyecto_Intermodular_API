@@ -10,10 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Application user account.
+ * Cuenta de usuario de la aplicación.
  *
- * Stores authentication data, authorization role, enabled state, refresh-token
- * version and optional profile image.
+ * Almacena datos de autenticación, rol de autorización, estado habilitado,
+ * versión de token de actualización e imagen de perfil opcional.
  */
 @Entity
 @Table(name = "users")
@@ -40,9 +40,9 @@ public class User {
     private long refreshTokenVersion = 0;
 
     /**
-     * Optional profile image stored as raw bytes.
+     * Imagen de perfil opcional almacenada como bytes sin procesar.
      *
-     * API clients send and receive this value as Base64 through the user DTOs.
+     * Los clientes de API envían y reciben este valor como Base64 a través de los DTOs de usuario.
      */
     @Column(columnDefinition = "LONGBLOB")
     private byte[] profileImage;
@@ -86,11 +86,11 @@ public class User {
     }
 
     /**
-     * Replaces the already encoded password.
+     * Reemplaza la contraseña ya codificada.
      *
-     * Callers must encode the raw password before invoking this method.
+     * Los llamadores deben codificar la contraseña sin procesar antes de invocar este método.
      *
-     * @param password encoded password to persist
+     * @param password contraseña codificada a persistir
      */
     public void setPassword(String password) {
         this.password = password;
@@ -105,18 +105,18 @@ public class User {
     }
 
     /**
-     * Returns the raw profile image bytes.
+     * Devuelve los bytes de la imagen de perfil sin procesar.
      *
-     * @return image bytes, or {@code null} when no profile image is set
+     * @return bytes de la imagen, o {@code null} cuando no se establece ninguna imagen de perfil
      */
     public byte[] getProfileImage() {
         return profileImage;
     }
 
     /**
-     * Updates or removes the profile image.
+     * Actualiza o elimina la imagen de perfil.
      *
-     * @param profileImage image bytes, or {@code null} to remove the image
+     * @param profileImage bytes de imagen, o {@code null} para eliminar la imagen
      */
     public void setProfileImage(byte[] profileImage) {
         this.profileImage = profileImage;

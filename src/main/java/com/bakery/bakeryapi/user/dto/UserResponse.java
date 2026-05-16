@@ -5,13 +5,13 @@ import com.bakery.bakeryapi.domain.Role;
 import java.util.Base64;
 
 /**
- * User data returned by the API.
+ * Datos de usuario devueltos por la API.
  *
- * @param id user identifier
- * @param email unique user email
- * @param role assigned user role
- * @param enabled whether the account can authenticate
- * @param profileImageBase64 profile image encoded as Base64, or {@code null} when absent
+ * @param id identificador de usuario
+ * @param email correo electrónico único del usuario
+ * @param role rol de usuario asignado
+ * @param enabled si la cuenta puede autenticarse
+ * @param profileImageBase64 imagen de perfil codificada como Base64, o {@code null} cuando está ausente
  */
 public record UserResponse(
         Long id,
@@ -21,10 +21,10 @@ public record UserResponse(
         String profileImageBase64
 ) {
     /**
-     * Creates an API response from a user entity.
+     * Crea una respuesta de API a partir de una entidad de usuario.
      *
-     * @param user user entity to convert
-     * @return response DTO with the profile image encoded as Base64 when present
+     * @param user entidad de usuario a convertir
+     * @return DTO de respuesta con la imagen de perfil codificada como Base64 cuando está presente
      */
     public static UserResponse from(com.bakery.bakeryapi.domain.User user) {
         return new UserResponse(

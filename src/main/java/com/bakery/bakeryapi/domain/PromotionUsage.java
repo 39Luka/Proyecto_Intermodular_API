@@ -14,9 +14,9 @@ import com.bakery.bakeryapi.domain.User;
 import java.time.LocalDateTime;
 
 /**
- * Records that a user has consumed a promotion.
+ * Registra que un usuario ha consumido una promoción.
  *
- * The unique constraint on promotion and user enforces one use per user.
+ * La restricción única en promoción y usuario refuerza un uso por usuario.
  */
 @Entity
 @Table(

@@ -60,7 +60,7 @@ class AuthTokenFlowIntegrationTest {
 
     @BeforeEach
     void cleanDb() {
-        // Keep cleanup explicit because these tests call the app over HTTP (no test transaction rollback).
+        // Mantener la limpieza explícita porque estas pruebas llaman a la app por HTTP (sin reversión de transacción de prueba).
         promotionUsageRepository.deleteAll();
         promotionRepository.deleteAll();
         productRepository.deleteAll();

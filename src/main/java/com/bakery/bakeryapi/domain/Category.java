@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Product category used to group bakery products.
+ * Categoría de producto utilizada para agrupar productos de panadería.
  */
 @Entity
 @Table(name = "categories")

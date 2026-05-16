@@ -29,12 +29,12 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 
 /**
- * Purchase application service.
+ * Servicio de aplicación de compra.
  *
- * Key rules:
- * - Users can only create/access their own purchases.
- * - Admins can create/access purchases for any user.
- * - Stock and promotion usage are updated inside a single transaction so failures roll back cleanly.
+ * Reglas clave:
+ * - Los usuarios solo pueden crear/acceder a sus propias compras.
+ * - Los administradores pueden crear/acceder a compras para cualquier usuario.
+ * - El stock y el uso de promoción se actualizan dentro de una única transacción para que los fallos se reviertan limpiamente.
  */
 @Service
 public class PurchaseService {
@@ -83,7 +83,7 @@ public class PurchaseService {
 
             Product product = productService.getActiveEntityById(itemRequest.productId());
 
-            // Decrease stock first, then apply promotion. If anything fails afterwards, the transaction rolls back.
+            // Disminuir stock primero, luego aplicar promoción. Si algo falla después, la transacción se revierte.
             product.decreaseStock(itemRequest.quantity());
 
             Promotion promotion = null;
@@ -124,22 +124,51 @@ public class PurchaseService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PurchaseResponse> getAll(Pageable pageable, Long userId) {
+    public Page<PurchaseResponse> getAll(Pageable pageable, Long userId, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
         Authentication auth = SecurityUtils.requireAuthentication();
 
+        // Si no hay filtro de fechas, usar los métodos existentes
+        boolean hasDateFilter = startDate != null || endDate != null;
+        
         if (SecurityUtils.isAdmin(auth)) {
+            if (userId != null) {
+                userService.getEntityById(userId);
+            }
+            
+            if (!hasDateFilter) {
                 if (userId != null) {
-                    userService.getEntityById(userId);
                     return repository.findAllDetailedByUserId(userId, safePageable)
-                        .map(PurchaseResponse::from);
+                            .map(PurchaseResponse::from);
                 }
-            return repository.findAllDetailed(safePageable)
+                return repository.findAllDetailed(safePageable)
+                        .map(PurchaseResponse::from);
+            }
+
+            // Con filtro de fechas
+            LocalDateTime from = startDate != null ? startDate : LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+            LocalDateTime to = endDate != null ? endDate : LocalDateTime.now(CLOCK_UTC).plusYears(100);
+
+            if (userId != null) {
+                return repository.findAllDetailedByUserIdBetweenDates(userId, from, to, safePageable)
+                        .map(PurchaseResponse::from);
+            }
+            return repository.findAllDetailedBetweenDates(from, to, safePageable)
                     .map(PurchaseResponse::from);
         }
 
+        // No-admin users: solo ven sus propias compras
         User currentUser = purchaseAccessService.currentUser();
-        return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
+        
+        if (!hasDateFilter) {
+            return repository.findAllDetailedByUserId(currentUser.getId(), safePageable)
+                    .map(PurchaseResponse::from);
+        }
+
+        LocalDateTime from = startDate != null ? startDate : LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+        LocalDateTime to = endDate != null ? endDate : LocalDateTime.now(CLOCK_UTC).plusYears(100);
+
+        return repository.findAllDetailedByUserIdBetweenDates(currentUser.getId(), from, to, safePageable)
                 .map(PurchaseResponse::from);
     }
 
@@ -156,7 +185,7 @@ public class PurchaseService {
             throw new InvalidPurchaseException("Only pending purchases can be cancelled");
         }
 
-        // Release promotion usage first, then restore stock. If something fails, the transaction rolls back.
+        // Liberar uso de promoción primero, luego restaurar stock. Si algo falla, la transacción se revierte.
         for (PurchaseItem item : purchase.getItems()) {
             if (item.getPromotion() != null) {
                 promotionService.releaseUsage(item.getPromotion(), purchase.getUser());

@@ -11,11 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 /**
- * Persistence access for products and product sales projections.
+ * Acceso de persistencia para productos y proyecciones de ventas de productos.
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Load category in the same query because ProductResponse includes it (avoids N+1).
+    // Cargar categoría en la misma consulta porque ProductResponse la incluye (evita N+1).
     @EntityGraph(attributePaths = {"category"})
     Page<Product> findAll(Pageable pageable);
 
@@ -65,6 +65,30 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     Page<ProductSalesResponse> findTopSellingByStatusAndActiveTrue(
             @Param("status") PurchaseStatus status,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"category"})
+    @Query("select p from Product p where lower(p.name) like lower(concat('%', :name, '%'))")
+    Page<Product> findByNameContainsIgnoreCase(@Param("name") String name, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category"})
+    @Query("select p from Product p where p.active = true and lower(p.name) like lower(concat('%', :name, '%'))")
+    Page<Product> findByNameContainsIgnoreCaseAndActiveTrue(@Param("name") String name, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category"})
+    @Query("select p from Product p where p.category.id = :categoryId and lower(p.name) like lower(concat('%', :name, '%'))")
+    Page<Product> findByCategoryIdAndNameContainsIgnoreCase(
+            @Param("categoryId") Long categoryId,
+            @Param("name") String name,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"category"})
+    @Query("select p from Product p where p.category.id = :categoryId and p.active = true and lower(p.name) like lower(concat('%', :name, '%'))")
+    Page<Product> findByCategoryIdAndNameContainsIgnoreCaseAndActiveTrue(
+            @Param("categoryId") Long categoryId,
+            @Param("name") String name,
             Pageable pageable
     );
 }

@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a promotion is not applicable or violates promotion rules.
+ * Se lanza cuando una promoción no es aplicable o viola reglas de promoción.
  */
 public class InvalidPromotionException extends ApiException {
 

@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 /**
- * Promotion that discounts a percentage of the gross line amount.
+ * Promoción que descuenta un porcentaje del importe bruto de la línea.
  */
 @Entity
 @DiscriminatorValue("PERCENTAGE")

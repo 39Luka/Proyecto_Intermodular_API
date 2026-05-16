@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Global exception handler for all controllers.
+ * Manejador de excepciones global para todos los controladores.
  *
- * Normalizes errors into ProblemDetail. For backward compatibility, responses also include a top-level
- * {@code message} property for clients.
+ * Normaliza los errores en ProblemDetail. Para la compatibilidad hacia atrás, las respuestas también incluyen
+ * una propiedad {@code message} de nivel superior para los clientes.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /** Domain errors (ApiException and subclasses). */
+    /** Errores del dominio (ApiException y subclases). */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ProblemDetail> handleApiException(ApiException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatus()).body(problem);
     }
 
-    /** Spring Security authentication errors. */
+    /** Errores de autenticación de Spring Security. */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Unauthorized");
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
-    /** Spring Security authorization errors. */
+    /** Errores de autorización de Spring Security. */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ProblemDetail> handleAccessDeniedException(AccessDeniedException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Forbidden");
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ProblemDetail> handleValidationErrors(MethodArgumentNotValidException ex) {
-        // Flatten all validation errors into a simple list for clients.
+        // Aplanar todos los errores de validación en una lista simple para los clientes.
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> Map.of(
                         "field", err.getField(),
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
         problem.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        // Keep "message" stable as a string; put field-level details into "errors".
+        // Mantener "message" estable como una cadena; poner detalles a nivel de campo en "errors".
         problem.setProperty("message", "Validation failed");
         problem.setProperty("errors", errors);
         problem.setProperty("timestamp", Instant.now());

@@ -16,7 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Admin-only REST endpoints for user management.
+ * Puntos finales REST solo para administradores para la gestión de usuarios.
  */
 @RestController
 @RequestMapping("/users")
@@ -81,7 +81,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Void> patchUser(@PathVariable Long id, @RequestBody @Valid ActiveUpdateRequest request) {
-        // API uses a unified flag name: { "active": true|false }. For users it maps to the "enabled" state.
+        // La API usa un nombre de bandera unificado: { "active": true|false }. Para usuarios se mapea al estado "enabled".
         service.setEnabled(id, request.active());
         return ResponseEntity.noContent().build();
     }

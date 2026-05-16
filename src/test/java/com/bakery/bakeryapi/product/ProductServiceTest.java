@@ -57,7 +57,7 @@ class ProductServiceTest {
         setAuth(Role.USER);
         when(repository.findAllByActiveTrue(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
-        service.getAll(PageRequest.of(0, 10), null);
+        service.getAll(PageRequest.of(0, 10), null, null);
 
         verify(repository).findAllByActiveTrue(any(PageRequest.class));
     }
@@ -68,7 +68,7 @@ class ProductServiceTest {
         setAuth(Role.ADMIN);
         when(repository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of()));
 
-        service.getAll(PageRequest.of(0, 10), null);
+        service.getAll(PageRequest.of(0, 10), null, null);
 
         verify(repository).findAll(any(PageRequest.class));
     }

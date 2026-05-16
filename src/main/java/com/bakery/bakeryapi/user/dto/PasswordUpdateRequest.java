@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request body used by an authenticated user to change their own password.
+ * Cuerpo de solicitud utilizado por un usuario autenticado para cambiar su propia contraseña.
  *
- * @param currentPassword current password used to verify ownership of the account
- * @param newPassword new raw password, between 8 and 72 characters
+ * @param currentPassword contraseña actual utilizada para verificar la propiedad de la cuenta
+ * @param newPassword nueva contraseña sin procesar, entre 8 y 72 caracteres
  */
 public record PasswordUpdateRequest(
         @Schema(description = "Current password", example = "password123")

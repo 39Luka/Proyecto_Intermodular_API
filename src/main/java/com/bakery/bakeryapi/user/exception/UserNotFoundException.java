@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a user cannot be found.
+ * Se lanza cuando no se puede encontrar un usuario.
  */
 public class UserNotFoundException extends ApiException {
 

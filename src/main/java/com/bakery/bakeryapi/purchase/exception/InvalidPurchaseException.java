@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a purchase request or status transition violates business rules.
+ * Se lanza cuando una solicitud de compra o transición de estado viola reglas de negocio.
  */
 public class InvalidPurchaseException extends ApiException {
 

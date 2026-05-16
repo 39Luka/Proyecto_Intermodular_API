@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Base64;
 
 /**
- * Application service for products.
+ * Servicio de aplicación para productos.
  *
- * It applies visibility rules for inactive products, validates optional product images
- * and prevents hard deletion when purchase history exists.
+ * Aplica reglas de visibilidad para productos inactivos, valida imágenes de productos opcionales
+ * y previene eliminación forzada cuando existe historial de compras.
  */
 @Service
 @Transactional(readOnly = true)
@@ -54,7 +54,7 @@ public class ProductService {
     public ProductResponse create(ProductRequest request) {
         log.info("Creating new product: {}", request.name());
         
-        // Validate image if provided
+        // Validar imagen si se proporciona
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
             ImageValidator.validateImageBase64(request.imageBase64());
         }
@@ -99,7 +99,7 @@ public class ProductService {
             return ProductResponse.from(product);
         }
         if (!product.isActive()) {
-            // Do not leak inactive products to non-admins (including anonymous users).
+            // No filtrar productos inactivos para no-administradores (incluyendo usuarios anónimos).
             throw new ProductNotFoundException(id);
         }
         return ProductResponse.from(product);
@@ -109,31 +109,69 @@ public class ProductService {
         return ProductResponse.from(getActiveEntityById(id));
     }
 
-    public Page<ProductResponse> getAllActiveCached(Pageable pageable, Long categoryId) {
+    public Page<ProductResponse> getAllActiveCached(Pageable pageable, Long categoryId, String name) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
-        if (categoryId == null) {
+        
+        // Si ambos filtros son null, devolver todos
+        if (categoryId == null && (name == null || name.isBlank())) {
             return repository.findAllByActiveTrue(safePageable).map(ProductResponse::from);
         }
+        
+        // Solo categoría
+        if (categoryId != null && (name == null || name.isBlank())) {
+            categoryService.getEntityById(categoryId);
+            return repository.findAllByCategoryIdAndActiveTrue(categoryId, safePageable).map(ProductResponse::from);
+        }
+        
+        // Solo nombre
+        if (categoryId == null) {
+            return repository.findByNameContainsIgnoreCaseAndActiveTrue(name, safePageable).map(ProductResponse::from);
+        }
+        
+        // Ambos filtros
         categoryService.getEntityById(categoryId);
-        return repository.findAllByCategoryIdAndActiveTrue(categoryId, safePageable).map(ProductResponse::from);
+        return repository.findByCategoryIdAndNameContainsIgnoreCaseAndActiveTrue(categoryId, name, safePageable).map(ProductResponse::from);
     }
 
-    public Page<ProductResponse> getAll(Pageable pageable, Long categoryId) {
+    public Page<ProductResponse> getAll(Pageable pageable, Long categoryId, String name) {
         Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
         Authentication auth = SecurityUtils.optionalAuthentication();
         boolean admin = auth != null && SecurityUtils.isAdmin(auth);
 
-        if (categoryId == null) {
+        // Si ambos filtros son null, devolver todos
+        if (categoryId == null && (name == null || name.isBlank())) {
             if (admin) {
                 return repository.findAll(safePageable).map(ProductResponse::from);
             }
-            return getAllActiveCached(safePageable, null);
+            return getAllActiveCached(safePageable, null, null);
         }
-        categoryService.getEntityById(categoryId);
+
+        // Validar categoría si se proporciona
+        if (categoryId != null) {
+            categoryService.getEntityById(categoryId);
+        }
+
+        // Solo nombre
+        if (categoryId == null) {
+            if (admin) {
+                return repository.findByNameContainsIgnoreCase(name, safePageable).map(ProductResponse::from);
+            }
+            return getAllActiveCached(safePageable, null, name);
+        }
+
+        // Solo categoría
+        if (name == null || name.isBlank()) {
+            if (admin) {
+                return repository.findAllByCategoryId(categoryId, safePageable).map(ProductResponse::from);
+            }
+            return getAllActiveCached(safePageable, categoryId, null);
+        }
+
+        // Ambos filtros
         if (admin) {
-            return repository.findAllByCategoryId(categoryId, safePageable).map(ProductResponse::from);
+            return repository.findByCategoryIdAndNameContainsIgnoreCase(categoryId, name, safePageable).map(ProductResponse::from);
         }
-        return getAllActiveCached(safePageable, categoryId);
+        return getAllActiveCached(safePageable, categoryId, name);
     }
 
     public Page<ProductSalesResponse> getTopSelling(Pageable pageable) {
@@ -148,7 +186,7 @@ public class ProductService {
     public ProductResponse update(Long id, ProductRequest request) {
         log.info("Updating product ID: {}", id);
         
-        // Validate image if provided
+        // Validar imagen si se proporciona
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
             ImageValidator.validateImageBase64(request.imageBase64());
         }

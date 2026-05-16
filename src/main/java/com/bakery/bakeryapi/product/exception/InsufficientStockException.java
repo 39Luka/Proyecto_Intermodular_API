@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a purchase requests more units than the product has in stock.
+ * Se lanza cuando una compra solicita más unidades de las que el producto tiene en stock.
  */
 public class InsufficientStockException extends ApiException {
 

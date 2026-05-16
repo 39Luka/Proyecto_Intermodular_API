@@ -14,7 +14,7 @@ import com.bakery.bakeryapi.domain.Promotion;
 import java.math.BigDecimal;
 
 /**
- * Line item of a purchase, storing the product, quantity and pricing snapshot.
+ * Línea de artículo de una compra, almacenando el producto, cantidad e instantánea de precios.
  */
 @Entity
 @Table(name = "purchase_items")

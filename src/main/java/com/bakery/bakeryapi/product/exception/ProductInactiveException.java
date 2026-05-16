@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when an operation requires an active product but the product is disabled.
+ * Se lanza cuando una operación requiere un producto activo pero el producto está deshabilitado.
  */
 public class ProductInactiveException extends ApiException {
 

@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 
 /**
- * Persistence access for promotions and active-promotion queries.
+ * Acceso de persistencia para promociones y consultas de promoción activa.
  */
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
 
@@ -42,7 +42,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
               and (p.endDate is null or p.endDate >= :date)
               and pu.id is null
             """)
-    // "pu.id is null" filters out promotions already used by the user.
+    // "pu.id is null" filtra las promociones que el usuario ya ha usado.
     @EntityGraph(attributePaths = "product")
     Page<Promotion> findActiveByProductIdAndUserId(
             @Param("productId") Long productId,

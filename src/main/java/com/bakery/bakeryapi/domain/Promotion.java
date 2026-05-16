@@ -18,10 +18,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Base class for product promotions.
+ * Clase base para promociones de productos.
  *
- * Promotions use single-table inheritance so every promotion type shares the
- * same database table and exposes a common activation window.
+ * Las promociones utilizan herencia de tabla única para que cada tipo de promoción comparta
+ * la misma tabla de base de datos y exponga una ventana de activación común.
  */
 @Entity
 // Indexes speed up lookups by product, date range and active flag.

@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when an email is already assigned to another account.
+ * Se lanza cuando un correo electrónico ya está asignado a otra cuenta.
  */
 public class EmailAlreadyExistsException extends ApiException {
 

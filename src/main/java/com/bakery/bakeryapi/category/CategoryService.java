@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Application service for category creation, lookup and updates.
+ * Servicio de aplicación para creación, búsqueda y actualizaciones de categorías.
  */
 @Service
 @Transactional(readOnly = true)

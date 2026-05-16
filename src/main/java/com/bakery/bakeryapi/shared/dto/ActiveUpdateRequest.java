@@ -3,7 +3,7 @@ package com.bakery.bakeryapi.shared.dto;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Request body for toggling active/enabled state.
+ * Cuerpo de solicitud para alternar estado activo/habilitado.
  */
 public record ActiveUpdateRequest(
         @NotNull(message = "active is required") Boolean active

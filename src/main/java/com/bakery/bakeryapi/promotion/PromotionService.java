@@ -30,10 +30,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Application service for promotions.
+ * Servicio de aplicación para promociones.
  *
- * It validates promotion windows, applies discounts, and enforces the one-use-per-user
- * rule through promotion usage records.
+ * Valida ventanas de promoción, aplica descuentos y refuerza la regla de un uso por usuario
+ * a través de registros de uso de promoción.
  */
 @Service
 @Transactional(readOnly = true)
@@ -104,14 +104,14 @@ public class PromotionService {
         Authentication auth = SecurityUtils.optionalAuthentication();
         if (auth == null) {
             if (userId != null) {
-                // Anonymous users can list active promotions, but cannot request user-scoped filtering.
+                // Los usuarios anónimos pueden listar promociones activas, pero no pueden solicitar filtrado por usuario.
                 throw new InsufficientAuthenticationException("Authentication required");
             }
         }
         Long effectiveUserId = auth == null ? null : resolveUserIdForPromotionFiltering(auth, userId);
 
-        // If effectiveUserId is null: return all active promotions.
-        // Otherwise: return only promotions the user has not used yet.
+        // Si effectiveUserId es null: devolver todas las promociones activas.
+        // Si no: devolver solo promociones que el usuario aún no ha usado.
         Page<Promotion> promotions = effectiveUserId == null
                 ? repository.findActiveByProductId(productId, today, safePageable)
                 : repository.findActiveByProductIdAndUserId(productId, effectiveUserId, today, safePageable);
@@ -134,8 +134,8 @@ public class PromotionService {
         BigDecimal discountAmount = promotion.calculateDiscountAmount(product.getPrice(), quantity);
 
         try {
-            // Unique constraint (promotion_id, user_id) guarantees "use once".
-            // saveAndFlush triggers the constraint violation inside this method so we can return a 400-style domain error.
+            // La restricción única (promotion_id, user_id) garantiza "usar una sola vez".
+            // saveAndFlush dispara la violación de restricción dentro de este método para que podamos devolver un error de dominio de tipo 400.
             usageRepository.saveAndFlush(new PromotionUsage(promotion, user, LocalDateTime.now()));
         } catch (DataIntegrityViolationException e) {
             throw new InvalidPromotionException("Promotion has already been used by this user");

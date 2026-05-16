@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.domain.PromotionUsage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Persistence access for promotion usage records.
+ * Acceso de persistencia para registros de uso de promoción.
  */
 public interface PromotionUsageRepository extends JpaRepository<PromotionUsage, Long> {
 

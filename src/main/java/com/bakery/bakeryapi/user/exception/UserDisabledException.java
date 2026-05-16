@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a disabled user attempts an authenticated flow.
+ * Se lanza cuando un usuario deshabilitado intenta un flujo autenticado.
  */
 public class UserDisabledException extends ApiException {
 

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
- * Persistence access for user accounts.
+ * Acceso de persistencia para cuentas de usuario.
  */
 public interface UserRepository extends JpaRepository<User,Long> {
 

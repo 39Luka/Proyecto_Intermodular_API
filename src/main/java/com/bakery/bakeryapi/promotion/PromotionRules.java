@@ -10,16 +10,16 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 /**
- * Validation and normalization rules for promotions.
+ * Reglas de validación y normalización para promociones.
  */
 @Component
 public class PromotionRules {
 
     /**
-     * Validates the configured promotion date window.
+     * Valida la ventana de fecha de promoción configurada.
      *
-     * @param startDate first active date
-     * @param endDate optional last active date
+     * @param startDate primer fecha activa
+     * @param endDate última fecha activa opcional
      */
     public void validateDates(LocalDate startDate, LocalDate endDate) {
         if (startDate.isBefore(LocalDate.now())) {
@@ -31,9 +31,9 @@ public class PromotionRules {
     }
 
     /**
-     * Validates a percentage discount.
+     * Valida un descuento de porcentaje.
      *
-     * @param discountPercentage discount percentage from 0 to 100
+     * @param discountPercentage porcentaje de descuento del 0 al 100
      */
     public void validatePercentage(BigDecimal discountPercentage) {
         if (discountPercentage == null) {

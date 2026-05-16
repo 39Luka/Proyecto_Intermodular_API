@@ -6,18 +6,18 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Calculates purchase line monetary amounts.
+ * Calcula montos monetarios de línea de compra.
  */
 @Service
 public class PurchasePricingService {
 
     /**
-     * Calculates a line subtotal after discount and normalizes it to two decimals.
+     * Calcula un subtotal de línea después del descuento y lo normaliza a dos decimales.
      *
-     * @param unitPrice product unit price
-     * @param quantity requested quantity
-     * @param discountAmount discount amount to subtract
-     * @return subtotal, never below zero
+     * @param unitPrice precio unitario del producto
+     * @param quantity cantidad solicitada
+     * @param discountAmount cantidad de descuento a restar
+     * @return subtotal, nunca por debajo de cero
      */
     public BigDecimal calculateSubtotal(BigDecimal unitPrice, int quantity, BigDecimal discountAmount) {
         BigDecimal gross = unitPrice.multiply(BigDecimal.valueOf(quantity));

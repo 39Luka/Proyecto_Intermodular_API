@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Rate-limits public authentication endpoints by client IP and endpoint path.
+ * Limita la velocidad de los puntos finales de autenticación pública por IP de cliente y ruta de punto final.
  */
 @Component
 public class AuthRateLimitFilter extends OncePerRequestFilter {

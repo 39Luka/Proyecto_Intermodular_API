@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Base64;
 
 /**
- * Application service for user management, profile image updates and password changes.
+ * Servicio de aplicación para gestión de usuarios, actualizaciones de imágenes de perfil y cambios de contraseña.
  */
 @Service
 @Transactional(readOnly = true)

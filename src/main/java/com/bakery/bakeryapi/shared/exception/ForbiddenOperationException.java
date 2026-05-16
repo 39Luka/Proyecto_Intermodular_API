@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when the authenticated user is not allowed to perform an operation.
+ * Se lanza cuando el usuario autenticado no puede realizar una operación.
  */
 public class ForbiddenOperationException extends ApiException {
 

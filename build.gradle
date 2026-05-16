@@ -41,26 +41,26 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    // Swagger/OpenAPI for API documentation (Spring Boot 4 compatible)
+    // Swagger/OpenAPI para la documentación de la API (compatible con Spring Boot 4)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 
-    // Logging (SLF4J is included by default, Logback for implementation)
+    // Registro (SLF4J está incluido por defecto, Logback para la implementación)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
 
-    // Actuator for health checks and metrics
+    // Actuator para comprobaciones de estado y métricas
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Micrometer for Prometheus metrics
+    // Micrometer para métricas de Prometheus
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
-    // Rate limiting (Bucket4J)
+    // Limitación de tasa (Bucket4J)
     implementation 'com.bucket4j:bucket4j_jdk17-core:8.11.1'
 
-    // Flyway for database migrations
+    // Flyway para migraciones de bases de datos
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql'
 
-    // RestAssured for E2E testing
+    // RestAssured para pruebas E2E
     testImplementation 'io.rest-assured:rest-assured:5.4.0'
 
 }
@@ -68,7 +68,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 
-    // CI safety: ensure tests run with the in-memory DB + test settings.
-    // This avoids accidentally booting the app with production datasource placeholders.
+    // Seguridad de CI: asegurar que las pruebas se ejecuten con la base de datos en memoria + configuración de prueba.
+    // Esto evita el arranque accidental de la aplicación con marcadores de posición de origen de datos de producción.
     systemProperty 'spring.profiles.active', 'test'
 }

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Main HTTP security configuration for the API.
+ * Configuración principal de seguridad HTTP para la API.
  */
 @Configuration
 @EnableMethodSecurity
@@ -59,10 +59,10 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
-                        // Preflight
+                        // Preflight (solicitud previa)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Swagger
+                        // Swagger (documentación)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         // AUTH PERSONAL
@@ -99,8 +99,8 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        // Comma-separated list, e.g.: https://myapp.com,http://localhost:5173
-        // When empty, CORS is effectively disabled (no allowed origins).
+        // Lista separada por comas, ej: https://myapp.com,http://localhost:5173
+        // Cuando está vacío, CORS se deshabilita efectivamente (sin orígenes permitidos).
         String raw = corsProperties.allowedOrigins() == null ? "" : corsProperties.allowedOrigins();
         List<String> origins = Arrays.stream(raw.split(","))
                 .map(String::trim)

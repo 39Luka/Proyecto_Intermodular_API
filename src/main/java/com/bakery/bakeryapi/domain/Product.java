@@ -15,7 +15,7 @@ import com.bakery.bakeryapi.product.exception.InsufficientStockException;
 import java.math.BigDecimal;
 
 /**
- * Sellable bakery product with stock, category and optional image.
+ * Producto de panadería vendible con stock, categoría e imagen opcional.
  */
 @Entity
 // Indexes speed up queries by category and active flag.
@@ -75,10 +75,10 @@ public class Product {
     }
 
     /**
-     * Decreases product stock for a purchase.
+     * Disminuye el stock del producto para una compra.
      *
-     * @param quantity quantity to reserve
-     * @throws InsufficientStockException when stock is lower than the requested quantity
+     * @param quantity cantidad a reservar
+     * @throws InsufficientStockException cuando el stock es menor que la cantidad solicitada
      */
     public void decreaseStock(int quantity) {
         if (stock < quantity) {

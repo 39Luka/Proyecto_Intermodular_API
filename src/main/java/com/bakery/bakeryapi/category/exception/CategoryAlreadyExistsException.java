@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a category name is already in use.
+ * Se lanza cuando un nombre de categoría ya está en uso.
  */
 public class CategoryAlreadyExistsException extends ApiException {
 

@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a product cannot be found or is hidden from the current user.
+ * Se lanza cuando no se puede encontrar un producto o está oculto del usuario actual.
  */
 public class ProductNotFoundException extends ApiException {
 

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * Admin request body for creating users with an explicit role.
+ * Cuerpo de solicitud de administrador para crear usuarios con un rol explícito.
  */
 public record UserRequest(
         @Email @NotBlank String email,

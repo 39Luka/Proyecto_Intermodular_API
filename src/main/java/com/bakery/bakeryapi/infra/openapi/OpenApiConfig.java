@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 
 /**
- * OpenAPI configuration for documentation metadata, JWT security and common errors.
+ * Configuración de OpenAPI para metadatos de documentación, seguridad JWT y errores comunes.
  */
 @Configuration
 public class OpenApiConfig {

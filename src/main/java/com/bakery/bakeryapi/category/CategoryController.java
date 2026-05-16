@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST endpoints for product categories.
+ * Puntos finales REST para categorías de productos.
  */
 @RestController
 @RequestMapping("/categories")

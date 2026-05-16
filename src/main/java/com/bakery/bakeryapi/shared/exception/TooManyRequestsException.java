@@ -3,7 +3,7 @@ package com.bakery.bakeryapi.shared.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when a client exceeds the configured rate limit.
+ * Se lanza cuando un cliente excede el límite de velocidad configurado.
  */
 public class TooManyRequestsException extends ApiException {
 

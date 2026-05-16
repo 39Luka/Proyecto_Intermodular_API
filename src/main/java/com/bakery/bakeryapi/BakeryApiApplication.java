@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 /**
- * Entry point for the Bakery API Spring Boot application.
+ * Punto de entrada para la aplicación Spring Boot de la API de Panadería.
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan

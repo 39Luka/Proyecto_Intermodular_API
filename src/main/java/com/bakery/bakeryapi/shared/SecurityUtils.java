@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Helpers for reading the current Spring Security authentication.
+ * Ayudantes para leer la autenticación actual de Spring Security.
  */
 public final class SecurityUtils {
 
@@ -14,9 +14,9 @@ public final class SecurityUtils {
     }
 
     /**
-     * Returns the current non-anonymous authentication when present.
+     * Devuelve la autenticación actual no anónima cuando está presente.
      *
-     * @return current authentication, or {@code null} when unauthenticated
+     * @return autenticación actual, o {@code null} cuando no se autentica
      */
     public static Authentication optionalAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -27,9 +27,9 @@ public final class SecurityUtils {
     }
 
     /**
-     * Returns the current authentication or raises Spring Security's unauthorized exception.
+     * Devuelve la autenticación actual o lanza la excepción no autorizada de Spring Security.
      *
-     * @return current authentication
+     * @return autenticación actual
      */
     public static Authentication requireAuthentication() {
         Authentication auth = optionalAuthentication();

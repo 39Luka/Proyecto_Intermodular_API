@@ -1,7 +1,7 @@
 package com.bakery.bakeryapi.domain;
 
 /**
- * Lifecycle states for a purchase.
+ * Estados del ciclo de vida para una compra.
  */
 public enum PurchaseStatus {
     CREATED,

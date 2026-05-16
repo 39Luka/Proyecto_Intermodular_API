@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence access for purchases, including detailed fetch queries and sales totals.
+ * Acceso de persistencia para compras, incluidas consultas de búsqueda detallada y totales de ventas.
  */
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
@@ -52,6 +52,23 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             @Param("status") PurchaseStatus status,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
+    );
+
+    @EntityGraph(attributePaths = {"items", "items.product", "items.promotion"})
+    @Query("select p from Purchase p where p.createdAt >= :from and p.createdAt < :to order by p.createdAt desc")
+    Page<Purchase> findAllDetailedBetweenDates(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"items", "items.product", "items.promotion"})
+    @Query("select p from Purchase p where p.user.id = :userId and p.createdAt >= :from and p.createdAt < :to order by p.createdAt desc")
+    Page<Purchase> findAllDetailedByUserIdBetweenDates(
+            @Param("userId") Long userId,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
+            Pageable pageable
     );
 }
 

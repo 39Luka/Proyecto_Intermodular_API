@@ -11,13 +11,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 /**
- * REST endpoints for purchase creation, lookup and status changes.
+ * Puntos finales REST para crear compras, búsqueda y cambios de estado.
  */
 @RestController
 @RequestMapping("/purchases")
@@ -44,17 +48,45 @@ public class PurchaseController {
     }
 
     @GetMapping
-    @Operation(summary = "List purchases", description = "Admins can optionally filter by userId. Non-admins always see their own purchases.")
+    @Operation(summary = "List purchases", description = """
+            Admins can optionally filter by userId and/or date range. Non-admins always see their own purchases. Supports sorting.
+            
+            Query parameters:
+            - page: Page number (0-indexed, default: 0)
+            - size: Items per page (default: 20, max: 100)
+            - sortBy: Field to sort by (createdAt, total, status - default: createdAt)
+            - order: Sort direction (asc, desc - default: desc)
+            - userId: Admin-only filter for specific user
+            - startDate: Start date (ISO 8601 format, e.g. 2024-01-01T00:00:00)
+            - endDate: End date (ISO 8601 format, e.g. 2024-12-31T23:59:59)
+            
+            Example: /purchases?page=0&size=10&sortBy=createdAt&order=desc&startDate=2024-01-01T00:00:00
+            """)
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ok"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<Page<PurchaseResponse>> getAll(
-            Pageable pageable,
-            @Parameter(description = "Admin-only filter") @RequestParam(required = false) Long userId
+            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Items per page") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Field to sort by (createdAt, total, status)") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(required = false) String order,
+            @Parameter(description = "Admin-only filter") @RequestParam(required = false) Long userId,
+            @Parameter(description = "Start date (ISO 8601 format)") @RequestParam(required = false) LocalDateTime startDate,
+            @Parameter(description = "End date (ISO 8601 format)") @RequestParam(required = false) LocalDateTime endDate
     ) {
-        return ResponseEntity.ok(service.getAll(pageable, userId));
+        Sort sort = buildSort(sortBy, order, "createdAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(service.getAll(pageable, userId, startDate, endDate));
+    }
+
+    private Sort buildSort(String sortBy, String order, String defaultField) {
+        String field = (sortBy == null || sortBy.isBlank()) ? defaultField : sortBy;
+        Sort.Direction direction = (order != null && order.equalsIgnoreCase("asc")) 
+            ? Sort.Direction.ASC 
+            : Sort.Direction.DESC;
+        return Sort.by(direction, field);
     }
 
     @PostMapping

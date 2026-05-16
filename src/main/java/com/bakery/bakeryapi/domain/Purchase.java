@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Purchase aggregate containing the buyer, status, total and line items.
+ * Agregado de compra que contiene el comprador, estado, total y líneas de artículos.
  */
 @Entity
 @Table(name = "purchases", indexes = {

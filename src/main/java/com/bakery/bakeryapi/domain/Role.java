@@ -1,7 +1,7 @@
 package com.bakery.bakeryapi.domain;
 
 /**
- * Application roles used for authorization.
+ * Roles de aplicación utilizados para autorización.
  */
 public enum Role {
     USER,

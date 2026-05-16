@@ -19,7 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST endpoints for percentage promotions.
+ * Puntos finales REST para promociones de porcentaje.
  */
 @RestController
 @RequestMapping("/promotions")

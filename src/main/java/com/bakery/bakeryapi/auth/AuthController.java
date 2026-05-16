@@ -21,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST endpoints for authentication and authenticated account actions.
+ * Puntos finales REST para autenticación y acciones de cuenta autenticada.
  */
 @RestController
 @RequestMapping("/auth")

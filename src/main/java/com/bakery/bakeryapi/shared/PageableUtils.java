@@ -4,7 +4,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Helpers for normalizing pagination requests.
+ * Ayudantes para normalizar solicitudes de paginación.
  */
 public final class PageableUtils {
 
@@ -12,11 +12,11 @@ public final class PageableUtils {
     }
 
     /**
-     * Clamps page number and page size to safe values while preserving sorting.
+     * Fija el número de página y tamaño de página a valores seguros mientras preserva el orden.
      *
-     * @param pageable requested pagination
-     * @param maxPageSize maximum accepted page size
-     * @return sanitized pagination request
+     * @param pageable paginación solicitada
+     * @param maxPageSize tamaño máximo de página aceptado
+     * @return solicitud de paginación desinfectada
      */
     public static Pageable safe(Pageable pageable, int maxPageSize) {
         return PageRequest.of(

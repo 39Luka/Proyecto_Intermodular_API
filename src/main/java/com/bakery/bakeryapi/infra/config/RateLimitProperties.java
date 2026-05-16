@@ -3,7 +3,7 @@ package com.bakery.bakeryapi.infra.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Rate-limit settings for authentication endpoints.
+ * Configuración de límite de velocidad para puntos finales de autenticación.
  */
 @ConfigurationProperties(prefix = "rate-limit")
 public record RateLimitProperties(

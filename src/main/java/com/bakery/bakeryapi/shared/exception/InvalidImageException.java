@@ -3,7 +3,7 @@ package com.bakery.bakeryapi.shared.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when an uploaded image payload is invalid.
+ * Se lanza cuando una carga de imagen es inválida.
  */
 public class InvalidImageException extends ApiException {
     public InvalidImageException(String message) {

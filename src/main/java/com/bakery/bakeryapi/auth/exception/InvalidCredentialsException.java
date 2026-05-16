@@ -4,7 +4,7 @@ import com.bakery.bakeryapi.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
 /**
- * Raised when login or token refresh credentials are invalid.
+ * Se lanza cuando las credenciales de inicio de sesión o actualización de token son inválidas.
  */
 public class InvalidCredentialsException extends ApiException {
 

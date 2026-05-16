@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Coordinates authentication flows: registration, login and refresh-token rotation.
+ * Coordina flujos de autenticación: registro, inicio de sesión y rotación de token de actualización.
  */
 @Service
 public class AuthService {

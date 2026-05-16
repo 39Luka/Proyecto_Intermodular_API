@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 /**
- * Generates and reads JWT access and refresh tokens.
+ * Genera y lee tokens JWT de acceso y actualización.
  */
 @Component
 public class JwtTokenService {
@@ -33,11 +33,11 @@ public class JwtTokenService {
     }
 
     /**
-     * Generates an access token for the authenticated user.
+     * Genera un token de acceso para el usuario autenticado.
      *
-     * @param email token subject
-     * @param role role claim without the {@code ROLE_} prefix
-     * @return signed JWT access token
+     * @param email asunto del token
+     * @param role reclamo de rol sin el prefijo {@code ROLE_}
+     * @return JWT de token de acceso firmado
      */
     public String generateToken(String email, String role) {
         Instant now = Instant.now();
