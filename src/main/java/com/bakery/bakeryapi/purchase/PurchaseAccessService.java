@@ -49,11 +49,11 @@ public class PurchaseAccessService {
     }
 
     /**
-     * Ensures the current user can access the purchase.
+     * Asegura que el usuario actual pueda acceder a la compra.
      *
-     * Admins can access every purchase. Regular users can only access their own.
+     * Los administradores pueden acceder a cualquier compra. Los usuarios normales solo pueden acceder a las suyas.
      *
-     * @param purchase purchase to check
+     * @param purchase compra a verificar
      */
     public void enforceAccess(Purchase purchase) {
         Authentication auth = SecurityUtils.requireAuthentication();
@@ -67,9 +67,9 @@ public class PurchaseAccessService {
     }
 
     /**
-     * Returns the current authenticated user entity.
+     * Devuelve la entidad del usuario autenticado actual.
      *
-     * @return current user
+     * @return usuario actual
      */
     public User currentUser() {
         Authentication auth = SecurityUtils.requireAuthentication();

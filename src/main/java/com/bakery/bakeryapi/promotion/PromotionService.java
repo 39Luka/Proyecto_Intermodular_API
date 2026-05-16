@@ -118,6 +118,20 @@ public class PromotionService {
         return promotions.map(PromotionResponse::from);
     }
 
+    public Page<PromotionResponse> getAvailablePromotions(Long userId, Pageable pageable) {
+        Pageable safePageable = PageableUtils.safe(pageable, paginationProperties.maxPageSize());
+        LocalDate today = LocalDate.now();
+
+        Authentication auth = SecurityUtils.optionalAuthentication();
+        if (auth == null) {
+            throw new InsufficientAuthenticationException("Authentication required");
+        }
+        Long effectiveUserId = resolveUserIdForPromotionFiltering(auth, userId);
+
+        return repository.findActiveAndUnusedByUser(effectiveUserId, today, safePageable)
+                .map(PromotionResponse::from);
+    }
+
     @Transactional
     public void setActive(Long id, boolean active) {
         Promotion promotion = getEntityById(id);

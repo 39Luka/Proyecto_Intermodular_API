@@ -51,5 +51,19 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
             Pageable pageable
     );
 
-}
+    @Query("""
+            select distinct p from Promotion p
+            left join PromotionUsage pu on pu.promotion = p and pu.user.id = :userId
+            where p.active = true
+              and p.startDate <= :date
+              and (p.endDate is null or p.endDate >= :date)
+              and pu.id is null
+            """)
+    @EntityGraph(attributePaths = "product")
+    Page<Promotion> findActiveAndUnusedByUser(
+            @Param("userId") Long userId,
+            @Param("date") LocalDate date,
+            Pageable pageable
+    );
 
+}

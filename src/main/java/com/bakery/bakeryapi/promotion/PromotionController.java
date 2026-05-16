@@ -78,6 +78,24 @@ public class PromotionController {
         return ResponseEntity.ok(service.getActiveByProduct(productId, userId, pageable));
     }
 
+    @GetMapping("/available")
+    @Operation(
+            summary = "List all available promotions for a user",
+            description = "Returns active percentage promotions that the user has not used yet across all products."
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Cannot query another user's promotions")
+    })
+    public ResponseEntity<Page<PromotionResponse>> getAvailablePromotions(
+            @Parameter(description = "Optional user id. Admins can query any; users only their own.") @RequestParam(required = false) Long userId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.getAvailablePromotions(userId, pageable));
+    }
+
     @PostMapping("/percentage")
     @Operation(summary = "Create percentage promotion", description = "Admin-only. Creates an active percentage discount for a product.")
     @SecurityRequirement(name = "bearerAuth")
