@@ -1,207 +1,147 @@
-# Bakery API
+# 🥐 La Croassantina - Proyecto Intermodular
 
-REST API (Spring Boot) for a bakery: users/roles, catalog (categories/products), promotions and purchases. Authentication is JWT-based.
+Este repositorio contiene la **API REST** central del proyecto **La Croassantina**, un sistema integral de e-commerce y gestión para una panadería moderna. El ecosistema se completa con una aplicación web (React) y una aplicación móvil (Android/Kotlin).
 
-## 🆕 Recent Improvements (April 2026)
+---
 
-**P1 (Critical) - Completed:**
-- ✅ Comprehensive logging (SLF4J + Logback) in all services
-- ✅ JWT Refresh Tokens (7 days expiration) with new `/auth/refresh` endpoint
-- ✅ Controller tests for Categories and Promotions
+## 📋 Descripción General
 
-**P2 (High) - Completed:**
-- ✅ Actuator health checks & Prometheus metrics
-- ✅ Image validation (size 5MB max, MIME type checking)
-- ✅ Rate limiting configuration (Bucket4J)
+**La Croassantina** es una solución tecnológica diseñada para digitalizar por completo las operaciones de una panadería. Permite a los clientes explorar el catálogo, aprovechar promociones dinámicas y realizar compras desde cualquier dispositivo, mientras proporciona a los administradores herramientas robustas para la gestión de inventario, usuarios y ventas.
 
-**P3+ - In Progress:** See `PRODUCTION_GUIDE.md`
+El sistema se divide en tres componentes principales:
+1.  **Backend (Este repositorio):** API REST robusta que centraliza la lógica de negocio y los datos.
+2.  **Frontend Web:** Aplicación Single Page (SPA) para clientes y administración.
+3.  **Aplicación Móvil:** Experiencia nativa Android optimizada para el usuario final.
 
-## Stack
+---
 
-- Java 21 + Gradle
-- Spring Boot 4 (WebMVC, Security, Validation, Data JPA)
-- MySQL for dev/production
-- H2 for tests
-- Swagger/OpenAPI (springdoc)
-- Logging: SLF4J + Logback
-- Metrics: Micrometer + Prometheus
-- Rate Limiting: Bucket4J
+## 🏗️ Arquitectura del Sistema
 
-## Quick Start (Local)
+El proyecto sigue principios de **Clean Code** y separación de responsabilidades:
 
-Prerequisites: Java 21.
+### Backend (API)
+Sigue una **Arquitectura por Capas** clásica:
+- **Capa de Controladores:** Gestión de endpoints REST y validación de entrada.
+- **Capa de Servicios:** Lógica de negocio, reglas de promoción y orquestación.
+- **Capa de Persistencia:** Repositorios JPA para comunicación con MySQL.
+- **Capa de Dominio:** Entidades del modelo de datos y reglas de integridad.
 
-1. Configure environment variables (see `.env.example`).
-2. Start MySQL (local or remote).
-3. Run:
+### Frontend (Web & Móvil)
+- **Web:** Arquitectura basada en componentes con React y gestión de estado mediante Context API.
+- **Móvil:** Arquitectura **MVVM** (Model-View-ViewModel) con Jetpack Compose, garantizando una UI reactiva y desacoplada de la lógica de datos.
 
-```powershell
-./gradlew bootRun
+---
 
+## 🛠️ Stack Tecnológico
+
+### Backend (Core)
+- **Java 21 (LTS)** & **Spring Boot 4.0**.
+- **Seguridad:** Spring Security con **JWT** (Access & Refresh Tokens).
+- **Base de Datos:** **MySQL 8.0** y migraciones con **Flyway**.
+- **Logs:** SLF4J + Logback para trazabilidad completa.
+- **Métricas:** Micrometer + Prometheus + Actuator.
+- **Documentación:** Swagger / OpenAPI 3.
+- **Limitación de Tasa:** Bucket4J para protección contra abusos.
+
+### Frontend Web
+- **React 19** + **Vite**.
+- **Navegación:** React Router DOM.
+- **Comunicación:** Fetch API centralizada.
+
+### Aplicación Móvil
+- **Kotlin 2.x** + **Jetpack Compose**.
+- **DI:** Hilt (Dagger).
+- **Networking:** Retrofit 2 + OkHttp.
+- **Persistencia:** Jetpack DataStore.
+
+---
+
+## 🚀 Funcionalidades Principales
+
+### 🔐 Seguridad y Usuarios
+- Sistema de autenticación robusto con tokens de acceso (15 min) y refresco (7 días).
+- Roles de usuario (**USER**, **ADMIN**) con permisos granulares.
+- Gestión de perfiles con carga de imágenes (validación MIME y tamaño).
+- Protección de endpoints mediante Rate Limiting.
+
+### 📦 Catálogo y Stock
+- Gestión completa de categorías y productos.
+- **Control de Concurrencia:** Bloqueo optimista (@Version) en productos para evitar sobreventas en compras simultáneas.
+- Paginación y filtros avanzados en todos los listados.
+
+### 🎁 Sistema de Promociones
+- Aplicación de descuentos porcentuales dinámicos.
+- Validación automática de fechas de vigencia y estado de activación.
+
+### 🛒 Compras y Pedidos
+- Flujo de compra completo: Carrito -> Pedido -> Pago/Cancelación.
+- Historial de compras detallado con estados en tiempo real (CREATED, PAID, CANCELED).
+
+---
+
+## 📂 Estructura del Proyecto (Backend)
+
+```text
+src/main/java/com/bakery/bakeryapi/
+├── auth/           # Seguridad, JWT y Registro
+├── category/       # Gestión de categorías de productos
+├── product/        # Catálogo, stock y precios
+├── purchase/       # Lógica de pedidos y transacciones
+├── promotion/      # Reglas de descuento y ofertas
+├── user/           # Gestión de usuarios y perfiles
+├── shared/         # Excepciones globales y utilidades
+└── infra/          # Configuraciones (Seguridad, OpenAPI, etc.)
 ```
 
-API base URL: `http://localhost:8080` (or the port in `PORT`).
+---
 
-## Swagger / OpenAPI
+## 📝 Endpoints Principales de la API
 
-- UI: `http://localhost:8080/swagger-ui/index.html`
-- JSON: `http://localhost:8080/v3/api-docs`
+| Método | Endpoint | Descripción | Acceso |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/auth/login` | Inicio de sesión (devuelve JWT + Refresh) | Público |
+| **POST** | `/auth/refresh` | Renovar token de acceso | Público |
+| **GET** | `/products` | Listado de productos (filtros/paginación) | Público |
+| **GET** | `/promotions/active`| Ver ofertas vigentes | Público |
+| **POST** | `/purchases` | Crear un nuevo pedido | Autenticado |
+| **PATCH** | `/purchases/{id}/pay`| Confirmar pago de pedido | Autenticado |
+| **POST** | `/categories` | Crear nueva categoría | **ADMIN** |
+| **GET** | `/actuator/metrics` | Métricas de rendimiento | **ADMIN** |
 
-Using Swagger with JWT:
+---
 
-1. Call `POST /auth/login` and copy the `token`.
-2. Click `Authorize` and paste the JWT (usually without the `Bearer` prefix).
+## ⚙️ Configuración e Instalación
 
-## Configuration (Environment Variables)
+### Requisitos Previos
+- Java 21 instalado.
+- Servidor MySQL 8.0 activo.
 
-Configuration comes from `src/main/resources/application.properties` and `src/main/resources/application-prod.properties`.
+### Pasos
+1. Clonar el repositorio.
+2. Copiar `.env.example` a `.env` y configurar las credenciales de BD y secreto JWT.
+3. Ejecutar con Gradle:
+   ```powershell
+   ./gradlew bootRun
+   ```
 
-### Core Settings
-- `PORT`: HTTP port (default `8080`)
-- `SPRING_PROFILES_ACTIVE`: `dev` or `prod`
+La documentación interactiva estará disponible en: `http://localhost:8080/swagger-ui/index.html`
 
-### Database
-- `DB_URL`: JDBC url. Example: `jdbc:mysql://localhost:3306/bakery_db?useSSL=false&serverTimezone=UTC`
-- `DB_USERNAME`, `DB_PASSWORD`
-- `HIBERNATE_DDL_AUTO`: `update` (dev) or `validate` (prod)
+---
 
-### JWT & Authentication
-- `JWT_SECRET`: JWT signing secret (required in prod, min 32 chars)
-- `JWT_EXPIRATION_MS`: Access token lifetime in milliseconds (default: `900000` = 15 min)
-- `JWT_REFRESH_EXPIRATION_MS`: Refresh token lifetime (default: `604800000` = 7 days)
+## 🧪 Testing
 
-### Logging
-- `LOG_FILE`: Path to log file (default: `logs/bakery-api.log`)
-- `SHOW_SQL`: `true|false` (show Hibernate SQL)
+El proyecto incluye una suite de pruebas completa:
+- **Unitarias:** Lógica de negocio y cálculos de precios.
+- **Integración:** Flujos de API con base de datos H2 en memoria.
+- **E2E:** Pruebas de endpoints con RestAssured.
 
-### CORS
-- `CORS_ALLOWED_ORIGINS`: Comma-separated. Example: `http://localhost:5173,https://your-frontend.com`
+Ejecutar pruebas: `./gradlew test`
 
-### Actuator & Monitoring
-- `OPENAPI_ENABLED`: `true|false` (Swagger UI enabled, default true for dev, false for prod)
-- `RATE_LIMIT_REQUESTS_PER_MINUTE`: Requests per minute per IP (default: `100`)
+---
 
-### Memory & Connection Pool
-- `LAZY_INIT`: `true|false` (lazy bean initialization)
-- `DB_POOL_MAX`: Max pool size (default: `10`)
-- `DB_POOL_MIN_IDLE`: Min idle connections (default: `0`)
-- `PAGINATION_MAX_PAGE_SIZE`: Max page size for API (default: `100`)
-
-## Auth & Permissions (Summary)
-
-Send the token as `Authorization: Bearer <token>`.
-
-- Public:
-  - `POST /auth/login` - Returns access token + refresh token
-  - `POST /auth/refresh` - Refresh access token using refresh token
-  - `POST /auth/register` (always creates a `USER`)
-  - `GET /categories`, `GET /categories/{id}`
-  - `GET /products`, `GET /products/{id}`, `GET /products/top-selling`
-  - `GET /promotions/active`
-  - `GET /actuator/health` - Health check (public)
-  - Swagger (`/swagger-ui/**`, `/v3/api-docs/**`)
-- Requires auth:
-  - `GET /purchases`, `GET /purchases/{id}`, `POST /purchases`, `PATCH /purchases/{id}/pay|cancel`
-  - `GET /actuator/metrics` - Metrics (ADMIN)
-  - `GET /actuator/prometheus` - Prometheus metrics (ADMIN)
-- ADMIN only:
-  - `POST|PUT|PATCH|DELETE` on `/categories/**`, `/products/**`, `/promotions/**`
-  - `GET /promotions` and `GET /promotions/{id}`
-  - `/users/**`
-
-## Promotions
-
-This project intentionally supports a single promotion type: percentage discounts.
-
-- Create: `POST /promotions/percentage`
-- Query active promotions for a product: `GET /promotions/active?productId=...`
-
-## Enable/Disable (Soft Flags)
-
-Instead of separate `/enable` and `/disable` endpoints, resources expose a single PATCH that toggles the flag:
-
-- Product: `PATCH /products/{id}` with `{ "active": true|false }`
-- Promotion: `PATCH /promotions/{id}` with `{ "active": true|false }`
-- User: `PATCH /users/{id}` with `{ "active": true|false }`
-
-## Typical Flow (curl)
-
-Login and get tokens:
-
-```bash
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"password123"}'
-
-# Response: { "token": "eyJ...", "refreshToken": "eyJ...", "expiresIn": 900000 }
-```
-
-Refresh access token when it expires:
-
-```bash
-curl -X POST http://localhost:8080/auth/refresh \
-  -H "Content-Type: application/json" \
-  -d '{"refreshToken":"eyJ..."}'
-
-# Response: { "token": "eyJ...", "refreshToken": "eyJ...", "expiresIn": 900000 }
-```
-
-List products (with token):
-
-```bash
-curl http://localhost:8080/products \
-  -H "Authorization: Bearer <token>"
-```
-
-Create purchase (USER: omit userId; ADMIN: include userId):
-
-```bash
-curl -X POST http://localhost:8080/purchases \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"items":[{"productId":10,"quantity":2,"promotionId":null}]}'
-```
-
-Check health:
-
-```bash
-curl http://localhost:8080/actuator/health
-```
-
-Get metrics (requires ADMIN role):
-
-```bash
-curl -H "Authorization: Bearer <admin-token>" \
-  http://localhost:8080/actuator/prometheus
-```
-
-## Tests
-
-```powershell
-./gradlew test
-```
-
-Notes:
-
-- Tests use in-memory H2 (`src/test/resources/application.properties`).
-- Gradle forces `spring.profiles.active=test` so CI does not attempt to boot with MySQL settings.
-
-## Production (Railway)
-
-Recommended:
-
-1. `SPRING_PROFILES_ACTIVE=prod`
-2. Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`.
-
-Schema behavior in prod:
-
-- Default is `HIBERNATE_DDL_AUTO=validate` (recommended).
-
-## Concurrency Notes (Stock)
-
-`products` use optimistic locking (`@Version`) so concurrent purchases cannot silently oversell inventory. If two requests try to update the same product stock at the same time, one may fail with `409 Concurrent update, please retry`.
-
-## Credits
-
-- Tutorial reference: https://www.youtube.com/watch?v=yluGdM1Wiow&t=641s
-- Tutorial reference: https://www.youtube.com/watch?v=Cm8AOEiE0ZI&t=378s
+## 📄 Información del Proyecto
+- **Título:** La Croassantina
+- **Tipo:** Proyecto Intermodular (TFG)
+- **Desarrollador:** Silvia Cachón Leiva
+- **Centro:** IES Severo Ochoa Elche
+- **Versión:** 1.0 (Mayo 2026)
