@@ -5,12 +5,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Request body for password-based login.
+ * Cuerpo de solicitud para el inicio de sesión basado en contraseña.
  */
 public record LoginRequest(
-        @Schema(description = "User email", example = "user@example.com")
+        @Schema(description = "Correo electrónico del usuario", example = "user@example.com")
         @Email @NotBlank String email,
-        @Schema(description = "User password", example = "password123")
+        @Schema(description = "Contraseña del usuario", example = "password123")
         @NotBlank String password
 ) {}
 

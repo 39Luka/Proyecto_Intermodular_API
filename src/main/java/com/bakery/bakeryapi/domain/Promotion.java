@@ -24,8 +24,8 @@ import java.time.LocalDate;
  * la misma tabla de base de datos y exponga una ventana de activación común.
  */
 @Entity
-// Indexes speed up lookups by product, date range and active flag.
-// SINGLE_TABLE inheritance: promotions share one "promotions" table. This project only exposes percentage promotions.
+// Los índices aceleran búsquedas por producto, rango de fechas y bandera activa.
+// La herencia SINGLE_TABLE comparte una tabla "promotions"; este proyecto solo expone promociones de porcentaje.
 @Table(name = "promotions", indexes = {
         @Index(name = "idx_promotion_product", columnList = "product_id"),
         @Index(name = "idx_promotion_dates", columnList = "start_date, end_date"),
@@ -55,7 +55,7 @@ public abstract class Promotion {
     private Product product;
 
     protected Promotion() {
-        // Constructor for JPA
+        // Constructor para JPA
     }
 
     protected Promotion(String description, LocalDate startDate, LocalDate endDate, Product product) {
@@ -66,11 +66,11 @@ public abstract class Promotion {
     }
 
     /**
-     * Calculates the discount amount for a purchase line.
+     * Calcula el importe de descuento para una línea de compra.
      *
-     * @param unitPrice product unit price
-     * @param quantity requested quantity
-     * @return discount amount before final normalization
+     * @param unitPrice precio unitario del producto
+     * @param quantity cantidad solicitada
+     * @return importe de descuento antes de la normalización final
      */
     public abstract BigDecimal calculateDiscountAmount(BigDecimal unitPrice, int quantity);
 
@@ -81,10 +81,10 @@ public abstract class Promotion {
     }
 
     /**
-     * Checks whether this promotion is active on a given date.
+     * Comprueba si esta promoción está activa en una fecha dada.
      *
-     * @param date date to evaluate
-     * @return {@code true} when active and inside the configured date range
+     * @param date fecha a evaluar
+     * @return {@code true} cuando está activa y dentro del rango de fechas configurado
      */
     public boolean isActiveOn(LocalDate date) {
         return active && !date.isBefore(startDate) && (endDate == null || !date.isAfter(endDate));

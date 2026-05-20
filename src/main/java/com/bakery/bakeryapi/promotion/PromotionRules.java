@@ -23,10 +23,10 @@ public class PromotionRules {
      */
     public void validateDates(LocalDate startDate, LocalDate endDate) {
         if (startDate.isBefore(LocalDate.now())) {
-            throw new InvalidPromotionException("Promotion start date cannot be in the past");
+            throw new InvalidPromotionException("La fecha de inicio de la promoción no puede estar en el pasado");
         }
         if (endDate != null && endDate.isBefore(startDate)) {
-            throw new InvalidPromotionException("Promotion end date cannot be before start date");
+            throw new InvalidPromotionException("La fecha de finalización de la promoción no puede ser anterior a la fecha de inicio");
         }
     }
 
@@ -37,40 +37,40 @@ public class PromotionRules {
      */
     public void validatePercentage(BigDecimal discountPercentage) {
         if (discountPercentage == null) {
-            throw new InvalidPromotionException("Percentage promotion requires discountPercentage");
+            throw new InvalidPromotionException("La promoción de porcentaje requiere discountPercentage");
         }
         if (discountPercentage.compareTo(BigDecimal.ZERO) < 0
                 || discountPercentage.compareTo(new BigDecimal("100")) > 0) {
-            throw new InvalidPromotionException("discountPercentage must be between 0 and 100");
+            throw new InvalidPromotionException("discountPercentage debe estar entre 0 y 100");
         }
     }
 
     /**
-     * Validates that a promotion can be applied to a product and quantity.
+     * Valida que una promoción pueda aplicarse a un producto y cantidad.
      *
-     * @param promotion promotion to apply
-     * @param product purchased product
-     * @param quantity requested quantity
+     * @param promotion promoción a aplicar
+     * @param product producto comprado
+     * @param quantity cantidad solicitada
      */
     public void validateApplicable(Promotion promotion, Product product, int quantity) {
         if (!promotion.getProduct().getId().equals(product.getId())) {
-            throw new InvalidPromotionException("Promotion does not apply to this product");
+            throw new InvalidPromotionException("La promoción no se aplica a este producto");
         }
 
         if (!promotion.isActiveOn(LocalDate.now())) {
-            throw new InvalidPromotionException("Promotion is not active");
+            throw new InvalidPromotionException("La promoción no está activa");
         }
 
         if (promotion.calculateDiscountAmount(product.getPrice(), quantity).compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidPromotionException("Promotion does not apply to the requested quantity");
+            throw new InvalidPromotionException("La promoción no se aplica a la cantidad solicitada");
         }
     }
 
     /**
-     * Normalizes money and percentage amounts to two decimals.
+     * Normaliza los importes monetarios y porcentuales a dos decimales.
      *
-     * @param value value to normalize
-     * @return normalized value, or zero when absent
+     * @param value valor a normalizar
+     * @return valor normalizado, o cero cuando está ausente
      */
     public BigDecimal normalizeAmount(BigDecimal value) {
         if (value == null) {

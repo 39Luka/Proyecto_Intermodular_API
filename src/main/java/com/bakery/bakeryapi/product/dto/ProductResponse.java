@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Base64;
 
 /**
- * Product data returned by the API.
+ * Datos del producto devueltos por la API.
  */
 public record ProductResponse(
         Long id,
@@ -17,7 +17,7 @@ public record ProductResponse(
         int stock,
         boolean active,
         Long categoryId,
-        @Schema(description = "Product image as base64 (null if not set)", type = "string")
+        @Schema(description = "Imagen del producto en formato base64 (null si no está establecida)", type = "string")
         String imageBase64
 ) {
     public static ProductResponse from(Product product) {

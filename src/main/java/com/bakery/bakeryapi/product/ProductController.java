@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/products")
-@Tag(name = "Products", description = "Product catalog")
+@Tag(name = "Productos", description = "Catálogo de productos")
 public class ProductController {
 
     private final ProductService service;
@@ -37,19 +37,19 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get product by id", description = "Non-admin users cannot access disabled products.")
+    @Operation(summary = "Obtener producto por ID", description = "Los usuarios no administradores no pueden acceder a productos deshabilitados.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping("/top-selling")
-    @Operation(summary = "Top selling products", description = "Returns the most sold products (from PAID purchases).")
+    @Operation(summary = "Productos más vendidos", description = "Devuelve los productos más vendidos (basado en compras PAGADAS).")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok")
+            @ApiResponse(responseCode = "200", description = "Correcto")
     })
     public ResponseEntity<Page<ProductSalesResponse>> getTopSelling(
             @PageableDefault(size = 10) Pageable pageable
@@ -58,30 +58,30 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "List products", description = """
-            Optional filters by categoryId and/or name. Supports sorting. Non-admin users only see active products.
+    @Operation(summary = "Listar productos", description = """
+            Filtros opcionales por categoryId y/o nombre. Soporta ordenación. Los usuarios no administradores solo ven productos activos.
             
-            Query parameters:
-            - page: Page number (0-indexed, default: 0)
-            - size: Items per page (default: 20, max: 100)
-            - sortBy: Field to sort by (name, price, category, createdAt - default: name)
-            - order: Sort direction (asc, desc - default: asc)
-            - categoryId: Optional category filter
-            - name: Optional name filter (partial match, case-insensitive)
+            Parámetros de consulta:
+            - page: Número de página (empezando en 0, por defecto: 0)
+            - size: Elementos por página (por defecto: 20, máx: 100)
+            - sortBy: Campo por el que ordenar (name, price, category, createdAt - por defecto: name)
+            - order: Dirección de ordenación (asc, desc - por defecto: asc)
+            - categoryId: Filtro opcional por categoría
+            - name: Filtro opcional por nombre (coincidencia parcial, insensible a mayúsculas)
             
-            Example: /products?page=0&size=10&sortBy=price&order=desc&categoryId=1&name=pan
+            Ejemplo: /products?page=0&size=10&sortBy=price&order=desc&categoryId=1&name=pan
             """)
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "404", description = "Category not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
     public ResponseEntity<Page<ProductResponse>> getAll(
-            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Items per page") @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "Field to sort by (name, price, category, createdAt)") @RequestParam(required = false) String sortBy,
-            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(required = false) String order,
-            @Parameter(description = "Optional category filter") @RequestParam(required = false) Long categoryId,
-            @Parameter(description = "Optional name filter (partial match)") @RequestParam(required = false) String name
+            @Parameter(description = "Número de página (empezando en 0)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Elementos por página") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Campo por el que ordenar (name, price, category, createdAt)") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Dirección de ordenación (asc, desc)") @RequestParam(required = false) String order,
+            @Parameter(description = "Filtro opcional por categoría") @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "Filtro opcional por nombre (coincidencia parcial)") @RequestParam(required = false) String name
     ) {
         Sort sort = buildSort(sortBy, order, "name");
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -97,14 +97,14 @@ public class ProductController {
     }
 
     @PostMapping
-    @Operation(summary = "Create product", description = "Admin-only.")
+    @Operation(summary = "Crear producto", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Product created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Category not found")
+            @ApiResponse(responseCode = "201", description = "Producto creado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
@@ -114,14 +114,14 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update product", description = "Admin-only.")
+    @Operation(summary = "Actualizar producto", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> update(
@@ -132,14 +132,14 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Update product flags", description = "Admin-only. Currently supports updating { active }.")
+    @Operation(summary = "Actualizar banderas de producto", description = "Solo para administradores. Actualmente soporta la actualización de { active }.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> patch(@PathVariable Long id, @Valid @RequestBody ActiveUpdateRequest request) {
@@ -148,13 +148,13 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete product", description = "Admin-only. If the product has purchases, it will be deactivated instead of deleted.")
+    @Operation(summary = "Eliminar producto", description = "Solo para administradores. Si el producto tiene compras, será desactivado en lugar de eliminado.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Deleted or deactivated"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Eliminado o desactivado"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

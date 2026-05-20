@@ -5,14 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 /**
- * Request body for one purchase line.
+ * Cuerpo de solicitud para una línea de compra.
  */
 public record PurchaseItemRequest(
-        @Schema(description = "Product id", example = "1")
+        @Schema(description = "ID del producto", example = "1")
         @NotNull Long productId,
-        @Schema(description = "Units to buy", example = "2")
+        @Schema(description = "Unidades a comprar", example = "2")
         @Positive int quantity,
-        @Schema(description = "Optional promotion id (percentage promotions only)", example = "10")
+        @Schema(description = "ID opcional de promoción (solo promociones de porcentaje)", example = "10")
         Long promotionId
 ) {
 }

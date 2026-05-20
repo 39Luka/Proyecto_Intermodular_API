@@ -5,7 +5,7 @@ import com.bakery.bakeryapi.domain.PurchaseItem;
 import java.math.BigDecimal;
 
 /**
- * Purchase line data returned by the API.
+ * Datos de la línea de compra devueltos por la API.
  */
 public record PurchaseItemResponse(
         Long productId,

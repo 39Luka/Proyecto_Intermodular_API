@@ -11,9 +11,9 @@ import jakarta.validation.constraints.Size;
  * @param newPassword nueva contraseña sin procesar, entre 8 y 72 caracteres
  */
 public record PasswordUpdateRequest(
-        @Schema(description = "Current password", example = "password123")
+        @Schema(description = "Contraseña actual", example = "password123")
         @NotBlank String currentPassword,
-        @Schema(description = "New password (8-72 chars)", example = "newPassword123")
+        @Schema(description = "Nueva contraseña (8-72 caracteres)", example = "newPassword123")
         @NotBlank @Size(min = 8, max = 72) String newPassword
 ) {
 }

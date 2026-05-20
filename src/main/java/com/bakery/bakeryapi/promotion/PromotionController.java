@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/promotions")
-@Tag(name = "Promotions", description = "Percentage promotions for products")
+@Tag(name = "Promociones", description = "Promociones porcentuales para productos")
 public class PromotionController {
 
     private final PromotionService service;
@@ -33,13 +33,13 @@ public class PromotionController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get promotion by id", description = "Admin-only.")
+    @Operation(summary = "Obtener promoción por ID", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PromotionResponse> getById(@PathVariable Long id) {
@@ -47,12 +47,12 @@ public class PromotionController {
     }
 
     @GetMapping
-    @Operation(summary = "List promotions", description = "Admin-only.")
+    @Operation(summary = "Listar promociones", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PromotionResponse>> getAll(Pageable pageable) {
@@ -61,18 +61,18 @@ public class PromotionController {
 
     @GetMapping("/active")
     @Operation(
-            summary = "List active promotions for a product",
-            description = "Returns active percentage promotions for the given product. If userId is provided, filters out promotions already used by that user."
+            summary = "Listar promociones activas para un producto",
+            description = "Devuelve las promociones de porcentaje activas para el producto dado. Si se proporciona userId, filtra las promociones ya utilizadas por ese usuario."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Authentication required for user-scoped filtering"),
-            @ApiResponse(responseCode = "403", description = "Cannot query another user's promotions"),
-            @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "Se requiere autenticación para el filtrado por usuario"),
+            @ApiResponse(responseCode = "403", description = "No se pueden consultar las promociones de otro usuario"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
     public ResponseEntity<Page<PromotionResponse>> getActiveByProduct(
-            @Parameter(description = "Product id") @RequestParam Long productId,
-            @Parameter(description = "Optional filter. Admins can query any userId; users can only query their own.") @RequestParam(required = false) Long userId,
+            @Parameter(description = "ID del producto") @RequestParam Long productId,
+            @Parameter(description = "Filtro opcional. Los administradores pueden consultar cualquier userId; los usuarios solo pueden consultar el suyo propio.") @RequestParam(required = false) Long userId,
             Pageable pageable
     ) {
         return ResponseEntity.ok(service.getActiveByProduct(productId, userId, pageable));
@@ -80,31 +80,31 @@ public class PromotionController {
 
     @GetMapping("/available")
     @Operation(
-            summary = "List all available promotions for a user",
-            description = "Returns active percentage promotions that the user has not used yet across all products."
+            summary = "Listar todas las promociones disponibles para un usuario",
+            description = "Devuelve las promociones de porcentaje activas que el usuario aún no ha utilizado en todos los productos."
     )
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Cannot query another user's promotions")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "No se pueden consultar las promociones de otro usuario")
     })
     public ResponseEntity<Page<PromotionResponse>> getAvailablePromotions(
-            @Parameter(description = "Optional user id. Admins can query any; users only their own.") @RequestParam(required = false) Long userId,
+            @Parameter(description = "ID de usuario opcional. Los administradores pueden consultar cualquiera; los usuarios solo el suyo propio.") @RequestParam(required = false) Long userId,
             Pageable pageable
     ) {
         return ResponseEntity.ok(service.getAvailablePromotions(userId, pageable));
     }
 
     @PostMapping("/percentage")
-    @Operation(summary = "Create percentage promotion", description = "Admin-only. Creates an active percentage discount for a product.")
+    @Operation(summary = "Crear promoción de porcentaje", description = "Solo para administradores. Crea un descuento de porcentaje activo para un producto.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Promotion created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "201", description = "Promoción creada"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PromotionResponse> createPercentage(@Valid @RequestBody PercentagePromotionRequest request) {
@@ -113,14 +113,14 @@ public class PromotionController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Update promotion flags", description = "Admin-only. Currently supports updating { active }.")
+    @Operation(summary = "Actualizar banderas de promoción", description = "Solo para administradores. Actualmente soporta la actualización de { active }.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> patch(@PathVariable Long id, @Valid @RequestBody ActiveUpdateRequest request) {

@@ -4,9 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Promotions are intentionally restricted to percentage-based discounts in this project.
- *
- * For that reason the API always exposes the discount percentage.
+ * Las promociones están restringidas intencionadamente a descuentos basados en porcentajes en este proyecto.
+ * Por este motivo, la API siempre expone el porcentaje de descuento.
  */
 public record PromotionResponse(
         Long id,

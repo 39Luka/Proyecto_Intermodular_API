@@ -13,7 +13,7 @@ public class ForbiddenOperationException extends ApiException {
     }
 
     public ForbiddenOperationException() {
-        super("Forbidden operation", HttpStatus.FORBIDDEN);
+        super("Operación prohibida", HttpStatus.FORBIDDEN);
     }
 }
 

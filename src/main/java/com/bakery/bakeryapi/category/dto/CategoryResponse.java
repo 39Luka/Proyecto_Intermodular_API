@@ -1,7 +1,7 @@
 package com.bakery.bakeryapi.category.dto;
 
 /**
- * Category data returned by the API.
+ * Datos de la categoría devueltos por la API.
  */
 public record CategoryResponse(
         Long id,

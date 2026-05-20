@@ -6,19 +6,19 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 /**
- * Base request fields shared by promotion creation requests.
+ * Campos de solicitud base compartidos por las solicitudes de creación de promociones.
  */
 public abstract class PromotionRequest {
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "La descripción es requerida")
     protected String description;
 
-    @NotNull(message = "Start date is required")
+    @NotNull(message = "La fecha de inicio es requerida")
     protected LocalDate startDate;
 
     protected LocalDate endDate;
 
-    @NotNull(message = "Product ID is required")
+    @NotNull(message = "El ID del producto es requerido")
     protected Long productId;
 
     protected PromotionRequest() {

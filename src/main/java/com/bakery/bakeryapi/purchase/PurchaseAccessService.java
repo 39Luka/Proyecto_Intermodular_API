@@ -33,7 +33,7 @@ public class PurchaseAccessService {
         Authentication auth = SecurityUtils.requireAuthentication();
         if (SecurityUtils.isAdmin(auth)) {
             if (requestedUserId == null) {
-                throw new InvalidPurchaseException("userId is required for admins");
+                throw new InvalidPurchaseException("El userId es requerido para administradores");
             }
             return userService.getEntityById(requestedUserId);
         }
@@ -43,7 +43,7 @@ public class PurchaseAccessService {
             return currentUser;
         }
         if (!currentUser.getId().equals(requestedUserId)) {
-            throw new ForbiddenOperationException("Cannot create a purchase for another user");
+            throw new ForbiddenOperationException("No se puede crear una compra para otro usuario");
         }
         return currentUser;
     }
@@ -62,7 +62,7 @@ public class PurchaseAccessService {
         }
         User currentUser = userService.getEntityByEmail(auth.getName());
         if (!purchase.getUser().getId().equals(currentUser.getId())) {
-            throw new ForbiddenOperationException("Cannot access purchases from another user");
+            throw new ForbiddenOperationException("No se puede acceder a las compras de otro usuario");
         }
     }
 

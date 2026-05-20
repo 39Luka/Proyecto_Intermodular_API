@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @param profileImageBase64 imagen codificada como Base64, o {@code null}/en blanco para eliminar la imagen
  */
 public record ProfileImageUpdateRequest(
-        @Schema(description = "Profile image as base64. Send null or empty to remove it.", type = "string")
+        @Schema(description = "Imagen de perfil en formato base64. Enviar null o vacío para eliminarla.", type = "string")
         String profileImageBase64
 ) {
 }

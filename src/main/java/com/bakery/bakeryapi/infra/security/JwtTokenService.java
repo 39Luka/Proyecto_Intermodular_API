@@ -101,7 +101,7 @@ public class JwtTokenService {
     }
 
     /**
-     * Minimal payload extracted from a valid refresh token.
+     * Carga útil mínima extraída de un token de refresco válido.
      */
     public record RefreshTokenPayload(String subject, long refreshTokenVersion) {
     }

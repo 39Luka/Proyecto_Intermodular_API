@@ -34,16 +34,16 @@ public final class SecurityUtils {
     public static Authentication requireAuthentication() {
         Authentication auth = optionalAuthentication();
         if (auth == null) {
-            throw new AuthenticationCredentialsNotFoundException("Unauthorized");
+            throw new AuthenticationCredentialsNotFoundException("No autorizado");
         }
         return auth;
     }
 
     /**
-     * Checks whether an authentication has the admin role.
+     * Comprueba si una autenticación tiene el rol de administrador.
      *
-     * @param auth authentication to inspect
-     * @return {@code true} when the user has {@code ROLE_ADMIN}
+     * @param auth autenticación a inspeccionar
+     * @return {@code true} cuando el usuario tiene {@code ROLE_ADMIN}
      */
     public static boolean isAdmin(Authentication auth) {
         return auth.getAuthorities().stream()

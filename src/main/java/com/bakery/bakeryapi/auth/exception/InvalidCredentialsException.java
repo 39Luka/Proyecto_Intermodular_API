@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public class InvalidCredentialsException extends ApiException {
 
     public InvalidCredentialsException() {
-        super("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        super("Credenciales inválidas", HttpStatus.UNAUTHORIZED);
     }
 }
 

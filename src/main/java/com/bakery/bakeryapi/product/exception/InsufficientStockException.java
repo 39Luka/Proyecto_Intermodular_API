@@ -10,7 +10,7 @@ public class InsufficientStockException extends ApiException {
 
     public InsufficientStockException(Long productId, int available, int requested) {
         super(
-                "Insufficient stock for product '" + productId + "'. Available: " + available + ", requested: " + requested,
+                "Stock insuficiente para el producto '" + productId + "'. Disponible: " + available + ", solicitado: " + requested,
                 HttpStatus.CONFLICT
         );
     }

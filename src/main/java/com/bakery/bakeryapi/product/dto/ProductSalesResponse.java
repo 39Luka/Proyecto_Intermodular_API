@@ -1,7 +1,7 @@
 package com.bakery.bakeryapi.product.dto;
 
 /**
- * Projection for product sales ranking.
+ * Proyección para el ranking de ventas de productos.
  */
 public record ProductSalesResponse(
         Long productId,

@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("/purchases")
-@Tag(name = "Purchases", description = "Create and manage purchases (stock is updated transactionally)")
+@Tag(name = "Compras", description = "Crear y gestionar compras (el stock se actualiza transaccionalmente)")
 @SecurityRequirement(name = "bearerAuth")
 public class PurchaseController {
 
@@ -36,45 +36,45 @@ public class PurchaseController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get purchase by id", description = "Users can only access their own purchases; admins can access any.")
+    @Operation(summary = "Obtener compra por ID", description = "Los usuarios solo pueden acceder a sus propias compras; los administradores pueden acceder a cualquiera.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     public ResponseEntity<PurchaseResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
-    @Operation(summary = "List purchases", description = """
-            Admins can optionally filter by userId and/or date range. Non-admins always see their own purchases. Supports sorting.
+    @Operation(summary = "Listar compras", description = """
+            Los administradores pueden filtrar opcionalmente por userId y/o rango de fechas. Los no administradores siempre ven sus propias compras. Soporta ordenación.
             
-            Query parameters:
-            - page: Page number (0-indexed, default: 0)
-            - size: Items per page (default: 20, max: 100)
-            - sortBy: Field to sort by (createdAt, total, status - default: createdAt)
-            - order: Sort direction (asc, desc - default: desc)
-            - userId: Admin-only filter for specific user
-            - startDate: Start date (ISO 8601 format, e.g. 2024-01-01T00:00:00)
-            - endDate: End date (ISO 8601 format, e.g. 2024-12-31T23:59:59)
+            Parámetros de consulta:
+            - page: Número de página (empezando en 0, por defecto: 0)
+            - size: Elementos por página (por defecto: 20, máx: 100)
+            - sortBy: Campo por el que ordenar (createdAt, total, status - por defecto: createdAt)
+            - order: Dirección de ordenación (asc, desc - por defecto: desc)
+            - userId: Filtro solo para administradores para un usuario específico
+            - startDate: Fecha de inicio (formato ISO 8601, ej. 2024-01-01T00:00:00)
+            - endDate: Fecha de fin (formato ISO 8601, ej. 2024-12-31T23:59:59)
             
-            Example: /purchases?page=0&size=10&sortBy=createdAt&order=desc&startDate=2024-01-01T00:00:00
+            Ejemplo: /purchases?page=0&size=10&sortBy=createdAt&order=desc&startDate=2024-01-01T00:00:00
             """)
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     public ResponseEntity<Page<PurchaseResponse>> getAll(
-            @Parameter(description = "Page number (0-indexed)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Items per page") @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "Field to sort by (createdAt, total, status)") @RequestParam(required = false) String sortBy,
-            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(required = false) String order,
-            @Parameter(description = "Admin-only filter") @RequestParam(required = false) Long userId,
-            @Parameter(description = "Start date (ISO 8601 format)") @RequestParam(required = false) LocalDateTime startDate,
-            @Parameter(description = "End date (ISO 8601 format)") @RequestParam(required = false) LocalDateTime endDate
+            @Parameter(description = "Número de página (empezando en 0)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Elementos por página") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "Campo por el que ordenar (createdAt, total, status)") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Dirección de ordenación (asc, desc)") @RequestParam(required = false) String order,
+            @Parameter(description = "Filtro solo para administradores") @RequestParam(required = false) Long userId,
+            @Parameter(description = "Fecha de inicio (formato ISO 8601)") @RequestParam(required = false) LocalDateTime startDate,
+            @Parameter(description = "Fecha de fin (formato ISO 8601)") @RequestParam(required = false) LocalDateTime endDate
     ) {
         Sort sort = buildSort(sortBy, order, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -90,14 +90,14 @@ public class PurchaseController {
     }
 
     @PostMapping
-    @Operation(summary = "Create purchase", description = "Decreases stock, optionally applies a percentage promotion (one-time per user), and creates a purchase.")
+    @Operation(summary = "Crear compra", description = "Disminuye el stock, aplica opcionalmente una promoción porcentual (una sola vez por usuario) y crea una compra.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Purchase created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Product, promotion or user not found"),
-            @ApiResponse(responseCode = "409", description = "Concurrent update / conflict")
+            @ApiResponse(responseCode = "201", description = "Compra creada"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "Producto, promoción o usuario no encontrado"),
+            @ApiResponse(responseCode = "409", description = "Actualización concurrente / conflicto")
     })
     public ResponseEntity<PurchaseResponse> create(@Valid @RequestBody PurchaseRequest request) {
         PurchaseResponse purchase = service.create(request);
@@ -106,13 +106,13 @@ public class PurchaseController {
     }
 
     @PatchMapping("/{id}/cancel")
-    @Operation(summary = "Cancel purchase", description = "Only the owner (or admin) can cancel a CREATED purchase. Restores stock and releases promotion usage.")
+    @Operation(summary = "Cancelar compra", description = "Solo el propietario (o administrador) puede cancelar una compra CREADA. Restaura el stock y libera el uso de la promoción.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Cancelled"),
-            @ApiResponse(responseCode = "400", description = "Invalid purchase state"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Cancelada"),
+            @ApiResponse(responseCode = "400", description = "Estado de compra inválido"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     public ResponseEntity<Void> cancel(@PathVariable Long id) {
         service.cancel(id);
@@ -120,13 +120,13 @@ public class PurchaseController {
     }
 
     @PatchMapping("/{id}/pay")
-    @Operation(summary = "Mark purchase as paid", description = "Only the owner (or admin) can pay a CREATED purchase.")
+    @Operation(summary = "Marcar compra como pagada", description = "Solo el propietario (o administrador) puede pagar una compra CREADA.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Paid"),
-            @ApiResponse(responseCode = "400", description = "Invalid purchase state"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Pagada"),
+            @ApiResponse(responseCode = "400", description = "Estado de compra inválido"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     public ResponseEntity<Void> pay(@PathVariable Long id) {
         service.pay(id);

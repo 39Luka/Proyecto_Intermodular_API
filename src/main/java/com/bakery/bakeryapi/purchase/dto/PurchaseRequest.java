@@ -7,12 +7,12 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
- * Request body for creating a purchase.
+ * Cuerpo de solicitud para crear una compra.
  */
 public record PurchaseRequest(
-        @Schema(description = "Optional. Owner user id. Required for admins; ignored/resolved from JWT for regular users.", example = "1")
+        @Schema(description = "Opcional. ID del usuario propietario. Requerido para administradores; ignorado/resuelto desde el JWT para usuarios regulares.", example = "1")
         Long userId,
-        @Schema(description = "Items in the purchase")
+        @Schema(description = "Artículos en la compra")
         @NotEmpty @Valid List<PurchaseItemRequest> items
 ) {
 }

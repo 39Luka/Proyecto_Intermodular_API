@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Request body for creating a percentage-based promotion.
+ * Cuerpo de solicitud para crear una promoción basada en porcentaje.
  */
 public class PercentagePromotionRequest extends PromotionRequest {
 
-    @Schema(description = "Discount percentage (0-100)", example = "10.00")
-    @NotNull(message = "Discount percentage is required")
-    @DecimalMin(value = "0.0", message = "Discount percentage must be at least 0")
-    @DecimalMax(value = "100.0", message = "Discount percentage must not exceed 100")
+    @Schema(description = "Porcentaje de descuento (0-100)", example = "10.00")
+    @NotNull(message = "El porcentaje de descuento es requerido")
+    @DecimalMin(value = "0.0", message = "El porcentaje de descuento debe ser al menos 0")
+    @DecimalMax(value = "100.0", message = "El porcentaje de descuento no debe exceder 100")
     private BigDecimal discountPercentage;
 
     public PercentagePromotionRequest() {

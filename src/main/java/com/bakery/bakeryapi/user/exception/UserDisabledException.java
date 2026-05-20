@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public class UserDisabledException extends ApiException {
 
     public UserDisabledException() {
-        super("User is disabled", HttpStatus.FORBIDDEN);
+        super("El usuario está deshabilitado", HttpStatus.FORBIDDEN);
     }
 }
 

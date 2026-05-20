@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Purchase data returned by the API.
+ * Datos de la compra devueltos por la API.
  */
 public record PurchaseResponse(
         Long id,

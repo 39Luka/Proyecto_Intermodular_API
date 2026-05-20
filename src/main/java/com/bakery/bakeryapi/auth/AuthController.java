@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth", description = "Login, register, and refresh JWT tokens")
+@Tag(name = "Auth", description = "Inicio de sesión, registro y refresco de tokens JWT")
 public class AuthController {
 
     private final AuthService authService;
@@ -37,11 +37,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login", description = "Authenticates a user and returns access and refresh tokens.", security = {})
+    @Operation(summary = "Iniciar sesión", description = "Autentica a un usuario y devuelve tokens de acceso y refresco.", security = {})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Authenticated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+            @ApiResponse(responseCode = "200", description = "Autenticado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     })
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request
@@ -53,11 +53,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register", description = "Creates a new USER account and returns access and refresh tokens.", security = {})
+    @Operation(summary = "Registrarse", description = "Crea una nueva cuenta de USUARIO y devuelve tokens de acceso y refresco.", security = {})
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "User created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "409", description = "Email already exists")
+            @ApiResponse(responseCode = "201", description = "Usuario creado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "409", description = "El correo electrónico ya existe")
     })
     public ResponseEntity<LoginResponse> register(
             @Valid @RequestBody RegisterRequest request
@@ -71,11 +71,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh token", description = "Uses a refresh token to obtain a new access token.", security = {})
+    @Operation(summary = "Refrescar token", description = "Utiliza un token de refresco para obtener un nuevo token de acceso.", security = {})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "New access token generated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
+            @ApiResponse(responseCode = "200", description = "Nuevo token de acceso generado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "Token de refresco inválido o expirado")
     })
     public ResponseEntity<LoginResponse> refresh(
             @Valid @RequestBody RefreshTokenRequest request
@@ -84,17 +84,17 @@ public class AuthController {
     }
 
     /**
-     * Returns the authenticated user's account data.
+     * Devuelve los datos de la cuenta del usuario autenticado.
      *
-     * @return current user data
+     * @return datos del usuario actual
      */
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Get my user", description = "Returns the authenticated user's account data.")
+    @Operation(summary = "Obtener mi usuario", description = "Devuelve los datos de la cuenta del usuario autenticado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado")
     })
     public ResponseEntity<UserResponse> getMe() {
         String email = SecurityUtils.requireAuthentication().getName();
@@ -102,19 +102,19 @@ public class AuthController {
     }
 
     /**
-     * Updates or removes the profile image of the authenticated user.
+     * Actualiza o elimina la imagen de perfil del usuario autenticado.
      *
-     * @param request request containing the Base64 image, or an empty value to remove it
-     * @return updated user data
+     * @param request solicitud que contiene la imagen en Base64, o un valor vacío para eliminarla
+     * @return datos del usuario actualizados
      */
     @PatchMapping("/me/profile-image")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Update my profile image", description = "Updates or removes the authenticated user's profile image.")
+    @Operation(summary = "Actualizar mi imagen de perfil", description = "Actualiza o elimina la imagen de perfil del usuario autenticado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid image"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Imagen inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado")
     })
     public ResponseEntity<UserResponse> updateMyProfileImage(
             @RequestBody ProfileImageUpdateRequest request
@@ -124,19 +124,19 @@ public class AuthController {
     }
 
     /**
-     * Changes the password of the authenticated user after checking the current password.
+     * Cambia la contraseña del usuario autenticado tras comprobar la contraseña actual.
      *
-     * @param request request containing the current password and the new password
-     * @return empty response when the password is changed
+     * @param request solicitud que contiene la contraseña actual y la nueva contraseña
+     * @return respuesta vacía cuando se cambia la contraseña
      */
     @PatchMapping("/me/password")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Change my password", description = "Changes the authenticated user's password after validating the current password.")
+    @Operation(summary = "Cambiar mi contraseña", description = "Cambia la contraseña del usuario autenticado tras validar la contraseña actual.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Invalid current password or unauthorized")
+            @ApiResponse(responseCode = "204", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "Contraseña actual inválida o no autorizado")
     })
     public ResponseEntity<Void> changeMyPassword(
             @Valid @RequestBody PasswordUpdateRequest request
@@ -147,5 +147,4 @@ public class AuthController {
     }
 
 }
-
 

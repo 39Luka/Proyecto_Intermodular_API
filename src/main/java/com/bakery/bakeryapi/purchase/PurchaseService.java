@@ -70,7 +70,7 @@ public class PurchaseService {
     @Transactional
     public PurchaseResponse create(PurchaseRequest request) {
         if (request.items() == null || request.items().isEmpty()) {
-            throw new InvalidPurchaseException("Purchase must include at least one item");
+            throw new InvalidPurchaseException("La compra debe incluir al menos un artículo");
         }
 
         User user = purchaseAccessService.resolvePurchaseUser(request.userId());
@@ -78,7 +78,7 @@ public class PurchaseService {
 
         for (PurchaseItemRequest itemRequest : request.items()) {
             if (itemRequest.quantity() <= 0) {
-                throw new InvalidPurchaseException("Item quantity must be greater than zero");
+                throw new InvalidPurchaseException("La cantidad del artículo debe ser mayor que cero");
             }
 
             Product product = productService.getActiveEntityById(itemRequest.productId());
@@ -179,10 +179,10 @@ public class PurchaseService {
         purchaseAccessService.enforceAccess(purchase);
 
         if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
-            throw new InvalidPurchaseException("Purchase is already cancelled");
+            throw new InvalidPurchaseException("La compra ya está cancelada");
         }
         if (purchase.getStatus() != PurchaseStatus.CREATED) {
-            throw new InvalidPurchaseException("Only pending purchases can be cancelled");
+            throw new InvalidPurchaseException("Solo las compras pendientes pueden ser canceladas");
         }
 
         // Liberar uso de promoción primero, luego restaurar stock. Si algo falla, la transacción se revierte.
@@ -207,13 +207,13 @@ public class PurchaseService {
         purchaseAccessService.enforceAccess(purchase);
 
         if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
-            throw new InvalidPurchaseException("Cancelled purchases cannot be paid");
+            throw new InvalidPurchaseException("Las compras canceladas no pueden ser pagadas");
         }
         if (purchase.getStatus() == PurchaseStatus.PAID) {
-            throw new InvalidPurchaseException("Purchase is already paid");
+            throw new InvalidPurchaseException("La compra ya está pagada");
         }
         if (purchase.getStatus() != PurchaseStatus.CREATED) {
-            throw new InvalidPurchaseException("Purchase cannot be marked as paid");
+            throw new InvalidPurchaseException("La compra no puede ser marcada como pagada");
         }
 
         purchase.pay();

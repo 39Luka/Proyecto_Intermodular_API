@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request body for public account registration.
+ * Cuerpo de solicitud para el registro público de cuentas.
  */
 public record RegisterRequest(
-        @Schema(description = "Email for the new account", example = "user@example.com")
+        @Schema(description = "Correo electrónico para la nueva cuenta", example = "user@example.com")
         @Email @NotBlank String email,
-        @Schema(description = "Password (8-72 chars)", example = "password123")
+        @Schema(description = "Contraseña (8-72 caracteres)", example = "password123")
         @NotBlank @Size(min = 8, max = 72) String password
 ) {}
 

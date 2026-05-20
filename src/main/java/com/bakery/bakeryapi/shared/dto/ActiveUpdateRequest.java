@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
  * Cuerpo de solicitud para alternar estado activo/habilitado.
  */
 public record ActiveUpdateRequest(
-        @NotNull(message = "active is required") Boolean active
+        @NotNull(message = "el estado activo es requerido") Boolean active
 ) {
 }
 

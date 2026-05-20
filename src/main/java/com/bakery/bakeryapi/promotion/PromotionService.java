@@ -105,7 +105,7 @@ public class PromotionService {
         if (auth == null) {
             if (userId != null) {
                 // Los usuarios anónimos pueden listar promociones activas, pero no pueden solicitar filtrado por usuario.
-                throw new InsufficientAuthenticationException("Authentication required");
+                throw new InsufficientAuthenticationException("Autenticación requerida");
             }
         }
         Long effectiveUserId = auth == null ? null : resolveUserIdForPromotionFiltering(auth, userId);
@@ -124,7 +124,7 @@ public class PromotionService {
 
         Authentication auth = SecurityUtils.optionalAuthentication();
         if (auth == null) {
-            throw new InsufficientAuthenticationException("Authentication required");
+            throw new InsufficientAuthenticationException("Autenticación requerida");
         }
         Long effectiveUserId = resolveUserIdForPromotionFiltering(auth, userId);
 
@@ -152,7 +152,7 @@ public class PromotionService {
             // saveAndFlush dispara la violación de restricción dentro de este método para que podamos devolver un error de dominio de tipo 400.
             usageRepository.saveAndFlush(new PromotionUsage(promotion, user, LocalDateTime.now()));
         } catch (DataIntegrityViolationException e) {
-            throw new InvalidPromotionException("Promotion has already been used by this user");
+            throw new InvalidPromotionException("La promoción ya ha sido utilizada por este usuario");
         }
 
         return promotionRules.normalizeAmount(discountAmount);
@@ -172,7 +172,7 @@ public class PromotionService {
 
         User currentUser = userService.getEntityByEmail(auth.getName());
         if (requestedUserId != null && !currentUser.getId().equals(requestedUserId)) {
-            throw new ForbiddenOperationException("Cannot request promotions for another user");
+            throw new ForbiddenOperationException("No se pueden solicitar promociones para otro usuario");
         }
         return currentUser.getId();
     }

@@ -27,7 +27,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Bakery API")
-                        .description("REST API for a bakery with JWT auth. Manages categories, products, percentage promotions and purchases.")
+                        .description("API REST para una panadería con autenticación JWT. Gestiona categorías, productos, promociones de porcentaje y compras.")
                         .version("1.0.0"))
                 .components(new Components()
                         .addSecuritySchemes(SECURITY_SCHEME_NAME,
@@ -36,7 +36,7 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("Use the JWT from POST /auth/login in the Authorization header: Bearer <token>")));
+                                        .description("Usar el JWT de POST /auth/login en la cabecera Authorization: Bearer <token>")));
     }
 
     @Bean
@@ -59,13 +59,13 @@ public class OpenApiConfig {
                             operation.setResponses(responses);
                         }
 
-                        addIfMissing(responses, "400", "Bad request", genericJsonContent);
-                        addIfMissing(responses, "500", "Internal server error", genericJsonContent);
+                        addIfMissing(responses, "400", "Solicitud incorrecta", genericJsonContent);
+                        addIfMissing(responses, "500", "Error interno del servidor", genericJsonContent);
 
                         boolean isSecuredOperation = operation.getSecurity() != null && !operation.getSecurity().isEmpty();
                         if (isSecuredOperation) {
-                            addIfMissing(responses, "401", "Unauthorized", genericJsonContent);
-                            addIfMissing(responses, "403", "Forbidden", genericJsonContent);
+                            addIfMissing(responses, "401", "No autorizado", genericJsonContent);
+                            addIfMissing(responses, "403", "Prohibido", genericJsonContent);
                         }
                     }));
         };

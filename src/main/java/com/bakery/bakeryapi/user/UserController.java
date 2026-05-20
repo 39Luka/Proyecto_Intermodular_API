@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 @PreAuthorize("hasRole('ADMIN')")
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Users", description = "Admin-only user management")
+@Tag(name = "Usuarios", description = "Gestión de usuarios solo para administradores")
 public class UserController {
 
     private final UserService service;
@@ -32,24 +32,24 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get user by id", description = "Admin-only.")
+    @Operation(summary = "Obtener usuario por ID", description = "Solo para administradores.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
-    @Operation(summary = "Get user by email", description = "Admin-only.")
+    @Operation(summary = "Obtener usuario por correo electrónico", description = "Solo para administradores.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     public ResponseEntity<UserResponse> getByEmail(@RequestParam String email) {
         return ResponseEntity.ok(service.getByEmail(email));
@@ -57,13 +57,13 @@ public class UserController {
 
 
     @PostMapping
-    @Operation(summary = "Create user", description = "Admin-only. Creates a user with role/flags according to request payload.")
+    @Operation(summary = "Crear usuario", description = "Solo para administradores. Crea un usuario con el rol/banderas según la carga de solicitud.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "409", description = "Conflict")
+            @ApiResponse(responseCode = "201", description = "Creado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "409", description = "Conflicto")
     })
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest request) {
         UserResponse user = service.create(request);
@@ -72,13 +72,13 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Update user flags", description = "Admin-only. Currently supports updating { active } which maps to enabled/disabled.")
+    @Operation(summary = "Actualizar banderas de usuario", description = "Solo para administradores. Actualmente soporta la actualización de { active } que se mapea a habilitado/deshabilitado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "204", description = "Actualizado"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrado")
     })
     public ResponseEntity<Void> patchUser(@PathVariable Long id, @RequestBody @Valid ActiveUpdateRequest request) {
         // La API usa un nombre de bandera unificado: { "active": true|false }. Para usuarios se mapea al estado "enabled".

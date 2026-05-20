@@ -36,80 +36,80 @@ public class AuthService {
     }
 
     /**
-     * Registers a new public account with the {@link Role#USER} role and returns login tokens.
+     * Registra una nueva cuenta pública con el rol {@link Role#USER} y devuelve los tokens de inicio de sesión.
      *
-     * @param email unique account email
-     * @param password raw password to encode
-     * @return access and refresh tokens for the new account
+     * @param email correo electrónico único de la cuenta
+     * @param password contraseña sin procesar para codificar
+     * @return tokens de acceso y refresco para la nueva cuenta
      */
     public LoginResponse register(String email, String password) {
-        log.info("User registration attempt for email: {}", email);
+        log.info("Intento de registro de usuario para el correo: {}", email);
         User user = userService.rotateRefreshToken(userService.createInternal(email, password, Role.USER));
         String accessToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
         String refreshToken = jwtTokenService.generateRefreshToken(user.getEmail(), user.getRefreshTokenVersion());
-        log.info("User registered successfully: {}", email);
+        log.info("Usuario registrado con éxito: {}", email);
         return new LoginResponse(accessToken, refreshToken, jwtTokenService.getExpirationMs());
     }
 
 
     /**
-     * Authenticates a user by email/password and rotates their refresh token.
+     * Autentica a un usuario por correo/contraseña y rota su token de refresco.
      *
-     * @param email account email
-     * @param password raw password supplied by the client
-     * @return fresh access and refresh tokens
-     * @throws InvalidCredentialsException when the user does not exist or the password is wrong
-     * @throws UserDisabledException when the account is disabled
+     * @param email correo de la cuenta
+     * @param password contraseña sin procesar proporcionada por el cliente
+     * @return nuevos tokens de acceso y refresco
+     * @throws InvalidCredentialsException cuando el usuario no existe o la contraseña es incorrecta
+     * @throws UserDisabledException cuando la cuenta está deshabilitada
      */
     public LoginResponse login(String email, String password) {
-        log.info("Login attempt for email: {}", email);
+        log.info("Intento de inicio de sesión para el correo: {}", email);
         User user;
         try {
             user = userService.getEntityByEmail(email);
         } catch (UserNotFoundException e){
-            log.warn("Login failed: user not found for email: {}", email);
+            log.warn("Inicio de sesión fallido: usuario no encontrado para el correo: {}", email);
             throw new InvalidCredentialsException();
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            log.warn("Login failed: invalid password for email: {}", email);
+            log.warn("Inicio de sesión fallido: contraseña inválida para el correo: {}", email);
             throw new InvalidCredentialsException();
         }
 
         if (!user.isEnabled()) {
-            log.warn("Login failed: user disabled for email: {}", email);
+            log.warn("Inicio de sesión fallido: usuario deshabilitado para el correo: {}", email);
             throw new UserDisabledException();
         }
 
         user = userService.rotateRefreshToken(user);
         String accessToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
         String refreshToken = jwtTokenService.generateRefreshToken(user.getEmail(), user.getRefreshTokenVersion());
-        log.info("Login successful for email: {}", email);
+        log.info("Inicio de sesión exitoso para el correo: {}", email);
         return new LoginResponse(accessToken, refreshToken, jwtTokenService.getExpirationMs());
     }
 
     /**
-     * Validates a refresh token and returns a new token pair.
+     * Valida un token de refresco y devuelve un nuevo par de tokens.
      *
-     * Refresh tokens are single-use because the stored token version is rotated after
-     * every successful refresh.
+     * Los tokens de refresco son de un solo uso porque la versión del token almacenada se rota después
+     * de cada refresco exitoso.
      *
-     * @param refreshToken refresh token supplied by the client
-     * @return new access and refresh tokens
-     * @throws InvalidCredentialsException when the token is invalid, expired or already rotated
-     * @throws UserDisabledException when the account is disabled
+     * @param refreshToken token de refresco proporcionado por el cliente
+     * @return nuevos tokens de acceso y refresco
+     * @throws InvalidCredentialsException cuando el token es inválido, ha expirado o ya ha sido rotado
+     * @throws UserDisabledException cuando la cuenta está deshabilitada
      */
     public LoginResponse refreshAccessToken(String refreshToken) {
-        log.info("Refresh token request");
+        log.info("Solicitud de refresco de token");
         JwtTokenService.RefreshTokenPayload payload = jwtTokenService.readRefreshToken(refreshToken);
         if (payload == null) {
-            log.warn("Refresh token validation failed");
+            log.warn("Fallo en la validación del token de refresco");
             throw new InvalidCredentialsException();
         }
 
         String email = payload.subject();
         if (email == null || email.isBlank()) {
-            log.warn("Could not extract email from refresh token");
+            log.warn("No se pudo extraer el correo del token de refresco");
             throw new InvalidCredentialsException();
         }
 
@@ -117,22 +117,22 @@ public class AuthService {
         try {
             user = userService.getEntityByEmail(email);
         } catch (UserNotFoundException e) {
-            log.warn("Refresh token rejected: user not found for email: {}", email);
+            log.warn("Token de refresco rechazado: usuario no encontrado para el correo: {}", email);
             throw new InvalidCredentialsException();
         }
         if (!user.isEnabled()) {
-            log.warn("User disabled: {}", email);
+            log.warn("Usuario deshabilitado: {}", email);
             throw new UserDisabledException();
         }
         if (payload.refreshTokenVersion() != user.getRefreshTokenVersion()) {
-            log.warn("Refresh token rejected: rotated token reuse for email: {}", email);
+            log.warn("Token de refresco rechazado: reutilización de token rotado para el correo: {}", email);
             throw new InvalidCredentialsException();
         }
 
         user = userService.rotateRefreshToken(user);
         String accessToken = jwtTokenService.generateToken(user.getEmail(), user.getRole().name());
         String newRefreshToken = jwtTokenService.generateRefreshToken(user.getEmail(), user.getRefreshTokenVersion());
-        log.info("Refresh token validated and new access token generated for: {}", email);
+        log.info("Token de refresco validado y nuevo token de acceso generado para: {}", email);
         return new LoginResponse(accessToken, newRefreshToken, jwtTokenService.getExpirationMs());
     }
 }

@@ -37,9 +37,9 @@ public class GlobalExceptionHandler {
     /** Errores de autenticación de Spring Security. */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "No autorizado");
         problem.setTitle(HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        problem.setProperty("message", "Unauthorized");
+        problem.setProperty("message", "No autorizado");
         problem.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
@@ -47,9 +47,9 @@ public class GlobalExceptionHandler {
     /** Errores de autorización de Spring Security. */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ProblemDetail> handleAccessDeniedException(AccessDeniedException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Forbidden");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Prohibido");
         problem.setTitle(HttpStatus.FORBIDDEN.getReasonPhrase());
-        problem.setProperty("message", "Forbidden");
+        problem.setProperty("message", "Prohibido");
         problem.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
@@ -69,10 +69,10 @@ public class GlobalExceptionHandler {
                 ))
                 .toList();
 
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validación fallida");
         problem.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
         // Mantener "message" estable como una cadena; poner detalles a nivel de campo en "errors".
-        problem.setProperty("message", "Validation failed");
+        problem.setProperty("message", "Validación fallida");
         problem.setProperty("errors", errors);
         problem.setProperty("timestamp", Instant.now());
         return ResponseEntity.badRequest().body(problem);
@@ -84,9 +84,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Conflict");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Conflicto");
         problem.setTitle(HttpStatus.CONFLICT.getReasonPhrase());
-        problem.setProperty("message", "Conflict");
+        problem.setProperty("message", "Conflicto");
         problem.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     public ResponseEntity<ProblemDetail> handleOptimisticLocking(ObjectOptimisticLockingFailureException ex) {
-        String message = "Concurrent update, please retry";
+        String message = "Actualización concurrente, inténtelo de nuevo";
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
         problem.setTitle(HttpStatus.CONFLICT.getReasonPhrase());
         problem.setProperty("message", message);

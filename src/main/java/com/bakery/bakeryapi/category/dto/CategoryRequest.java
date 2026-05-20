@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Request body for creating or updating a product category.
+ * Cuerpo de solicitud para crear o actualizar una categoría de producto.
  */
 public record CategoryRequest(
-        @Schema(description = "Category name", example = "Bread")
+        @Schema(description = "Nombre de la categoría", example = "Pan")
         @NotBlank String name
 ) {
 }

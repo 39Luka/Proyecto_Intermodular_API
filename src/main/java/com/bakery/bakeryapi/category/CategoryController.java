@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/categories")
-@Tag(name = "Categories", description = "Product categories")
+@Tag(name = "Categorías", description = "Categorías de productos")
 public class CategoryController {
 
     private final CategoryService service;
@@ -31,33 +31,33 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get category by id")
+    @Operation(summary = "Obtener categoría por ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok"),
-            @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "Correcto"),
+            @ApiResponse(responseCode = "404", description = "No encontrada")
     })
     public ResponseEntity<CategoryResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
-    @Operation(summary = "List categories")
+    @Operation(summary = "Listar categorías")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ok")
+            @ApiResponse(responseCode = "200", description = "Correcto")
     })
     public ResponseEntity<Page<CategoryResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(service.getAll(pageable));
     }
 
     @PostMapping
-    @Operation(summary = "Create category", description = "Admin-only.")
+    @Operation(summary = "Crear categoría", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Category created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "409", description = "Already exists")
+            @ApiResponse(responseCode = "201", description = "Categoría creada"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "409", description = "Ya existe")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
@@ -67,15 +67,15 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update category", description = "Admin-only.")
+    @Operation(summary = "Actualizar categoría", description = "Solo para administradores.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "409", description = "Already exists")
+            @ApiResponse(responseCode = "200", description = "Actualizada"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autorizado"),
+            @ApiResponse(responseCode = "403", description = "Prohibido"),
+            @ApiResponse(responseCode = "404", description = "No encontrada"),
+            @ApiResponse(responseCode = "409", description = "Ya existe")
     })
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {

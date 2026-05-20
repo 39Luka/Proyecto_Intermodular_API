@@ -31,12 +31,12 @@ public class ImageValidator {
         try {
             decodedBytes = java.util.Base64.getDecoder().decode(imageBase64);
         } catch (IllegalArgumentException e) {
-            throw new InvalidImageException("Invalid base64 encoding");
+            throw new InvalidImageException("Codificación base64 inválida");
         }
 
         if (decodedBytes.length > MAX_IMAGE_SIZE_BYTES) {
             throw new InvalidImageException(
-                    "Image exceeds maximum size of 5MB (got "
+                    "La imagen excede el tamaño máximo de 5MB (recibido "
                             + formatBytes(decodedBytes.length)
                             + ")"
             );
@@ -45,7 +45,7 @@ public class ImageValidator {
         String detectedMimeType = detectMimeType(decodedBytes);
         if (!isAllowedMimeType(detectedMimeType)) {
             throw new InvalidImageException(
-                    "Image type not supported. Allowed: JPEG, PNG, WebP (detected: "
+                    "Tipo de imagen no soportado. Permitidos: JPEG, PNG, WebP (detectado: "
                             + detectedMimeType
                             + ")"
             );
@@ -54,7 +54,7 @@ public class ImageValidator {
 
     private static String detectMimeType(byte[] bytes) {
         if (bytes.length < 4) {
-            return "unknown";
+            return "desconocido";
         }
 
         if (bytes[0] == (byte) 0x89 && bytes[1] == 0x50
@@ -75,7 +75,7 @@ public class ImageValidator {
             return "image/webp";
         }
 
-        return "unknown";
+        return "desconocido";
     }
 
     private static boolean isAllowedMimeType(String mimeType) {

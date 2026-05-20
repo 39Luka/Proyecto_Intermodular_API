@@ -52,7 +52,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-        log.info("Creating new product: {}", request.name());
+        log.info("Creando nuevo producto: {}", request.name());
         
         // Validar imagen si se proporciona
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
@@ -71,15 +71,15 @@ public class ProductService {
             product.setImage(decodeImageBase64(request.imageBase64()));
         }
         Product saved = repository.save(product);
-        log.info("Product created successfully with ID: {}", saved.getId());
+        log.info("Producto creado con éxito con ID: {}", saved.getId());
         return ProductResponse.from(saved);
     }
 
     public Product getEntityById(Long id) {
-        log.debug("Fetching product entity by ID: {}", id);
+        log.debug("Obteniendo entidad de producto por ID: {}", id);
         return repository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Product not found: {}", id);
+                    log.warn("Producto no encontrado: {}", id);
                     return new ProductNotFoundException(id);
                 });
     }
@@ -184,7 +184,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse update(Long id, ProductRequest request) {
-        log.info("Updating product ID: {}", id);
+        log.info("Actualizando producto con ID: {}", id);
         
         // Validar imagen si se proporciona
         if (request.imageBase64() != null && !request.imageBase64().isBlank()) {
@@ -204,13 +204,13 @@ public class ProductService {
             product.setImage(decodeImageBase64(request.imageBase64()));
         }
         Product updated = repository.save(product);
-        log.info("Product updated successfully: {}", id);
+        log.info("Producto actualizado con éxito: {}", id);
         return ProductResponse.from(updated);
     }
 
     @Transactional
     public void setActive(Long id, boolean active) {
-        log.info("Setting product {} active status to: {}", id, active);
+        log.info("Estableciendo estado activo del producto {} a: {}", id, active);
         Product product = getEntityById(id);
         if (active) {
             product.enable();
@@ -218,20 +218,20 @@ public class ProductService {
             product.disable();
         }
         repository.save(product);
-        log.info("Product {} active status updated", id);
+        log.info("Estado activo del producto {} actualizado", id);
     }
 
     @Transactional
     public void delete(Long id) {
-        log.info("Attempting to delete product ID: {}", id);
+        log.info("Intentando eliminar producto con ID: {}", id);
         Product product = getEntityById(id);
         
         if (repository.existsPurchasesByProductId(id)) {
-            log.info("Product {} has purchases, deactivating instead of deleting", id);
+            log.info("El producto {} tiene compras, desactivando en lugar de eliminar", id);
             product.disable();
             repository.save(product);
         } else {
-            log.info("Product {} has no purchases, performing hard delete", id);
+            log.info("El producto {} no tiene compras, realizando eliminación física", id);
             repository.delete(product);
         }
     }
@@ -240,7 +240,7 @@ public class ProductService {
         try {
             return Base64.getDecoder().decode(imageBase64);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid base64 image encoding", e);
+            throw new IllegalArgumentException("Codificación de imagen base64 inválida", e);
         }
     }
 }

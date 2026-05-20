@@ -9,20 +9,20 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 /**
- * Request body for creating or updating a product.
+ * Cuerpo de solicitud para crear o actualizar un producto.
  */
 public record ProductRequest(
-        @Schema(description = "Product name", example = "Baguette")
+        @Schema(description = "Nombre del producto", example = "Baguette")
         @NotBlank String name,
-        @Schema(description = "Optional description", example = "Classic French bread")
+        @Schema(description = "Descripción opcional", example = "Pan francés clásico")
         String description,
-        @Schema(description = "Unit price", example = "1.50")
+        @Schema(description = "Precio unitario", example = "1.50")
         @NotNull @DecimalMin("0.0") BigDecimal price,
-        @Schema(description = "Current stock", example = "50")
+        @Schema(description = "Stock actual", example = "50")
         @PositiveOrZero int stock,
-        @Schema(description = "Category id", example = "1")
+        @Schema(description = "ID de la categoría", example = "1")
         @NotNull Long categoryId,
-        @Schema(description = "Product image as base64 (optional)", type = "string")
+        @Schema(description = "Imagen del producto en formato base64 (opcional)", type = "string")
         String imageBase64
 ) {
 }

@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 public class UserNotFoundException extends ApiException {
 
     public UserNotFoundException(Long id) {
-        super("User with id " + id + " not found", HttpStatus.NOT_FOUND);
+        super("Usuario con id " + id + " no encontrado", HttpStatus.NOT_FOUND);
     }
 
     public UserNotFoundException(String email) {
-        super("User with email " + email + " not found", HttpStatus.NOT_FOUND);
+        super("Usuario con correo " + email + " no encontrado", HttpStatus.NOT_FOUND);
     }
 }
 
