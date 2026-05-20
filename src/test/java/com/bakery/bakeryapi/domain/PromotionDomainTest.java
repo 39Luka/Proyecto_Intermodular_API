@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PromotionDomainTest {
 
+    /**
+     * CP-DOM.04: isActiveOn_withNullEndDate_neverExpiresWhileActive
+     * Valida que las promociones sin fecha de fin definida se mantengan activas indefinidamente.
+     */
     @Test
     void isActiveOn_withNullEndDate_neverExpiresWhileActive() {
         Product product = new Product("Baguette", null, new BigDecimal("1.00"), 10, new Category("Bread"));
@@ -22,6 +26,10 @@ class PromotionDomainTest {
         assertTrue(promo.isActiveOn(LocalDate.now().plusYears(10)));
     }
 
+    /**
+     * CP-DOM.05: isActiveOn_beforeStartDate_isFalse
+     * Asegura que una promoción no sea aplicable si la fecha actual es anterior a su fecha de inicio.
+     */
     @Test
     void isActiveOn_beforeStartDate_isFalse() {
         Product product = new Product("Baguette", null, new BigDecimal("1.00"), 10, new Category("Bread"));
@@ -29,6 +37,10 @@ class PromotionDomainTest {
         assertFalse(promo.isActiveOn(LocalDate.now()));
     }
 
+    /**
+     * CP-DOM.06: percentagePromotion_calculatesDiscount
+     * Verifica que el cálculo matemático de descuentos porcentuales en el dominio sea exacto.
+     */
     @Test
     void percentagePromotion_calculatesDiscount() {
         Product product = new Product("Baguette", null, new BigDecimal("2.00"), 10, new Category("Bread"));

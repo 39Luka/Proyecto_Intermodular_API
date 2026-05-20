@@ -43,6 +43,10 @@ class AuthServiceTest {
         authService = new AuthService(userService, jwtTokenService, passwordEncoder);
     }
 
+    /**
+     * CP-AUT.07: register_createsUserAsUserRole_andReturnsTokens
+     * Valida que el registro cree internamente un usuario con rol USER y devuelva los tokens correspondientes.
+     */
     @Test
     void register_createsUserAsUserRole_andReturnsTokens() {
         String email = "user@example.com";
@@ -64,6 +68,10 @@ class AuthServiceTest {
         verify(userService).createInternal(eq(email), eq(password), eq(Role.USER));
     }
 
+    /**
+     * CP-AUT.08: login_correctPassword_returnsTokens
+     * Verifica que el servicio de autenticación genere tokens válidos cuando la contraseña coincide.
+     */
     @Test
     void login_correctPassword_returnsTokens() {
         String email = "user@example.com";
@@ -84,6 +92,10 @@ class AuthServiceTest {
         assertEquals("refresh-token", response.refreshToken());
     }
 
+    /**
+     * CP-AUT.09: login_wrongPassword_throwsInvalidCredentialsException
+     * Asegura que se lance una excepción de credenciales inválidas si la contraseña es incorrecta.
+     */
     @Test
     void login_wrongPassword_throwsInvalidCredentialsException() {
         String email = "user@example.com";
@@ -97,6 +109,10 @@ class AuthServiceTest {
         verify(jwtTokenService, never()).generateToken(anyString(), anyString());
     }
 
+    /**
+     * CP-AUT.10: login_userNotFound_throwsInvalidCredentialsException
+     * Valida que se lance una excepción si el usuario no existe en la base de datos durante el login.
+     */
     @Test
     void login_userNotFound_throwsInvalidCredentialsException() {
         String email = "missing@example.com";
@@ -109,6 +125,10 @@ class AuthServiceTest {
         verify(jwtTokenService, never()).generateToken(any(), any());
     }
 
+    /**
+     * CP-AUT.11: login_disabledUser_throwsUserDisabledException
+     * Verifica que un usuario con la cuenta desactivada no pueda iniciar sesión.
+     */
     @Test
     void login_disabledUser_throwsUserDisabledException() {
         String email = "user@example.com";
@@ -124,6 +144,10 @@ class AuthServiceTest {
         verify(jwtTokenService, never()).generateToken(anyString(), anyString());
     }
 
+    /**
+     * CP-AUT.12: refresh_validToken_rotatesRefreshToken
+     * Valida el flujo de refresco de tokens, asegurando la rotación del Refresh Token para mayor seguridad.
+     */
     @Test
     void refresh_validToken_rotatesRefreshToken() {
         String email = "user@example.com";
@@ -151,6 +175,10 @@ class AuthServiceTest {
         assertNotEquals("old-refresh", response.refreshToken());
     }
 
+    /**
+     * CP-AUT.13: refresh_reusedRotatedToken_throwsInvalidCredentialsException
+     * Detecta intentos de reutilización de tokens de refresco antiguos (detección de robo de tokens).
+     */
     @Test
     void refresh_reusedRotatedToken_throwsInvalidCredentialsException() {
         String email = "user@example.com";

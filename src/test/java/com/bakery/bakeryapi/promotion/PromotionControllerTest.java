@@ -56,6 +56,10 @@ class PromotionControllerTest {
         productId = product.getId();
     }
 
+    /**
+     * CP-PRM.01: testGetActivePromotionsByProductIdSuccess
+     * Verifica que se puedan consultar las promociones activas de un producto de forma pública.
+     */
     @Test
     void testGetActivePromotionsByProductIdSuccess() throws Exception {
         mockMvc.perform(get("/promotions/active")
@@ -64,6 +68,10 @@ class PromotionControllerTest {
                 .andExpect(status().isOk());
     }
 
+    /**
+     * CP-PRM.02: testCreatePercentagePromotionSuccess
+     * Valida que un administrador pueda crear una promoción de descuento porcentual correctamente.
+     */
     @Test
     void testCreatePercentagePromotionSuccess() throws Exception {
         PercentagePromotionRequest request = percentagePromotionRequest("Summer Sale");
@@ -77,6 +85,10 @@ class PromotionControllerTest {
                 .andExpect(jsonPath("$.description").value("Summer Sale"));
     }
 
+    /**
+     * CP-PRM.03: testCreatePromotionForbiddenForUserRole
+     * Asegura que un usuario con rol USER no pueda crear promociones (Error 403).
+     */
     @Test
     void testCreatePromotionForbiddenForUserRole() throws Exception {
         PercentagePromotionRequest request = percentagePromotionRequest("Summer Sale");
@@ -89,6 +101,10 @@ class PromotionControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /**
+     * CP-PRM.04: testCreatePromotionUnauthorized
+     * Verifica que el endpoint de creación de promociones requiera autenticación.
+     */
     @Test
     void testCreatePromotionUnauthorized() throws Exception {
         PercentagePromotionRequest request = percentagePromotionRequest("Summer Sale");
@@ -99,6 +115,10 @@ class PromotionControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    /**
+     * CP-PRM.05: testPatchPromotionActiveSuccess
+     * Valida que un administrador pueda activar o desactivar una promoción existente.
+     */
     @Test
     void testPatchPromotionActiveSuccess() throws Exception {
         PromotionResponse created = createPromotion("Flash Sale");
@@ -111,6 +131,10 @@ class PromotionControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    /**
+     * CP-PRM.06: testGetPromotionByIdNotFound
+     * Verifica que el sistema devuelva 404 al intentar acceder a una promoción que no existe.
+     */
     @Test
     void testGetPromotionByIdNotFound() throws Exception {
         mockMvc.perform(get("/promotions/99999")

@@ -51,6 +51,10 @@ class ProductServiceTest {
         SecurityContextHolder.clearContext();
     }
 
+    /**
+     * CP-PRD.01: getAll_asUser_usesActiveOnlyRepositoryMethod
+     * Valida que cuando un usuario normal solicita productos, solo se devuelvan los que están marcados como activos.
+     */
     @Test
     void getAll_asUser_usesActiveOnlyRepositoryMethod() {
         when(paginationProperties.maxPageSize()).thenReturn(100);
@@ -62,6 +66,10 @@ class ProductServiceTest {
         verify(repository).findAllByActiveTrue(any(PageRequest.class));
     }
 
+    /**
+     * CP-PRD.02: getAll_asAdmin_usesFindAll
+     * Verifica que un administrador pueda ver todos los productos del catálogo, incluidos los inactivos.
+     */
     @Test
     void getAll_asAdmin_usesFindAll() {
         when(paginationProperties.maxPageSize()).thenReturn(100);
@@ -73,6 +81,10 @@ class ProductServiceTest {
         verify(repository).findAll(any(PageRequest.class));
     }
 
+    /**
+     * CP-PRD.03: getById_inactive_asUser_throwsNotFound
+     * Asegura que un usuario no pueda acceder a la ficha de un producto que ha sido desactivado.
+     */
     @Test
     void getById_inactive_asUser_throwsNotFound() {
         setAuth(Role.USER);
@@ -83,6 +95,10 @@ class ProductServiceTest {
         assertThrows(ProductNotFoundException.class, () -> service.getById(1L));
     }
 
+    /**
+     * CP-PRD.04: getById_inactive_asAdmin_returnsProduct
+     * Valida que un administrador sí pueda consultar la información de productos inactivos por su ID.
+     */
     @Test
     void getById_inactive_asAdmin_returnsProduct() {
         setAuth(Role.ADMIN);
@@ -96,6 +112,10 @@ class ProductServiceTest {
         assertEquals("Old", response.name());
     }
 
+    /**
+     * CP-PRD.05: topSelling_asUser_callsActiveOnlyQuery
+     * Verifica que el listado de productos más vendidos para usuarios solo incluya productos activos.
+     */
     @Test
     void topSelling_asUser_callsActiveOnlyQuery() {
         when(paginationProperties.maxPageSize()).thenReturn(100);

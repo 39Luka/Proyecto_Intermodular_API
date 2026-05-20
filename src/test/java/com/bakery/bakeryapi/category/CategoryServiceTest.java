@@ -36,12 +36,20 @@ class CategoryServiceTest {
     @InjectMocks
     private CategoryService service;
 
+    /**
+     * CP-CAT.07: create_duplicateName_throws
+     * Asegura que el servicio lance una excepción si se intenta crear una categoría con un nombre que ya existe (ignorando mayúsculas).
+     */
     @Test
     void create_duplicateName_throws() {
         when(repository.existsByNameIgnoreCase("Bread")).thenReturn(true);
         assertThrows(CategoryAlreadyExistsException.class, () -> service.create(new CategoryRequest("Bread")));
     }
 
+    /**
+     * CP-CAT.08: create_savesCategory
+     * Valida la lógica de negocio para guardar una nueva categoría válida en el repositorio.
+     */
     @Test
     void create_savesCategory() {
         when(repository.existsByNameIgnoreCase("Bread")).thenReturn(false);
@@ -54,12 +62,20 @@ class CategoryServiceTest {
         verify(repository).save(any(Category.class));
     }
 
+    /**
+     * CP-CAT.09: getById_missing_throws
+     * Verifica que el servicio lance una excepción si se solicita una categoría por un ID inexistente.
+     */
     @Test
     void getById_missing_throws() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> service.getById(1L));
     }
 
+    /**
+     * CP-CAT.10: getAll_returnsPage
+     * Valida que el listado de categorías sea paginado correctamente y devuelva los datos esperados.
+     */
     @Test
     void getAll_returnsPage() {
         when(paginationProperties.maxPageSize()).thenReturn(100);

@@ -72,6 +72,10 @@ class PromotionServiceTest {
         SecurityContextHolder.clearContext();
     }
 
+    /**
+     * CP-PRM.07: getAll_capsPageSizeTo100
+     * Verifica que el servicio de promociones limite el tamaño de página a un máximo de 100 para evitar sobrecarga.
+     */
     @Test
     void getAll_capsPageSizeTo100() {
         setAuth(Role.ADMIN, "admin@example.com");
@@ -84,6 +88,10 @@ class PromotionServiceTest {
         assertEquals(100, captor.getValue().getPageSize());
     }
 
+    /**
+     * CP-PRM.08: getActiveByProduct_asUser_usesAuthenticatedUserId_whenUserIdNull
+     * Valida que cuando un usuario busca ofertas, el sistema use automáticamente su ID para filtrar promociones personalizadas.
+     */
     @Test
     void getActiveByProduct_asUser_usesAuthenticatedUserId_whenUserIdNull() {
         setAuth(Role.USER, "user@example.com");
@@ -98,6 +106,10 @@ class PromotionServiceTest {
         verify(repository, never()).findActiveByProductId(eq(5L), any(LocalDate.class), any(Pageable.class));
     }
 
+    /**
+     * CP-PRM.09: getActiveByProduct_asUser_withDifferentUserId_throwsForbidden
+     * Asegura que un usuario no pueda intentar consultar las promociones activas de otro usuario (Seguridad de datos).
+     */
     @Test
     void getActiveByProduct_asUser_withDifferentUserId_throwsForbidden() {
         setAuth(Role.USER, "user@example.com");
@@ -108,6 +120,10 @@ class PromotionServiceTest {
                 () -> service.getActiveByProduct(5L, 99L, PageRequest.of(0, 10)));
     }
 
+    /**
+     * CP-PRM.10: getActiveByProduct_asAdmin_withUserId_validatesUser_andFilters
+     * Valida que un administrador pueda consultar las ofertas activas de cualquier usuario específico.
+     */
     @Test
     void getActiveByProduct_asAdmin_withUserId_validatesUser_andFilters() {
         setAuth(Role.ADMIN, "admin@example.com");
@@ -120,6 +136,10 @@ class PromotionServiceTest {
         verify(repository).findActiveByProductIdAndUserId(eq(5L), eq(10L), any(LocalDate.class), any(Pageable.class));
     }
 
+    /**
+     * CP-PRM.11: getActiveByProduct_asAdmin_withNullUserId_returnsAllActive
+     * Verifica que un administrador pueda obtener todas las promociones generales activas de un producto.
+     */
     @Test
     void getActiveByProduct_asAdmin_withNullUserId_returnsAllActive() {
         setAuth(Role.ADMIN, "admin@example.com");

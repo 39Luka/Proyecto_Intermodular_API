@@ -32,6 +32,10 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    /**
+     * CP-USR.01: getById_existingUser_returnsUser
+     * Valida la recuperación correcta de un usuario por su identificador único.
+     */
     @Test
     void getById_existingUser_returnsUser() {
         User user = new User("silvia@example.com", "1234", Role.USER);
@@ -42,6 +46,10 @@ class UserServiceTest {
         assertEquals("silvia@example.com", result.email());
     }
 
+    /**
+     * CP-USR.02: getById_nonExistingUser_throwsException
+     * Asegura que se lance una excepción si se intenta recuperar un usuario con un ID inexistente.
+     */
     @Test
     void getById_nonExistingUser_throwsException() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
@@ -49,6 +57,10 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getById(1L));
     }
 
+    /**
+     * CP-USR.03: create_uniqueEmail_savesUser
+     * Valida la creación de un nuevo usuario con un correo único y el cifrado de su contraseña.
+     */
     @Test
     void create_uniqueEmail_savesUser() {
         when(repository.existsByEmail("silvia@example.com")).thenReturn(false);
@@ -62,6 +74,10 @@ class UserServiceTest {
         verify(passwordEncoder).encode("1234");
     }
 
+    /**
+     * CP-USR.04: create_existingEmail_throwsException
+     * Verifica que no se permitan emails duplicados durante la creación manual de usuarios (ADMIN).
+     */
     @Test
     void create_existingEmail_throwsException() {
         when(repository.existsByEmail("silvia@example.com")).thenReturn(true);
@@ -71,6 +87,10 @@ class UserServiceTest {
         verify(passwordEncoder, never()).encode(anyString());
     }
 
+    /**
+     * CP-USR.05: enableUser_existingUser_setsEnabledTrue
+     * Valida la funcionalidad de activación de cuenta de usuario.
+     */
     @Test
     void enableUser_existingUser_setsEnabledTrue() {
         User user = new User("silvia@example.com", "1234", Role.USER);
@@ -83,6 +103,10 @@ class UserServiceTest {
         verify(repository).save(user);
     }
 
+    /**
+     * CP-USR.06: disableUser_existingUser_setsEnabledFalse
+     * Valida la funcionalidad de desactivación de cuenta de usuario.
+     */
     @Test
     void disableUser_existingUser_setsEnabledFalse() {
         User user = new User("silvia@example.com", "1234", Role.USER);
@@ -94,6 +118,10 @@ class UserServiceTest {
         verify(repository).save(user);
     }
 
+    /**
+     * CP-USR.07: updateProfileImage_validImage_savesImage
+     * Verifica que se pueda subir y actualizar correctamente la imagen de perfil en formato Base64.
+     */
     @Test
     void updateProfileImage_validImage_savesImage() {
         String pngBase64 = Base64.getEncoder().encodeToString(new byte[]{
@@ -110,6 +138,10 @@ class UserServiceTest {
         verify(repository).save(user);
     }
 
+    /**
+     * CP-USR.08: updateProfileImage_blankImage_removesImage
+     * Valida que al enviar una imagen vacía, se elimine la imagen de perfil actual del usuario.
+     */
     @Test
     void updateProfileImage_blankImage_removesImage() {
         User user = new User("silvia@example.com", "1234", Role.USER);
@@ -124,6 +156,10 @@ class UserServiceTest {
         verify(repository).save(user);
     }
 
+    /**
+     * CP-USR.09: changePassword_correctCurrentPassword_savesEncodedPasswordAndRotatesRefreshToken
+     * Verifica el cambio de contraseña seguro, incluyendo re-cifrado y rotación de tokens.
+     */
     @Test
     void changePassword_correctCurrentPassword_savesEncodedPasswordAndRotatesRefreshToken() {
         User user = new User("silvia@example.com", "old-hashed", Role.USER);
@@ -138,6 +174,10 @@ class UserServiceTest {
         verify(repository).save(user);
     }
 
+    /**
+     * CP-USR.10: changePassword_wrongCurrentPassword_throwsInvalidCredentialsException
+     * Asegura que el cambio de contraseña falle si la contraseña actual no coincide.
+     */
     @Test
     void changePassword_wrongCurrentPassword_throwsInvalidCredentialsException() {
         User user = new User("silvia@example.com", "old-hashed", Role.USER);

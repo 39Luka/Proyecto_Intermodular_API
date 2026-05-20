@@ -31,12 +31,20 @@ class CategoryControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
+    /**
+     * CP-CAT.01: testGetAllCategoriesSuccess
+     * Verifica que el listado de categorías sea accesible de forma pública y devuelva un estado 200.
+     */
     @Test
     void testGetAllCategoriesSuccess() throws Exception {
         mockMvc.perform(get("/categories").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
+    /**
+     * CP-CAT.02: testCreateCategorySuccess
+     * Valida que un usuario con rol ADMIN pueda crear una nueva categoría correctamente.
+     */
     @Test
     void testCreateCategorySuccess() throws Exception {
         CategoryRequest request = new CategoryRequest(uniqueName("Bread"));
@@ -50,6 +58,10 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.name").value(request.name()));
     }
 
+    /**
+     * CP-CAT.03: testCreateCategoryForbiddenForUserRole
+     * Asegura que un usuario con rol USER no tenga permisos para crear categorías (Error 403).
+     */
     @Test
     void testCreateCategoryForbiddenForUserRole() throws Exception {
         CategoryRequest request = new CategoryRequest(uniqueName("Bread"));
@@ -62,6 +74,10 @@ class CategoryControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /**
+     * CP-CAT.04: testCreateCategoryUnauthorized
+     * Verifica que no se permita la creación de categorías sin un token de autenticación válido (Error 401).
+     */
     @Test
     void testCreateCategoryUnauthorized() throws Exception {
         CategoryRequest request = new CategoryRequest(uniqueName("Bread"));
@@ -72,6 +88,10 @@ class CategoryControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    /**
+     * CP-CAT.05: testUpdateCategorySuccess
+     * Valida que un administrador pueda actualizar el nombre de una categoría existente.
+     */
     @Test
     void testUpdateCategorySuccess() throws Exception {
         CategoryResponse created = createCategory(uniqueName("Donuts"));
@@ -86,6 +106,10 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.name").value(updateRequest.name()));
     }
 
+    /**
+     * CP-CAT.06: testGetCategoryByIdNotFound
+     * Verifica que el sistema responda con 404 al buscar una categoría con un ID inexistente.
+     */
     @Test
     void testGetCategoryByIdNotFound() throws Exception {
         mockMvc.perform(get("/categories/99999").contentType(MediaType.APPLICATION_JSON))

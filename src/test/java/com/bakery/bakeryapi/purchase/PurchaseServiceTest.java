@@ -82,6 +82,10 @@ class PurchaseServiceTest {
         SecurityContextHolder.clearContext();
     }
 
+    /**
+     * CP-PUR.01: create_withoutItems_throws
+     * Asegura que no se permita crear una compra si el carrito está vacío (Error 400).
+     */
     @Test
     void create_withoutItems_throws() {
         setAuth(Role.USER, "user@example.com");
@@ -89,6 +93,10 @@ class PurchaseServiceTest {
         assertThrows(InvalidPurchaseException.class, () -> service.create(request));
     }
 
+    /**
+     * CP-PUR.02: create_asUser_forAnotherUser_throwsForbidden
+     * Valida la seguridad de la compra: un usuario no puede crear pedidos a nombre de otro usuario.
+     */
     @Test
     void create_asUser_forAnotherUser_throwsForbidden() {
         setAuth(Role.USER, "user@example.com");
@@ -100,6 +108,10 @@ class PurchaseServiceTest {
         verify(userService, never()).getEntityById(any());
     }
 
+    /**
+     * CP-PUR.03: create_asAdmin_forAnotherUser_loadsUserById
+     * Verifica que un administrador tenga permisos para crear compras en nombre de cualquier usuario del sistema.
+     */
     @Test
     void create_asAdmin_forAnotherUser_loadsUserById() {
         setAuth(Role.ADMIN, "admin@example.com");
@@ -119,6 +131,10 @@ class PurchaseServiceTest {
         verify(userService).getEntityById(2L);
     }
 
+    /**
+     * CP-PUR.04: cancel_whenPaid_throws
+     * Valida que una compra ya pagada no pueda ser cancelada, protegiendo el flujo de ingresos.
+     */
     @Test
     void cancel_whenPaid_throws() {
         setAuth(Role.USER, "user@example.com");
@@ -133,6 +149,10 @@ class PurchaseServiceTest {
         assertThrows(InvalidPurchaseException.class, () -> service.cancel(10L));
     }
 
+    /**
+     * CP-PUR.05: cancel_created_restoresStock_andReleasesPromotionUsage
+     * Verifica que al cancelar una compra pendiente, se devuelva el stock a los productos y se liberen los usos de promociones.
+     */
     @Test
     void cancel_created_restoresStock_andReleasesPromotionUsage() {
         setAuth(Role.USER, "user@example.com");

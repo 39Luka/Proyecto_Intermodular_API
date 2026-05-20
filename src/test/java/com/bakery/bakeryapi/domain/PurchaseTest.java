@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PurchaseTest {
 
+    /**
+     * CP-DOM.07: addItem_accumulatesTotal
+     * Valida que al añadir items a una compra, el total de la misma se recalcule y acumule correctamente.
+     */
     @Test
     void addItem_accumulatesTotal() {
         User user = new User("u@example.com", "pass", Role.USER);

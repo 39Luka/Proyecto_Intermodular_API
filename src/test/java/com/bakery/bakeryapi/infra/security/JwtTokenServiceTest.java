@@ -19,6 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class JwtTokenServiceTest {
 
+    /**
+     * CP-SEC.02: generateToken_includesSubjectRoleAndExpiry
+     * Valida que el servicio JWT genere tokens que incluyan correctamente el email del usuario, su rol y la fecha de expiración.
+     */
     @Test
     void generateToken_includesSubjectRoleAndExpiry() {
         String secret = "0123456789abcdef0123456789abcdef";

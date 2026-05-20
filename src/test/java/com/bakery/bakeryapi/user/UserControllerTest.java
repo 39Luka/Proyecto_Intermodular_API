@@ -45,6 +45,10 @@ class UserControllerTest {
         objectMapper = new ObjectMapper();
     }
 
+    /**
+     * CP-USR.11: getUser_existingId_returnsUser
+     * Valida que un administrador pueda consultar el perfil de cualquier usuario por su ID.
+     */
     @Test
     void getUser_existingId_returnsUser() throws Exception {
         UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true, null);
@@ -58,6 +62,10 @@ class UserControllerTest {
         verify(userService).getById(1L);
     }
 
+    /**
+     * CP-USR.12: getByEmail_existingEmail_returnsUser
+     * Verifica la búsqueda de usuarios por su correo electrónico único.
+     */
     @Test
     void getByEmail_existingEmail_returnsUser() throws Exception {
         UserResponse user = new UserResponse(1L, "test@example.com", Role.USER, true, null);
@@ -72,6 +80,10 @@ class UserControllerTest {
         verify(userService).getByEmail("test@example.com");
     }
 
+    /**
+     * CP-USR.13: createUser_validRequest_createsUser
+     * Valida que un administrador pueda crear manualmente un nuevo usuario con un rol específico.
+     */
     @Test
     void createUser_validRequest_createsUser() throws Exception {
         UserRequest request = new UserRequest("new@example.com", "password123", Role.USER);
@@ -89,6 +101,10 @@ class UserControllerTest {
         verify(userService).create(request);
     }
 
+    /**
+     * CP-USR.14: disableUser_callsService
+     * Verifica que el endpoint de actualización de estado llame correctamente al servicio para desactivar un usuario.
+     */
     @Test
     void disableUser_callsService() throws Exception {
         mockMvc.perform(patch("/users/1")
@@ -99,6 +115,10 @@ class UserControllerTest {
         verify(userService).setEnabled(1L, false);
     }
 
+    /**
+     * CP-USR.15: enableUser_callsService
+     * Verifica que el endpoint de actualización de estado llame correctamente al servicio para activar un usuario.
+     */
     @Test
     void enableUser_callsService() throws Exception {
         mockMvc.perform(patch("/users/1")
@@ -109,6 +129,10 @@ class UserControllerTest {
         verify(userService).setEnabled(1L, true);
     }
 
+    /**
+     * CP-USR.16: getUser_nonExistingId_returnsNotFound
+     * Asegura que el controlador devuelva 404 si el usuario solicitado por ID no existe.
+     */
     @Test
     void getUser_nonExistingId_returnsNotFound() throws Exception {
         when(userService.getById(999L)).thenThrow(new UserNotFoundException(999L));
@@ -119,6 +143,10 @@ class UserControllerTest {
         verify(userService).getById(999L);
     }
 
+    /**
+     * CP-USR.17: getByEmail_nonExistingEmail_returnsNotFound
+     * Asegura que el controlador devuelva 404 si el usuario solicitado por email no existe.
+     */
     @Test
     void getByEmail_nonExistingEmail_returnsNotFound() throws Exception {
         when(userService.getByEmail("missing@example.com"))
@@ -131,6 +159,10 @@ class UserControllerTest {
         verify(userService).getByEmail("missing@example.com");
     }
 
+    /**
+     * CP-USR.18: createUser_existingEmail_returnsConflict
+     * Valida que se devuelva un error 409 si un administrador intenta crear un usuario con un email ya registrado.
+     */
     @Test
     void createUser_existingEmail_returnsConflict() throws Exception {
         UserRequest request = new UserRequest("existing@example.com", "password123", Role.USER);
@@ -145,6 +177,10 @@ class UserControllerTest {
         verify(userService).create(request);
     }
 
+    /**
+     * CP-USR.19: createUser_invalidRequest_returnsBadRequest
+     * Verifica que el controlador valide los datos de entrada al crear un usuario (campos obligatorios).
+     */
     @Test
     void createUser_invalidRequest_returnsBadRequest() throws Exception {
         UserRequest invalidRequest = new UserRequest("", null, null);

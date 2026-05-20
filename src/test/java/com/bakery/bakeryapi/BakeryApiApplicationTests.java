@@ -8,6 +8,10 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class BakeryApiApplicationTests {
 
+    /**
+     * CP-SYS.01: contextLoads
+     * Prueba de humo: Verifica que el contexto de Spring Boot se cargue correctamente con todas sus dependencias y configuraciones.
+     */
     @Test
     void contextLoads() {
     }

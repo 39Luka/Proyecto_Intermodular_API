@@ -25,6 +25,10 @@ class AuthRateLimitIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * CP-INT.05: authEndpoints_areRateLimitedPerIp
+     * Valida la protección contra ataques de fuerza bruta: tras varios intentos fallidos desde la misma IP, se bloquean las peticiones temporalmente (Error 429).
+     */
     @Test
     void authEndpoints_areRateLimitedPerIp() throws Exception {
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(context)

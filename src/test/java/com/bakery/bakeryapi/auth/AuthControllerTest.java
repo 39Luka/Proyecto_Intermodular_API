@@ -59,6 +59,10 @@ class AuthControllerTest {
         SecurityContextHolder.clearContext();
     }
 
+    /**
+     * CP-AUT.01: login_validRequest_returnsToken
+     * Valida que un login con credenciales correctas devuelva un token JWT y los datos de expiración.
+     */
     @Test
     void login_validRequest_returnsToken() throws Exception {
         LoginRequest request = new LoginRequest("user@example.com", "password123");
@@ -75,6 +79,10 @@ class AuthControllerTest {
         verify(authService).login(eq(request.email()), eq(request.password()));
     }
 
+    /**
+     * CP-AUT.02: login_invalidRequest_returnsBadRequest
+     * Verifica que si los campos del login están vacíos o son nulos, la API responda con error 400.
+     */
     @Test
     void login_invalidRequest_returnsBadRequest() throws Exception {
         LoginRequest invalidRequest = new LoginRequest("", null);
@@ -85,6 +93,10 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * CP-AUT.03: register_validRequest_returnsCreatedToken
+     * Valida el registro exitoso de un nuevo usuario y la generación inmediata de su token de acceso.
+     */
     @Test
     void register_validRequest_returnsCreatedToken() throws Exception {
         RegisterRequest request = new RegisterRequest("new@example.com", "pass12345");
@@ -102,6 +114,10 @@ class AuthControllerTest {
         verify(authService).register(eq(request.email()), eq(request.password()));
     }
 
+    /**
+     * CP-AUT.04: register_existingEmail_returnsConflict
+     * Asegura que el sistema no permita registrar dos cuentas con el mismo correo electrónico (Error 409).
+     */
     @Test
     void register_existingEmail_returnsConflict() throws Exception {
         RegisterRequest request = new RegisterRequest("existing@example.com", "pass12345");
@@ -117,6 +133,10 @@ class AuthControllerTest {
         verify(authService).register(eq(request.email()), eq(request.password()));
     }
 
+    /**
+     * CP-AUT.05: register_invalidRequest_returnsBadRequest
+     * Verifica la validación de campos obligatorios en el registro de usuarios.
+     */
     @Test
     void register_invalidRequest_returnsBadRequest() throws Exception {
         RegisterRequest invalidRequest = new RegisterRequest("", null);
@@ -127,6 +147,10 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * CP-AUT.06: getMe_authenticated_returnsCurrentUser
+     * Valida que el endpoint /me devuelva la información del usuario actualmente autenticado basado en su token.
+     */
     @Test
     void getMe_authenticated_returnsCurrentUser() throws Exception {
         setAuth("user@example.com");

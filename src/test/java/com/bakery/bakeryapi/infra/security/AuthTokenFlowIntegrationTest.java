@@ -75,12 +75,20 @@ class AuthTokenFlowIntegrationTest {
                 .build();
     }
 
+    /**
+     * CP-INT.01: apiDocs_isPublic
+     * Verifica que la documentación de la API (Swagger UI) sea accesible de forma pública sin necesidad de token.
+     */
     @Test
     void apiDocs_isPublic() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk());
     }
 
+    /**
+     * CP-INT.02: user_can_login_get_token_and_filter_active_promotions_for_self
+     * Valida el flujo completo: Registro -> Login -> Obtención de Token -> Consulta de promociones propias.
+     */
     @Test
     void user_can_login_get_token_and_filter_active_promotions_for_self() throws Exception {
         String email = "user+" + UUID.randomUUID() + "@example.com";
@@ -104,6 +112,10 @@ class AuthTokenFlowIntegrationTest {
                 .andExpect(jsonPath("$.content.length()").value(1));
     }
 
+    /**
+     * CP-INT.03: user_token_cannot_filter_active_promotions_for_other_user
+     * Prueba de integración de seguridad: un token de usuario no debe poder acceder a datos privados de otro usuario.
+     */
     @Test
     void user_token_cannot_filter_active_promotions_for_other_user() throws Exception {
         String email = "user+" + UUID.randomUUID() + "@example.com";
@@ -127,6 +139,10 @@ class AuthTokenFlowIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+    /**
+     * CP-INT.04: refresh_rotates_token_and_rejects_old_refresh_token
+     * Valida la integración de la rotación de Refresh Tokens: un token antiguo debe ser invalidado inmediatamente tras su uso.
+     */
     @Test
     void refresh_rotates_token_and_rejects_old_refresh_token() throws Exception {
         String email = "user+" + UUID.randomUUID() + "@example.com";

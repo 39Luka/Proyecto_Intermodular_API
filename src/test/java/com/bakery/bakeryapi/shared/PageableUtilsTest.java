@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PageableUtilsTest {
 
+    /**
+     * CP-SHR.01: safe_capsPageSizeTo100
+     * Verifica que la utilidad de paginación limite cualquier solicitud de tamaño de página superior a 100 por seguridad.
+     */
     @Test
     void safe_capsPageSizeTo100() {
         PageRequest request = PageRequest.of(0, 1000);
@@ -14,6 +18,10 @@ class PageableUtilsTest {
         assertEquals(100, safe.getPageSize());
     }
 
+    /**
+     * CP-SHR.02: safe_keepsValidSmallPageSize
+     * Valida que los tamaños de página pequeños y válidos se mantengan sin cambios.
+     */
     @Test
     void safe_keepsValidSmallPageSize() {
         PageRequest request = PageRequest.of(0, 1);
